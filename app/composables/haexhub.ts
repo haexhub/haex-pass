@@ -66,6 +66,7 @@ export const useHaexHub = () => {
     extensionInfo: readonly(extensionInfoRef),
     context: readonly(contextRef),
     db: clientInstance.db,
+    storage: clientInstance.storage,
     getTableName,
   };
 };

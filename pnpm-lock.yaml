@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@haexhub/sdk':
-        specifier: 0.1.15
-        version: 0.1.15
+        specifier: 0.1.16
+        version: 0.1.16
       '@nuxt/eslint':
         specifier: 1.9.0
         version: 1.9.0(@typescript-eslint/utils@8.46.0(eslint@9.37.0(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.22)(eslint@9.37.0(jiti@2.6.1))(magicast@0.3.5)(typescript@5.9.3)(vite@7.1.9(jiti@2.6.1)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))
@@ -466,8 +466,8 @@ packages:
   '@floating-ui/vue@1.1.9':
     resolution: {integrity: sha512-BfNqNW6KA83Nexspgb9DZuz578R7HT8MZw1CfK9I6Ah4QReNWEJsXWHN+SdmOVLNGmTPDi+fDT535Df5PzMLbQ==}
 
-  '@haexhub/sdk@0.1.15':
-    resolution: {integrity: sha512-M2SmMMBNfY5YO3VPW/haqnP9fV9FwQVfa+yLpkHSfhsemJjRmtX5RBsN7VhN6oSOj50xuiRlGYXfEXZ/v8otcA==}
+  '@haexhub/sdk@0.1.16':
+    resolution: {integrity: sha512-9q2pEHde/Gd1iUoaabsorIcvxy2HzS9LsI7ZsllD+0eKyOJISfWOW+nrCAXPDntOeHmK9ugaCWeOUpjN7soJOg==}
     hasBin: true
 
   '@humanfs/core@0.19.1':
@@ -5349,7 +5349,7 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@haexhub/sdk@0.1.15':
+  '@haexhub/sdk@0.1.16':
     dependencies:
       archiver: 7.0.1
       commander: 14.0.1

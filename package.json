@@ -12,7 +12,7 @@
     "build:release": "pnpm build && pnpm package"
   },
   "dependencies": {
-    "@haexhub/sdk": "0.1.15",
+    "@haexhub/sdk": "0.1.16",
     "@nuxt/eslint": "1.9.0",
     "@nuxt/ui": "4.0.0",
     "@nuxtjs/i18n": "^10.1.0",
