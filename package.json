@@ -1,0 +1,28 @@
+{
+  "name": "nuxt-app",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build --preset static",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "package": "haexhub sign dist -k private.key",
+    "build:release": "pnpm build && pnpm package"
+  },
+  "dependencies": {
+    "@haexhub/sdk": "0.1.15",
+    "@nuxt/eslint": "1.9.0",
+    "@nuxt/ui": "4.0.0",
+    "@nuxtjs/i18n": "^10.1.0",
+    "@pinia/nuxt": "^0.11.2",
+    "@tailwindcss/vite": "^4.1.14",
+    "eslint": "^9.37.0",
+    "nuxt": "^4.1.3",
+    "tailwindcss": "^4.1.14",
+    "typescript": "^5.9.3",
+    "vue": "^3.5.22",
+    "vue-router": "^4.5.1"
+  }
+}
