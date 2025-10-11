@@ -3,7 +3,13 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "@nuxt/ui", "@nuxtjs/i18n", "@pinia/nuxt"],
+  modules: [
+    "@nuxt/eslint",
+    "@nuxt/ui",
+    "@nuxtjs/i18n",
+    "@pinia/nuxt",
+    "@haexhub/sdk/nuxt", // HaexHub SDK with automatic polyfill injection
+  ],
   css: ["~/assets/css/main.css"],
   ssr: false,
   app: {
@@ -19,6 +25,24 @@ export default defineNuxtConfig({
       "types/**",
     ],
   },
+
+  i18n: {
+    strategy: "prefix_and_default",
+    defaultLocale: "de",
+
+    locales: [
+      { code: "de", language: "de-DE", isCatchallLocale: true },
+      { code: "en", language: "en-EN" },
+    ],
+
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: "i18n_redirected",
+      redirectOn: "root", // recommended
+    },
+    types: "composition",
+  },
+
   // Use static generation
   /* nitro: {
     preset: "static",

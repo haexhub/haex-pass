@@ -5,7 +5,7 @@
   "author": "HaexHub",
   "url": "https://github.com/haexhub/haex-pass",
   "entry": "index.html",
-  "icon": "icon.svg",
+  "icon": "",
   "permissions": {
     "database": [
       {

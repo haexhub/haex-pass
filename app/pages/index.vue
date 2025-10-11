@@ -5,6 +5,11 @@
       Database Test Extension
     </h1>
 
+    <div>
+      <NuxtLink to="/test">Test</NuxtLink>
+      <NuxtLink to="/about">About</NuxtLink>
+    </div>
+
     <!-- Extension Info -->
     <div class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
       <h2 class="text-xl font-semibold mb-4 text-green-400">Extension Info</h2>
