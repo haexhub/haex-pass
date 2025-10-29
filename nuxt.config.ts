@@ -2,19 +2,16 @@
 
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
-  devtools: { enabled: true },
+  devtools: { enabled: false }, // Disabled because DevTools don't work in sandboxed iframes
   modules: [
     "@nuxt/eslint",
     "@nuxt/ui",
     "@nuxtjs/i18n",
     "@pinia/nuxt",
-    "@haexhub/sdk/nuxt", // HaexHub SDK with automatic polyfill injection
+    "@haexhub/sdk/nuxt", // HaexHub SDK with automatic polyfill injection and baseURL configuration
   ],
   css: ["~/assets/css/main.css"],
   ssr: false,
-  app: {
-    baseURL: "./", // Relative paths
-  },
 
   imports: {
     dirs: [

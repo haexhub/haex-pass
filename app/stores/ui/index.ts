@@ -30,17 +30,6 @@ export const useUiStore = defineStore("uiStore", () => {
       label: $i18n.t("ui.light"),
       icon: "line-md:moon-to-sunny-outline-loop-transition",
     },
-    /*     {
-      value: 'soft',
-      label: t('ui.soft'),
-      icon: 'line-md:paint-drop',
-    },
-
-    {
-      value: 'corporate',
-      label: t('ui.corporate'),
-      icon: 'hugeicons:corporate',
-    }, */
   ]);
 
   const defaultTheme = ref("dark");
@@ -57,13 +46,14 @@ export const useUiStore = defineStore("uiStore", () => {
   const colorMode = useColorMode();
 
   watchImmediate(currentThemeName, () => {
-    console.log("set colorMode", currentThemeName.value);
     colorMode.preference = currentThemeName.value;
   });
 
+  const context = ref();
+
   return {
     availableThemes,
-    //currentScreenSize,
+    context,
     currentTheme,
     currentThemeName,
     defaultTheme,

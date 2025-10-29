@@ -25,3 +25,6 @@ logs
 
 private.key
 .claude
+# HaexHub Extension
+./haextension/private.key
+*.haextension

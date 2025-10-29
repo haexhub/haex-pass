@@ -1,5 +1,5 @@
-import { computedAsync } from "@vueuse/core";
-import { eq, isNull } from "drizzle-orm";
+import { eq, isNull } from 'drizzle-orm'
+import { db } from '~/database'
 import {
   haexPasswordsGroupItems,
   haexPasswordsItemDetails,
@@ -11,39 +11,63 @@ import {
   type SelectHaexPasswordsGroups,
   type SelectHaexPasswordsItemDetails,
   type SelectHaexPasswordsItemKeyValues,
-} from "~/database/schemas";
-import { getSingleRouteParam } from "~/utils/helper";
+} from '~/database/schemas'
+import { getSingleRouteParam } from '~/utils/helper'
 
-export const usePasswordItemStore = defineStore("passwordItemStore", () => {
+export const usePasswordItemStore = defineStore('passwordItemStore', () => {
   const currentItemId = computed({
     get: () =>
       getSingleRouteParam(useRouter().currentRoute.value.params.itemId),
     set: (entryId) => {
-      console.log("set entryId", entryId);
-      useRouter().currentRoute.value.params.entryId = entryId ?? "";
+      console.log('set entryId', entryId)
+      useRouter().currentRoute.value.params.entryId = entryId ?? ''
     },
-  });
+  })
 
-  const currentItem = computedAsync(() => readAsync(currentItemId.value));
+  const currentItem = ref<{
+    details: SelectHaexPasswordsItemDetails
+    history: any[]
+    keyValues: SelectHaexPasswordsItemKeyValues[]
+  } | null>(null)
+
+  // Watch currentItemId and update currentItem
+  watch(
+    currentItemId,
+    async (newId) => {
+      if (newId) {
+        currentItem.value = await readAsync(newId)
+      } else {
+        currentItem.value = null
+      }
+    },
+    { immediate: true }
+  )
 
   const items = ref<
     {
-      haex_passwords_item_details: SelectHaexPasswordsItemDetails;
-      haex_passwords_group_items: SelectHaexPasswordsGroupItems;
+      haex_passwords_item_details: SelectHaexPasswordsItemDetails
+      haex_passwords_group_items: SelectHaexPasswordsGroupItems
     }[]
-  >([]);
+  >([])
 
   const syncItemsAsync = async () => {
-    const { currentVault } = useVaultStore();
-    items.value =
-      (await currentVault?.drizzle
-        .select()
-        .from(haexPasswordsItemDetails)
-        .innerJoin(
-          haexPasswordsGroupItems,
-          eq(haexPasswordsItemDetails.id, haexPasswordsGroupItems.itemId)
-        )) ?? [];
-  };
+    const haexhub = useHaexHub()
+    const query = db
+      .select()
+      .from(haexPasswordsItemDetails)
+      .innerJoin(
+        haexPasswordsGroupItems,
+        eq(haexPasswordsItemDetails.id, haexPasswordsGroupItems.itemId)
+      )
+      .toSQL()
+
+    const result = await haexhub.db.query<{
+      haex_passwords_item_details: SelectHaexPasswordsItemDetails
+      haex_passwords_group_items: SelectHaexPasswordsGroupItems
+    }>(query.sql, query.params)
+
+    items.value = result ?? []
+  }
 
   return {
     currentItemId,
@@ -59,16 +83,16 @@ export const usePasswordItemStore = defineStore("passwordItemStore", () => {
     readKeyValuesAsync,
     syncItemsAsync,
     updateAsync,
-  };
-});
+  }
+})
 
 const addAsync = async (
   details: SelectHaexPasswordsItemDetails,
   keyValues: SelectHaexPasswordsItemKeyValues[],
   group?: SelectHaexPasswordsGroups | null
 ) => {
-  const { currentVault } = useVaultStore();
-  console.log("addItem", details, group);
+  const haexhub = useHaexHub()
+  console.log('addItem', details, group)
 
   const newDetails: InsertHaexPasswordsItemDetails = {
     id: crypto.randomUUID(),
@@ -79,7 +103,7 @@ const addAsync = async (
     title: details.title,
     url: details.url,
     username: details.username,
-  };
+  }
 
   const newKeyValues: InserthaexPasswordsItemKeyValues[] = keyValues.map(
     (keyValue) => ({
@@ -88,52 +112,74 @@ const addAsync = async (
       key: keyValue.key,
       value: keyValue.value,
     })
-  );
+  )
 
   try {
-    await currentVault?.drizzle.transaction(async (tx) => {
-      await tx.insert(haexPasswordsItemDetails).values(newDetails);
+    // Insert item details
+    const insertDetailsQuery = db
+      .insert(haexPasswordsItemDetails)
+      .values(newDetails)
+      .toSQL()
+    await haexhub.db.execute(insertDetailsQuery.sql, insertDetailsQuery.params)
 
-      await tx
-        .insert(haexPasswordsGroupItems)
-        .values({ itemId: newDetails.id, groupId: group?.id ?? null });
+    // Insert group item relation
+    const insertGroupItemQuery = db
+      .insert(haexPasswordsGroupItems)
+      .values({ itemId: newDetails.id, groupId: group?.id ?? null })
+      .toSQL()
+    await haexhub.db.execute(
+      insertGroupItemQuery.sql,
+      insertGroupItemQuery.params
+    )
 
-      if (newKeyValues.length)
-        await tx.insert(haexPasswordsItemKeyValues).values(newKeyValues);
-    });
+    // Insert key values if any
+    if (newKeyValues.length) {
+      const insertKeyValuesQuery = db
+        .insert(haexPasswordsItemKeyValues)
+        .values(newKeyValues)
+        .toSQL()
+      await haexhub.db.execute(
+        insertKeyValuesQuery.sql,
+        insertKeyValuesQuery.params
+      )
+    }
   } catch (error) {
-    console.error("ERROR addItem", error);
+    console.error('ERROR addItem', error)
   }
 
-  return newDetails.id;
-};
+  return newDetails.id
+}
 
 const addKeyValueAsync = async (
   item?: InserthaexPasswordsItemKeyValues | null,
   itemId?: string
 ) => {
+  const haexhub = useHaexHub()
+
   const newKeyValue: InserthaexPasswordsItemKeyValues = {
     id: crypto.randomUUID(),
     itemId: item?.itemId || itemId,
     key: item?.key,
     value: item?.value,
-  };
-  try {
-    const { currentVault } = useVaultStore();
-    return await currentVault?.drizzle
-      .insert(haexPasswordsItemKeyValues)
-      .values(newKeyValue);
-  } catch (error) {
-    console.error("ERROR addItem", error);
   }
-};
+
+  try {
+    const query = db
+      .insert(haexPasswordsItemKeyValues)
+      .values(newKeyValue)
+      .toSQL()
+    return await haexhub.db.execute(query.sql, query.params)
+  } catch (error) {
+    console.error('ERROR addItem', error)
+  }
+}
 
 const addKeyValuesAsync = async (
   items: InserthaexPasswordsItemKeyValues[],
   itemId?: string
 ) => {
-  const { currentVault } = useVaultStore();
-  console.log("addKeyValues", items, itemId);
+  const haexhub = useHaexHub()
+  console.log('addKeyValues', items, itemId)
 
   const newKeyValues: InserthaexPasswordsItemKeyValues[] = items?.map(
     (item) => ({
@@ -142,90 +188,111 @@ const addKeyValuesAsync = async (
       key: item.key,
       value: item.value,
     })
-  );
+  )
 
   try {
-    return await currentVault?.drizzle
+    const query = db
       .insert(haexPasswordsItemKeyValues)
-      .values(newKeyValues);
+      .values(newKeyValues)
+      .toSQL()
+    return await haexhub.db.execute(query.sql, query.params)
   } catch (error) {
-    console.error("ERROR addItem", error);
+    console.error('ERROR addItem', error)
   }
-};
+}
 
 const readByGroupIdAsync = async (groupId?: string | null) => {
   try {
-    const { currentVault } = useVaultStore();
+    const haexhub = useHaexHub()
 
-    console.log("get entries by groupId", groupId || null);
+    console.log('get entries by groupId', groupId || null)
 
+    let query
     if (groupId) {
-      const entries = await currentVault?.drizzle
+      query = db
         .select()
         .from(haexPasswordsGroupItems)
         .innerJoin(
           haexPasswordsItemDetails,
           eq(haexPasswordsItemDetails.id, haexPasswordsGroupItems.itemId)
         )
-        .where(eq(haexPasswordsGroupItems.groupId, groupId));
-
-      console.log("found entries by groupId", entries);
-      return entries?.map((entry) => entry.haex_passwords_item_details);
+        .where(eq(haexPasswordsGroupItems.groupId, groupId))
+        .toSQL()
     } else {
-      const entries = await currentVault?.drizzle
+      query = db
         .select()
         .from(haexPasswordsGroupItems)
         .innerJoin(
           haexPasswordsItemDetails,
           eq(haexPasswordsItemDetails.id, haexPasswordsGroupItems.itemId)
         )
-        .where(isNull(haexPasswordsGroupItems.groupId));
-
-      console.log("found entries", entries);
-      return entries?.map((entry) => entry.haex_passwords_item_details);
+        .where(isNull(haexPasswordsGroupItems.groupId))
+        .toSQL()
     }
+
+    const entries = await haexhub.db.query<{
+      haex_passwords_item_details: SelectHaexPasswordsItemDetails
+      haex_passwords_group_items: SelectHaexPasswordsGroupItems
+    }>(query.sql, query.params)
+
+    console.log('found entries by groupId', entries)
+    return entries?.map((entry) => entry.haex_passwords_item_details)
   } catch (error) {
-    console.error(error);
-    return [];
+    console.error(error)
+    return []
   }
-};
+}
 
 const readAsync = async (itemId: string | null) => {
-  if (!itemId) return null;
+  if (!itemId) return null
 
   try {
-    const { currentVault } = useVaultStore();
+    const haexhub = useHaexHub()
 
-    const details =
-      await currentVault?.drizzle.query.haexPasswordsItemDetails.findFirst({
-        where: eq(haexPasswordsItemDetails.id, itemId),
-      });
+    const query = db
+      .select()
+      .from(haexPasswordsItemDetails)
+      .where(eq(haexPasswordsItemDetails.id, itemId))
+      .limit(1)
+      .toSQL()
 
-    console.log("readAsync details", details);
+    const result = await haexhub.db.query<SelectHaexPasswordsItemDetails>(
+      query.sql,
+      query.params
+    )
+    const details = result[0] || null
 
-    if (!details) return null;
+    console.log('readAsync details', details)
 
-    const history = (await usePasswordHistoryStore().getAsync(itemId)) ?? [];
-    const keyValues = (await readKeyValuesAsync(itemId)) ?? [];
+    if (!details) return null
 
-    console.log("found item by id", { details, history, keyValues });
-    return { details, history, keyValues };
+    const history = (await usePasswordHistoryStore().getAsync(itemId)) ?? []
+    const keyValues = (await readKeyValuesAsync(itemId)) ?? []
+
+    console.log('found item by id', { details, history, keyValues })
+    return { details, history, keyValues }
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.error(error)
+    throw error
   }
-};
+}
 
 const readKeyValuesAsync = async (itemId: string | null) => {
-  if (!itemId) return null;
-  const { currentVault } = useVaultStore();
+  if (!itemId) return null
+  const haexhub = useHaexHub()
 
-  const keyValues =
-    await currentVault?.drizzle.query.haexPasswordsItemKeyValues.findMany({
-      where: eq(haexPasswordsGroupItems.itemId, itemId),
-    });
-  return keyValues;
-};
+  const query = db
+    .select()
+    .from(haexPasswordsItemKeyValues)
+    .where(eq(haexPasswordsItemKeyValues.itemId, itemId))
+    .toSQL()
+
+  const keyValues = await haexhub.db.query<SelectHaexPasswordsItemKeyValues>(
+    query.sql,
+    query.params
+  )
+  return keyValues
+}
 
 const updateAsync = async ({
   details,
@@ -234,15 +301,15 @@ const updateAsync = async ({
   keyValuesDelete,
   groupId,
 }: {
-  details: SelectHaexPasswordsItemDetails;
-  keyValues: SelectHaexPasswordsItemKeyValues[];
-  keyValuesAdd: SelectHaexPasswordsItemKeyValues[];
-  keyValuesDelete: SelectHaexPasswordsItemKeyValues[];
-  groupId: string | null;
+  details: SelectHaexPasswordsItemDetails
+  keyValues: SelectHaexPasswordsItemKeyValues[]
+  keyValuesAdd: SelectHaexPasswordsItemKeyValues[]
+  keyValuesDelete: SelectHaexPasswordsItemKeyValues[]
+  groupId: string | null
 }) => {
-  const { currentVault } = useVaultStore();
+  const haexhub = useHaexHub()
 
-  if (!details.id) return;
+  if (!details.id) return
 
   const newDetails: InsertHaexPasswordsItemDetails = {
     id: details.id,
@@ -253,7 +320,7 @@ const updateAsync = async ({
     title: details.title,
     url: details.url,
     username: details.username,
-  };
+  }
 
   const newKeyValues: InserthaexPasswordsItemKeyValues[] = keyValues
     .map((keyValue) => ({
@@ -262,7 +329,7 @@ const updateAsync = async ({
       key: keyValue.key,
       value: keyValue.value,
     }))
-    .filter((keyValue) => keyValue.id);
+    .filter((keyValue) => keyValue.id)
 
   const newKeyValuesAdd: InserthaexPasswordsItemKeyValues[] = keyValuesAdd.map(
     (keyValue) => ({
@@ -271,100 +338,145 @@ const updateAsync = async ({
       key: keyValue.key,
       value: keyValue.value,
     })
-  );
+  )
 
   console.log(
-    "update item",
+    'update item',
     newDetails,
     newKeyValues,
     newKeyValuesAdd,
     groupId
-  );
+  )
 
-  return await currentVault?.drizzle.transaction(async (tx) => {
-    await tx
+  try {
+    // Update item details
+    const updateDetailsQuery = db
       .update(haexPasswordsItemDetails)
       .set(newDetails)
-      .where(eq(haexPasswordsItemDetails.id, newDetails.id));
+      .where(eq(haexPasswordsItemDetails.id, newDetails.id))
+      .toSQL()
+    await haexhub.db.execute(updateDetailsQuery.sql, updateDetailsQuery.params)
 
-    await tx
+    // Update group item relation
+    const updateGroupItemQuery = db
       .update(haexPasswordsGroupItems)
       .set({ itemId: newDetails.id, groupId })
-      .where(eq(haexPasswordsGroupItems.itemId, newDetails.id));
+      .where(eq(haexPasswordsGroupItems.itemId, newDetails.id))
+      .toSQL()
+    await haexhub.db.execute(
+      updateGroupItemQuery.sql,
+      updateGroupItemQuery.params
+    )
 
-    const promises = newKeyValues.map((keyValue) =>
-      tx
+    // Update existing key values
+    for (const keyValue of newKeyValues) {
+      const updateKeyValueQuery = db
         .update(haexPasswordsItemKeyValues)
         .set(keyValue)
         .where(eq(haexPasswordsItemKeyValues.id, keyValue.id))
-    );
+        .toSQL()
+      await haexhub.db.execute(
+        updateKeyValueQuery.sql,
+        updateKeyValueQuery.params
+      )
+    }
 
-    await Promise.all(promises);
+    // Add new key values
+    if (newKeyValuesAdd.length) {
+      const insertKeyValuesQuery = db
+        .insert(haexPasswordsItemKeyValues)
+        .values(newKeyValuesAdd)
+        .toSQL()
+      await haexhub.db.execute(
+        insertKeyValuesQuery.sql,
+        insertKeyValuesQuery.params
+      )
+    }
 
-    if (newKeyValuesAdd.length)
-      await tx.insert(haexPasswordsItemKeyValues).values(newKeyValuesAdd);
-
-    const promisesDelete = keyValuesDelete.map((keyValue) =>
-      tx
+    // Delete key values
+    for (const keyValue of keyValuesDelete) {
+      const deleteKeyValueQuery = db
         .delete(haexPasswordsItemKeyValues)
         .where(eq(haexPasswordsItemKeyValues.id, keyValue.id))
-    );
-    await Promise.all(promisesDelete);
+        .toSQL()
+      await haexhub.db.execute(
+        deleteKeyValueQuery.sql,
+        deleteKeyValueQuery.params
+      )
+    }
 
-    return newDetails.id;
-  });
-};
+    return newDetails.id
+  } catch (error) {
+    console.error('ERROR updateItem', error)
+    throw error
+  }
+}
 
 const deleteAsync = async (itemId: string, final: boolean = false) => {
-  const { currentVault } = useVaultStore();
-  const { createTrashIfNotExistsAsync, trashId } = usePasswordGroupStore();
+  const haexhub = useHaexHub()
+  const { createTrashIfNotExistsAsync, trashId } = usePasswordGroupStore()
 
-  console.log("deleteAsync", itemId, final);
-  if (final)
-    await currentVault?.drizzle.transaction(async (tx) => {
-      await tx
+  console.log('deleteAsync', itemId, final)
+
+  if (final) {
+    try {
+      // Delete key values
+      const deleteKeyValuesQuery = db
         .delete(haexPasswordsItemKeyValues)
-        .where(eq(haexPasswordsItemKeyValues.itemId, itemId));
-      await tx
+        .where(eq(haexPasswordsItemKeyValues.itemId, itemId))
+        .toSQL()
+      await haexhub.db.execute(
+        deleteKeyValuesQuery.sql,
+        deleteKeyValuesQuery.params
+      )
+
+      // Delete history
+      const deleteHistoryQuery = db
         .delete(haexPasswordsItemHistory)
-        .where(eq(haexPasswordsItemHistory.itemId, itemId));
-      await tx
+        .where(eq(haexPasswordsItemHistory.itemId, itemId))
+        .toSQL()
+      await haexhub.db.execute(deleteHistoryQuery.sql, deleteHistoryQuery.params)
+
+      // Delete group items
+      const deleteGroupItemsQuery = db
         .delete(haexPasswordsGroupItems)
-        .where(eq(haexPasswordsGroupItems.itemId, itemId));
-      await tx
+        .where(eq(haexPasswordsGroupItems.itemId, itemId))
+        .toSQL()
+      await haexhub.db.execute(
+        deleteGroupItemsQuery.sql,
+        deleteGroupItemsQuery.params
+      )
+
+      // Delete item details
+      const deleteDetailsQuery = db
         .delete(haexPasswordsItemDetails)
-        .where(eq(haexPasswordsItemDetails.id, itemId));
-    });
-  else {
-    if (await createTrashIfNotExistsAsync())
-      await currentVault?.drizzle
+        .where(eq(haexPasswordsItemDetails.id, itemId))
+        .toSQL()
+      await haexhub.db.execute(deleteDetailsQuery.sql, deleteDetailsQuery.params)
+    } catch (error) {
+      console.error('ERROR deleteItem', error)
+      throw error
+    }
+  } else {
+    if (await createTrashIfNotExistsAsync()) {
+      const updateQuery = db
         .update(haexPasswordsGroupItems)
         .set({ groupId: trashId })
-        .where(eq(haexPasswordsGroupItems.itemId, itemId));
+        .where(eq(haexPasswordsGroupItems.itemId, itemId))
+        .toSQL()
+      await haexhub.db.execute(updateQuery.sql, updateQuery.params)
+    }
   }
-};
+}
 
 const deleteKeyValueAsync = async (id: string) => {
-  console.log("deleteKeyValueAsync", id);
-  const { currentVault } = useVaultStore();
-  return await currentVault?.drizzle
+  console.log('deleteKeyValueAsync', id)
+  const haexhub = useHaexHub()
+
+  const query = db
     .delete(haexPasswordsItemKeyValues)
-    .where(eq(haexPasswordsItemKeyValues.id, id));
-};
+    .where(eq(haexPasswordsItemKeyValues.id, id))
+    .toSQL()
 
-/* const areItemsEqual = (
-  groupA: unknown | unknown[] | null,
-  groupB: unknown | unknown[] | null,
-) => {
-  if (groupA === null && groupB === null) return true
-
-  if (Array.isArray(groupA) && Array.isArray(groupB)) {
-    console.log('compare object arrays', groupA, groupB)
-    if (groupA.length === groupB.length) return true
-
-    return groupA.some((group, index) => {
-      return areObjectsEqual(group, groupA[index])
-    })
-  }
-  return areObjectsEqual(groupA, groupB)
-} */
+  return await haexhub.db.execute(query.sql, query.params)
+}

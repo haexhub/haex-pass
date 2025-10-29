@@ -2,13 +2,13 @@
   <div class="flex flex-1">
     <!-- <div class="h-screen bg-accented">aaa</div> -->
     <div class="flex flex-col flex-1">
-      <HaexPassGroupBreadcrumbs
+      <PassGroupBreadcrumbs
         v-show="breadCrumbs.length"
         :items="breadCrumbs"
         class="px-2 sticky -top-2 z-10"
       />
       <!-- <div class="flex-1 py-1 flex"> -->
-      <HaexPassMobileMenu
+      <PassMobileMenu
         ref="listRef"
         v-model:selected-items="selectedItems"
         :menu-items="groupItems"
@@ -20,10 +20,7 @@
       >
         <div class="w-full" />
 
-        <UDropdownMenu
-          v-model:open="open"
-          :items="menu"
-        >
+        <UDropdownMenu v-model:open="open" :items="menu">
           <UButton
             icon="mdi:plus"
             :ui="{
@@ -75,32 +72,32 @@
 </template>
 
 <script setup lang="ts">
-import type { IPasswordMenuItem } from '~/components/haex/pass/mobile/menu/types'
+import type { IPasswordMenuItem } from "~/components/pass/mobile/menu/types";
 //import { useMagicKeys, whenever } from '@vueuse/core'
-import Fuse from 'fuse.js'
+import Fuse from "fuse.js";
 
 definePageMeta({
-  name: 'passwordGroupItems',
-})
+  name: "passwordGroupItems",
+});
 
-const open = ref(false)
+const open = ref(false);
 
-const { t } = useI18n()
+const { t } = useI18n();
 
-const { add } = useToast()
+const { add } = useToast();
 
-const selectedItems = ref<Set<IPasswordMenuItem>>(new Set())
-const { menu } = storeToRefs(usePasswordsActionMenuStore())
+const selectedItems = ref<Set<IPasswordMenuItem>>(new Set());
+const { menu } = storeToRefs(usePasswordsActionMenuStore());
 
-const { syncItemsAsync } = usePasswordItemStore()
-const { syncGroupItemsAsync } = usePasswordGroupStore()
+const { syncItemsAsync } = usePasswordItemStore();
+const { syncGroupItemsAsync } = usePasswordGroupStore();
 onMounted(async () => {
   try {
-    await Promise.allSettled([syncItemsAsync(), syncGroupItemsAsync()])
+    await Promise.allSettled([syncItemsAsync(), syncGroupItemsAsync()]);
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-})
+});
 
 const {
   breadCrumbs,
@@ -108,32 +105,32 @@ const {
   inTrashGroup,
   selectedGroupItems,
   groups,
-} = storeToRefs(usePasswordGroupStore())
+} = storeToRefs(usePasswordGroupStore());
 
-const { items } = storeToRefs(usePasswordItemStore())
-const { search } = storeToRefs(useSearchStore())
+const { items } = storeToRefs(usePasswordItemStore());
+const { search } = storeToRefs(useSearchStore());
 
 const groupItems = computed<IPasswordMenuItem[]>(() => {
-  const menuItems: IPasswordMenuItem[] = []
+  const menuItems: IPasswordMenuItem[] = [];
   const filteredGroups = search.value
     ? new Fuse(groups.value, {
-        keys: ['name', 'description'],
+        keys: ["name", "description"],
         findAllMatches: true,
       })
         .search(search.value)
         .map((match) => match.item)
-    : groups.value.filter((group) => group.parentId == currentGroupId.value)
+    : groups.value.filter((group) => group.parentId == currentGroupId.value);
 
   const filteredItems = search.value
     ? new Fuse(items.value, {
-        keys: ['title', 'note', 'password', 'tags', 'url', 'username'],
+        keys: ["title", "note", "password", "tags", "url", "username"],
       })
         .search(search.value)
         .map((match) => match.item)
     : items.value.filter(
         (item) =>
-          item.haex_passwords_group_items.groupId == currentGroupId.value,
-      )
+          item.haex_passwords_group_items.groupId == currentGroupId.value
+      );
 
   menuItems.push(
     ...filteredGroups.map<IPasswordMenuItem>((group) => ({
@@ -141,121 +138,123 @@ const groupItems = computed<IPasswordMenuItem[]>(() => {
       icon: group.icon,
       id: group.id,
       name: group.name,
-      type: 'group',
-    })),
-  )
+      type: "group",
+    }))
+  );
 
   menuItems.push(
     ...filteredItems.map<IPasswordMenuItem>((item) => ({
       icon: item.haex_passwords_item_details.icon,
       id: item.haex_passwords_item_details.id,
       name: item.haex_passwords_item_details.title,
-      type: 'item',
-    })),
-  )
+      type: "item",
+    }))
+  );
 
-  return menuItems
-})
+  return menuItems;
+});
 
 const onEditAsync = async () => {
-  const item = selectedItems.value.values().next().value
+  const item = selectedItems.value.values().next().value;
 
-  if (item?.type === 'group')
+  if (item?.type === "group")
     await navigateTo(
       useLocalePath()({
-        name: 'passwordGroupEdit',
+        name: "passwordGroupEdit",
         params: { groupId: item.id },
-      }),
-    )
-  else if (item?.type === 'item') {
+      })
+    );
+  else if (item?.type === "item") {
     await navigateTo(
       useLocalePath()({
-        name: 'passwordItemEdit',
+        name: "passwordItemEdit",
         params: { itemId: item.id },
-      }),
-    )
+      })
+    );
   }
-}
-onKeyStroke('e', async (e) => {
+};
+onKeyStroke("e", async (e) => {
   if (e.ctrlKey) {
-    await onEditAsync()
+    await onEditAsync();
   }
-})
+});
 
 const onCut = () => {
-  selectedGroupItems.value = [...selectedItems.value]
-  selectedItems.value.clear()
-}
-onKeyStroke('x', (event) => {
+  selectedGroupItems.value = [...selectedItems.value];
+  selectedItems.value.clear();
+};
+onKeyStroke("x", (event) => {
   if (event.ctrlKey && selectedItems.value.size) {
-    event.preventDefault()
-    onCut()
+    event.preventDefault();
+    onCut();
   }
-})
+});
 
-const { insertGroupItemsAsync } = usePasswordGroupStore()
+const { insertGroupItemsAsync } = usePasswordGroupStore();
 
 const onPasteAsync = async () => {
-  if (!selectedGroupItems.value?.length) return
+  if (!selectedGroupItems.value?.length) return;
 
   try {
     await insertGroupItemsAsync(
       [...selectedGroupItems.value],
-      currentGroupId.value,
-    )
-    await syncGroupItemsAsync()
-    selectedGroupItems.value = []
-    selectedItems.value.clear()
+      currentGroupId.value
+    );
+    await syncGroupItemsAsync();
+    selectedGroupItems.value = [];
+    selectedItems.value.clear();
   } catch (error) {
-    console.error(error)
-    selectedGroupItems.value = []
-    add({ color: 'error', description: t('error.paste') })
+    console.error(error);
+    selectedGroupItems.value = [];
+    add({ color: "error", description: t("error.paste") });
   }
-}
-onKeyStroke('v', async (event) => {
+};
+onKeyStroke("v", async (event) => {
   if (event.ctrlKey) {
-    await onPasteAsync()
+    await onPasteAsync();
   }
-})
+});
 
 /* const { escape } = useMagicKeys()
 whenever(escape, () => {
   selectedItems.value.clear()
 }) */
 
-onKeyStroke('escape', () => selectedItems.value.clear())
+onKeyStroke("escape", () => selectedItems.value.clear());
 
-onKeyStroke('a', (event) => {
+onKeyStroke("a", (event) => {
   if (event.ctrlKey) {
-    event.preventDefault()
-    event.stopImmediatePropagation()
-    selectedItems.value = new Set(groupItems.value)
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    selectedItems.value = new Set(groupItems.value);
   }
-})
+});
 
-const { deleteAsync } = usePasswordItemStore()
-const { deleteGroupAsync } = usePasswordGroupStore()
+const { deleteAsync } = usePasswordItemStore();
+const { deleteGroupAsync } = usePasswordGroupStore();
 
 const onDeleteAsync = async () => {
   for (const item of selectedItems.value) {
-    if (item.type === 'group') {
-      await deleteGroupAsync(item.id, inTrashGroup.value)
+    if (item.type === "group") {
+      await deleteGroupAsync(item.id, inTrashGroup.value);
     }
-    if (item.type === 'item') {
-      await deleteAsync(item.id, inTrashGroup.value)
+    if (item.type === "item") {
+      await deleteAsync(item.id, inTrashGroup.value);
     }
   }
-  selectedItems.value.clear()
-  await syncGroupItemsAsync()
-}
+  selectedItems.value.clear();
+  await syncGroupItemsAsync();
+};
 /* const keys = useMagicKeys()
 whenever(keys, async () => {
   await onDeleteAsync()
 }) */
-onKeyStroke('delete', () => onDeleteAsync())
+onKeyStroke("delete", () => onDeleteAsync());
 
-const listRef = useTemplateRef<HTMLElement>('listRef')
-onClickOutside(listRef, () => setTimeout(() => selectedItems.value.clear(), 50))
+const listRef = useTemplateRef<HTMLElement>("listRef");
+onClickOutside(listRef, () =>
+  setTimeout(() => selectedItems.value.clear(), 50)
+);
 </script>
 
 <i18n lang="yaml">
@@ -264,7 +263,7 @@ de:
   paste: Einfügen
   delete: Löschen
   edit: Bearbeiten
-  wtf: 'wtf'
+  wtf: "wtf"
 en:
   cut: Cut
   paste: Paste

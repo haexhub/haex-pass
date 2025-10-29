@@ -1,87 +1,77 @@
-import { computedAsync } from "@vueuse/core";
-import { eq, isNull, sql } from "drizzle-orm";
-import type { IPasswordMenuItem } from "~/components/pass/mobile/menu/types";
+import { eq, isNull, sql } from 'drizzle-orm'
+import type { IPasswordMenuItem } from '~/components/pass/mobile/menu/types'
 
+import { db } from '~/database'
 import {
   haexPasswordsGroupItems,
   haexPasswordsGroups,
   type InsertHaexPasswordsGroups,
   type SelectHaexPasswordsGroupItems,
   type SelectHaexPasswordsGroups,
-} from "~/database/schemas";
-import { getSingleRouteParam } from "~/utils/helper";
-import { usePasswordItemStore } from "./items";
+} from '~/database/schemas'
+import { getSingleRouteParam } from '~/utils/helper'
+import { usePasswordItemStore } from './items'
 
-export const trashId = "trash";
+export const trashId = 'trash'
 
-export const usePasswordGroupStore = defineStore("passwordGroupStore", () => {
-  const groups = ref<SelectHaexPasswordsGroups[]>([]);
+export const usePasswordGroupStore = defineStore('passwordGroupStore', () => {
+  const groups = ref<SelectHaexPasswordsGroups[]>([])
 
   const currentGroupId = computed<string | null | undefined>({
     get: () =>
       getSingleRouteParam(useRouter().currentRoute.value.params.groupId) ||
       undefined,
     set: (newGroupId) => {
-      console.log("set groupId", newGroupId);
-      useRouter().currentRoute.value.params.groupId = newGroupId ?? "";
+      console.log('set groupId', newGroupId)
+      useRouter().currentRoute.value.params.groupId = newGroupId ?? ''
     },
-  });
+  })
 
-  const currentGroup = computedAsync(() =>
-    currentGroupId.value ? readGroupAsync(currentGroupId.value) : null
-  );
+  const currentGroup = ref<SelectHaexPasswordsGroups | null>(null)
 
-  const selectedGroupItems = ref<IPasswordMenuItem[]>();
+  // Watch currentGroupId and update currentGroup
+  watch(
+    currentGroupId,
+    async (newId) => {
+      if (newId) {
+        currentGroup.value = await readGroupAsync(newId)
+      } else {
+        currentGroup.value = null
+      }
+    },
+    { immediate: true }
+  )
 
-  const breadCrumbs = computed(() => getParentChain(currentGroupId.value));
+  const selectedGroupItems = ref<IPasswordMenuItem[]>()
+
+  const breadCrumbs = computed(() => getParentChain(currentGroupId.value))
 
   const getParentChain = (
     groupId?: string | null,
     chain: SelectHaexPasswordsGroups[] = []
   ) => {
-    const group = groups.value.find((group) => group.id === groupId);
-    console.log("getParentChain1: found group", group, chain);
-    /* if (group) {
-      chain.push(group)
-      console.log('getParentChain: found group', group, chain)
+    const group = groups.value.find((group) => group.id === groupId)
+    if (group) {
+      chain.unshift(group)
       return getParentChain(group.parentId, chain)
     }
-
-    return chain.reverse() */
-    return [];
-  };
+    return chain
+  }
 
   const syncGroupItemsAsync = async () => {
-    const { syncItemsAsync } = usePasswordItemStore();
+    const { syncItemsAsync } = usePasswordItemStore()
 
-    groups.value = (await readGroupsAsync()) ?? [];
-    await syncItemsAsync();
-    /* currentGroup.value = groups.value?.find(
-      (group) => group.id === currentGroupId.value,
-    )
-
-    try {
-      currentGroupItems.groups =
-        (await getByParentIdAsync(currentGroupId)) ?? []
-      currentGroupItems.items = (await readByGroupIdAsync(currentGroupId)) ?? []
-    } catch (error) {
-      console.error(error)
-      currentGroupItems.groups = []
-      currentGroupItems.items = []
-      await addNotificationAsync({
-        type: 'log',
-        text: JSON.stringify(error),
-      })
-    } */
-  };
+    groups.value = (await readGroupsAsync()) ?? []
+    await syncItemsAsync()
+  }
 
   watch(currentGroupId, () => syncGroupItemsAsync(), {
     immediate: true,
-  });
+  })
 
   const inTrashGroup = computed(() =>
     breadCrumbs.value?.some((item) => item.id === trashId)
-  );
+  )
 
   return {
     addGroupAsync,
@@ -90,7 +80,6 @@ export const usePasswordGroupStore = defineStore("passwordGroupStore", () => {
     createTrashIfNotExistsAsync,
     currentGroup,
     currentGroupId,
-    // currentGroupItems,
     deleteGroupAsync,
     getChildGroupsRecursiveAsync,
     groups,
@@ -105,12 +94,11 @@ export const usePasswordGroupStore = defineStore("passwordGroupStore", () => {
     syncGroupItemsAsync,
     trashId,
     updateAsync,
-  };
-});
+  }
+})
 
 const addGroupAsync = async (group: Partial<InsertHaexPasswordsGroups>) => {
-  const { currentVault } = useVaultStore();
-  const { syncGroupItemsAsync } = usePasswordGroupStore();
+  const haexhub = useHaexHub()
 
   const newGroup: InsertHaexPasswordsGroups = {
     id: group.id || crypto.randomUUID(),
@@ -119,120 +107,146 @@ const addGroupAsync = async (group: Partial<InsertHaexPasswordsGroups>) => {
     icon: group.icon,
     name: group.name,
     order: group.order,
-  };
-  await currentVault?.drizzle?.insert(haexPasswordsGroups).values(newGroup);
-  await syncGroupItemsAsync();
-  return newGroup;
-};
+  }
+
+  const query = db.insert(haexPasswordsGroups).values(newGroup).toSQL()
+  await haexhub.db.execute(query.sql, query.params)
+
+  return newGroup
+}
 
 const readGroupAsync = async (groupId: string) => {
-  const { currentVault } = useVaultStore();
-  const group = await currentVault?.drizzle.query.haexPasswordsGroups.findFirst(
-    {
-      where: eq(haexPasswordsGroups.id, groupId),
-    }
-  );
-  console.log("readGroupAsync", groupId, group);
-  return group;
-};
+  const haexhub = useHaexHub()
+
+  const query = db
+    .select()
+    .from(haexPasswordsGroups)
+    .where(eq(haexPasswordsGroups.id, groupId))
+    .limit(1)
+    .toSQL()
+
+  const result = await haexhub.db.query<SelectHaexPasswordsGroups>(
+    query.sql,
+    query.params
+  )
+
+  return result[0] || null
+}
 
 const readGroupsAsync = async (filter?: { parentId?: string | null }) => {
-  const { currentVault } = useVaultStore();
+  const haexhub = useHaexHub()
+
+  let query
   if (filter?.parentId) {
-    return await currentVault?.drizzle
+    query = db
       .select()
       .from(haexPasswordsGroups)
-      .where(eq(haexPasswordsGroups.id, filter.parentId));
+      .where(eq(haexPasswordsGroups.parentId, filter.parentId))
+      .orderBy(sql`${haexPasswordsGroups.order} nulls last`)
+      .toSQL()
   } else {
-    return await currentVault?.drizzle
+    query = db
       .select()
       .from(haexPasswordsGroups)
-      .orderBy(sql`${haexPasswordsGroups.order} nulls last`);
+      .orderBy(sql`${haexPasswordsGroups.order} nulls last`)
+      .toSQL()
   }
-};
+
+  return await haexhub.db.query<SelectHaexPasswordsGroups>(
+    query.sql,
+    query.params
+  )
+}
 
 const readGroupItemsAsync = async (
   groupId?: string | null
 ): Promise<SelectHaexPasswordsGroupItems[]> => {
-  const { currentVault } = useVaultStore();
+  const haexhub = useHaexHub()
 
+  let query
   if (groupId) {
-    return (
-      currentVault?.drizzle
-        ?.select()
-        .from(haexPasswordsGroupItems)
-        .where(eq(haexPasswordsGroupItems.groupId, groupId)) ?? []
-    );
+    query = db
+      .select()
+      .from(haexPasswordsGroupItems)
+      .where(eq(haexPasswordsGroupItems.groupId, groupId))
+      .toSQL()
   } else {
-    return (
-      currentVault?.drizzle
-        ?.select()
-        .from(haexPasswordsGroupItems)
-        .where(isNull(haexPasswordsGroupItems.groupId)) ?? []
-    );
+    query = db
+      .select()
+      .from(haexPasswordsGroupItems)
+      .where(isNull(haexPasswordsGroupItems.groupId))
+      .toSQL()
   }
-};
+
+  return await haexhub.db.query<SelectHaexPasswordsGroupItems>(
+    query.sql,
+    query.params
+  )
+}
 
 const getChildGroupsRecursiveAsync = async (
   groupId: string,
   groups: SelectHaexPasswordsGroups[] = []
 ) => {
-  const childGroups = (await getByParentIdAsync(groupId)) ?? [];
+  const childGroups = (await getByParentIdAsync(groupId)) ?? []
   for (const child of childGroups) {
-    groups.push(...(await getChildGroupsRecursiveAsync(child.id)));
+    groups.push(...(await getChildGroupsRecursiveAsync(child.id)))
   }
 
-  return groups;
-};
+  return groups
+}
 
 const getByParentIdAsync = async (
   parentId?: string | null
 ): Promise<SelectHaexPasswordsGroups[]> => {
   try {
-    const { currentVault } = useVaultStore();
+    const haexhub = useHaexHub()
 
-    console.log("getByParentIdAsync", parentId);
+    console.log('getByParentIdAsync', parentId)
+    let query
     if (parentId) {
-      const groups = await currentVault?.drizzle
-        ?.select()
+      query = db
+        .select()
         .from(haexPasswordsGroups)
         .where(eq(haexPasswordsGroups.parentId, parentId))
-        .orderBy(sql`${haexPasswordsGroups.order} nulls last`);
-
-      return groups ?? [];
+        .orderBy(sql`${haexPasswordsGroups.order} nulls last`)
+        .toSQL()
     } else {
-      const groups = await currentVault?.drizzle
-        ?.select()
+      query = db
+        .select()
         .from(haexPasswordsGroups)
         .where(isNull(haexPasswordsGroups.parentId))
-        .orderBy(sql`${haexPasswordsGroups.order} nulls last`);
-
-      return groups ?? [];
+        .orderBy(sql`${haexPasswordsGroups.order} nulls last`)
+        .toSQL()
     }
+
+    return await haexhub.db.query<SelectHaexPasswordsGroups>(
+      query.sql,
+      query.params
+    )
   } catch (error) {
-    console.error(error);
-    return [];
+    console.error(error)
+    return []
   }
-};
+}
 
 const navigateToGroupAsync = (groupId?: string | null) =>
   navigateTo(
     useLocaleRoute()({
-      name: "passwordGroupEdit",
+      name: 'passwordGroupEdit',
       params: {
-        vaultId: useRouter().currentRoute.value.params.vaultId,
         groupId,
       },
       query: {
         ...useRouter().currentRoute.value.query,
       },
     })
-  );
+  )
 
 const updateAsync = async (group: InsertHaexPasswordsGroups) => {
-  console.log("updateAsync", group);
-  const { currentVault } = useVaultStore();
-  if (!group.id) return;
+  console.log('updateAsync', group)
+  const haexhub = useHaexHub()
+  if (!group.id) return
 
   const newGroup: InsertHaexPasswordsGroups = {
     id: group.id,
@@ -242,18 +256,21 @@ const updateAsync = async (group: InsertHaexPasswordsGroups) => {
     name: group.name,
     order: group.order,
     parentId: group.parentId,
-  };
+  }
 
-  return currentVault?.drizzle
+  const query = db
     .update(haexPasswordsGroups)
     .set(newGroup)
-    .where(eq(haexPasswordsGroups.id, newGroup.id));
-};
+    .where(eq(haexPasswordsGroups.id, newGroup.id))
+    .toSQL()
+
+  return await haexhub.db.execute(query.sql, query.params)
+}
 
 const navigateToGroupItemsAsync = (groupId: string) => {
   return navigateTo(
     useLocaleRoute()({
-      name: "passwordGroupItems",
+      name: 'passwordGroupItems',
       params: {
         groupId,
       },
@@ -261,97 +278,123 @@ const navigateToGroupItemsAsync = (groupId: string) => {
         ...useRouter().currentRoute.value.query,
       },
     })
-  );
-};
+  )
+}
 
 const insertGroupItemsAsync = async (
   items: IPasswordMenuItem[],
   groupdId?: string | null
 ) => {
-  const { currentVault } = useVaultStore();
-  const { groups } = usePasswordGroupStore();
-  const { syncGroupItemsAsync } = usePasswordGroupStore();
+  const haexhub = useHaexHub()
+  const { groups } = usePasswordGroupStore()
+  const { syncGroupItemsAsync } = usePasswordGroupStore()
 
-  const targetGroup = groups.find((group) => group.id === groupdId);
+  const targetGroup = groups.find((group) => group.id === groupdId)
 
   for (const item of items) {
-    if (item.type === "group") {
-      const updateGroup = groups.find((group) => group.id === item.id);
+    if (item.type === 'group') {
+      const updateGroup = groups.find((group) => group.id === item.id)
 
-      if (updateGroup?.parentId === targetGroup?.id) return;
+      if (updateGroup?.parentId === targetGroup?.id) return
 
       if (updateGroup) {
-        updateGroup.parentId = targetGroup?.id ?? null;
-        await currentVault?.drizzle
+        updateGroup.parentId = targetGroup?.id ?? null
+        const query = db
           .update(haexPasswordsGroups)
           .set(updateGroup)
-          .where(eq(haexPasswordsGroups.id, updateGroup.id));
+          .where(eq(haexPasswordsGroups.id, updateGroup.id))
+          .toSQL()
+        await haexhub.db.execute(query.sql, query.params)
       }
     } else {
-      if (targetGroup)
-        await currentVault?.drizzle
+      if (targetGroup) {
+        const query = db
           .update(haexPasswordsGroupItems)
           .set({ groupId: targetGroup.id, itemId: item.id })
-          .where(eq(haexPasswordsGroupItems.itemId, item.id));
+          .where(eq(haexPasswordsGroupItems.itemId, item.id))
+          .toSQL()
+        await haexhub.db.execute(query.sql, query.params)
+      }
     }
   }
-  return syncGroupItemsAsync();
-};
+  return syncGroupItemsAsync()
+}
 
 const createTrashIfNotExistsAsync = async () => {
-  const exists = await readGroupAsync(trashId);
-  console.log("found trash", exists);
-  if (exists) return true;
+  const exists = await readGroupAsync(trashId)
+  console.log('found trash', exists)
+  if (exists) return true
 
   return addGroupAsync({
-    name: "Trash",
+    name: 'Trash',
     id: trashId,
-    icon: "mdi:trash-outline",
+    icon: 'mdi:trash-outline',
     parentId: null,
-  });
-};
+  })
+}
 
 const deleteGroupAsync = async (groupId: string, final: boolean = false) => {
-  const { currentVault } = useVaultStore();
-  const { readByGroupIdAsync, deleteAsync } = usePasswordItemStore();
+  const haexhub = useHaexHub()
+  const { readByGroupIdAsync, deleteAsync } = usePasswordItemStore()
 
-  console.log("deleteGroupAsync", groupId, final);
+  console.log('deleteGroupAsync', groupId, final)
 
   if (final || groupId === trashId) {
-    const childGroups = await getByParentIdAsync(groupId);
+    const childGroups = await getByParentIdAsync(groupId)
 
     for (const child of childGroups) {
-      await deleteGroupAsync(child.id, true);
+      await deleteGroupAsync(child.id, true)
     }
 
-    const items = (await readByGroupIdAsync(groupId)) ?? [];
-    console.log("deleteGroupAsync delete Items", items);
+    const items = (await readByGroupIdAsync(groupId)) ?? []
+    console.log('deleteGroupAsync delete Items', items)
     for (const item of items) {
-      if (item) await deleteAsync(item.id, true);
+      if (item) await deleteAsync(item.id, true)
     }
 
-    return await currentVault?.drizzle
+    const query = db
       .delete(haexPasswordsGroups)
-      .where(eq(haexPasswordsGroups.id, groupId));
+      .where(eq(haexPasswordsGroups.id, groupId))
+      .toSQL()
+
+    return await haexhub.db.execute(query.sql, query.params)
   } else {
     if (await createTrashIfNotExistsAsync())
-      await updateAsync({ id: groupId, parentId: trashId });
+      await updateAsync({ id: groupId, parentId: trashId })
   }
-};
+}
 
 const areGroupsEqual = (
   groupA: unknown | unknown[] | null,
   groupB: unknown | unknown[] | null
 ) => {
-  if (groupA === null && groupB === null) return true;
+  if (groupA === null && groupB === null) return true
 
   if (Array.isArray(groupA) && Array.isArray(groupB)) {
-    console.log("compare object arrays", groupA, groupB);
-    if (groupA.length === groupB.length) return true;
+    console.log('compare object arrays', groupA, groupB)
+    if (groupA.length === groupB.length) return true
 
-    return groupA.some((group, index) => {
-      return areObjectsEqual(group, groupA[index]);
-    });
+    return groupA.some((group: unknown, index: number) => {
+      return areObjectsEqual(group, groupA[index])
+    })
   }
-  return areObjectsEqual(groupA, groupB);
-};
+  return areObjectsEqual(groupA, groupB)
+}
+
+// Helper function for object comparison
+function areObjectsEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true
+  if (typeof a !== 'object' || typeof b !== 'object') return false
+  if (a === null || b === null) return false
+
+  const keysA = Object.keys(a as Record<string, unknown>)
+  const keysB = Object.keys(b as Record<string, unknown>)
+
+  if (keysA.length !== keysB.length) return false
+
+  return keysA.every((key) => {
+    const valA = (a as Record<string, unknown>)[key]
+    const valB = (b as Record<string, unknown>)[key]
+    return valA === valB
+  })
+}
