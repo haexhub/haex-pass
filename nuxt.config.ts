@@ -59,4 +59,10 @@ export default defineNuxtConfig({
       hashMode: true, // History mode, aber mit SPA fallback
     },
   },
+
+  vite: {
+    optimizeDeps: {
+      include: ["@vueuse/core"],
+    },
+  },
 });

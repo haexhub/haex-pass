@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "haex-pass",
   "type": "module",
   "private": true,
   "scripts": {
@@ -14,12 +14,13 @@
     "ext:build": "nuxt build --preset static && haexhub sign dist"
   },
   "dependencies": {
-    "@haexhub/sdk": "0.1.88",
+    "@haexhub/sdk": "1.0.15",
     "@nuxt/eslint": "1.9.0",
-    "@nuxt/ui": "4.0.0",
+    "@nuxt/ui": "^4.1.0",
     "@nuxtjs/i18n": "^10.1.2",
     "@pinia/nuxt": "^0.11.2",
     "@tailwindcss/vite": "^4.1.16",
+    "@vueuse/core": "^13.9.0",
     "drizzle-orm": "^0.44.7",
     "eslint": "^9.38.0",
     "fuse.js": "^7.1.0",
@@ -28,11 +29,5 @@
     "typescript": "^5.9.3",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"
-  },
-  "pnpm": {
-    "overrides": {
-      "@vueuse/core": "^10.11.1",
-      "@vueuse/shared": "^10.11.1"
-    }
   }
 }

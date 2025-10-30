@@ -26,9 +26,12 @@
 
 <script setup lang="ts">
 import type { ZodSchema } from 'zod'
-import { openUrl } from '@tauri-apps/plugin-opener'
 
 const { t } = useI18n()
+
+const openUrl = (url: string) => {
+  window.open(url, '_blank')
+}
 
 const value = defineModel<string | null | undefined>()
 

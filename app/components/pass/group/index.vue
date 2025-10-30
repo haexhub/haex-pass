@@ -53,7 +53,8 @@
 </template>
 
 <script setup lang="ts">
-import type { SelectHaexPasswordsGroups } from '~~/src-tauri/database/schemas/vault'
+import { onStartTyping, useMagicKeys } from '@vueuse/core'
+import type { SelectHaexPasswordsGroups } from '~/database'
 
 const group = defineModel<SelectHaexPasswordsGroups | null>()
 const { readOnly = false } = defineProps<{

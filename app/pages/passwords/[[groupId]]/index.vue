@@ -2,11 +2,11 @@
   <div class="flex flex-1">
     <!-- <div class="h-screen bg-accented">aaa</div> -->
     <div class="flex flex-col flex-1">
-      <PassGroupBreadcrumbs
+      <!-- <PassGroupBreadcrumbs
         v-show="breadCrumbs.length"
         :items="breadCrumbs"
         class="px-2 sticky -top-2 z-10"
-      />
+      /> -->
       <!-- <div class="flex-1 py-1 flex"> -->
       <PassMobileMenu
         ref="listRef"
@@ -73,8 +73,10 @@
 
 <script setup lang="ts">
 import type { IPasswordMenuItem } from "~/components/pass/mobile/menu/types";
-//import { useMagicKeys, whenever } from '@vueuse/core'
+import { onKeyStroke, onClickOutside } from '@vueuse/core'
 import Fuse from "fuse.js";
+import { getTableName } from "drizzle-orm";
+import { haexPasswordsGroupItems, haexPasswordsItemDetails } from "~/database";
 
 definePageMeta({
   name: "passwordGroupItems",
@@ -89,28 +91,23 @@ const { add } = useToast();
 const selectedItems = ref<Set<IPasswordMenuItem>>(new Set());
 const { menu } = storeToRefs(usePasswordsActionMenuStore());
 
-const { syncItemsAsync } = usePasswordItemStore();
+// Initial sync is handled automatically by the watch in usePasswordGroupStore
 const { syncGroupItemsAsync } = usePasswordGroupStore();
-onMounted(async () => {
-  try {
-    await Promise.allSettled([syncItemsAsync(), syncGroupItemsAsync()]);
-  } catch (error) {
-    console.error(error);
-  }
-});
 
-const {
-  breadCrumbs,
-  currentGroupId,
-  inTrashGroup,
-  selectedGroupItems,
-  groups,
-} = storeToRefs(usePasswordGroupStore());
+const { currentGroupId, inTrashGroup, selectedGroupItems, groups } =
+  storeToRefs(usePasswordGroupStore());
 
 const { items } = storeToRefs(usePasswordItemStore());
 const { search } = storeToRefs(useSearchStore());
 
+// Get the actual prefixed table names from Drizzle
+const groupItemsTableName = getTableName(haexPasswordsGroupItems);
+const itemDetailsTableName = getTableName(haexPasswordsItemDetails);
+
 const groupItems = computed<IPasswordMenuItem[]>(() => {
+  console.log('[groupItems] currentGroupId:', currentGroupId.value, 'type:', typeof currentGroupId.value)
+  console.log('[groupItems] All groups:', groups.value.map(g => ({ id: g.id, name: g.name, parentId: g.parentId })))
+
   const menuItems: IPasswordMenuItem[] = [];
   const filteredGroups = search.value
     ? new Fuse(groups.value, {
@@ -119,7 +116,11 @@ const groupItems = computed<IPasswordMenuItem[]>(() => {
       })
         .search(search.value)
         .map((match) => match.item)
-    : groups.value.filter((group) => group.parentId == currentGroupId.value);
+    : groups.value.filter((group) => {
+        const matches = group.parentId == currentGroupId.value
+        console.log('[groupItems] Group:', group.name, 'parentId:', group.parentId, 'matches:', matches)
+        return matches
+      });
 
   const filteredItems = search.value
     ? new Fuse(items.value, {
@@ -128,8 +129,10 @@ const groupItems = computed<IPasswordMenuItem[]>(() => {
         .search(search.value)
         .map((match) => match.item)
     : items.value.filter(
-        (item) =>
-          item.haex_passwords_group_items.groupId == currentGroupId.value
+        (item) => {
+          const itemRecord = item as Record<string, Record<string, unknown>>;
+          return itemRecord[groupItemsTableName]?.groupId == currentGroupId.value;
+        }
       );
 
   menuItems.push(
@@ -143,12 +146,16 @@ const groupItems = computed<IPasswordMenuItem[]>(() => {
   );
 
   menuItems.push(
-    ...filteredItems.map<IPasswordMenuItem>((item) => ({
-      icon: item.haex_passwords_item_details.icon,
-      id: item.haex_passwords_item_details.id,
-      name: item.haex_passwords_item_details.title,
-      type: "item",
-    }))
+    ...filteredItems.map<IPasswordMenuItem>((item) => {
+      const itemRecord = item as Record<string, Record<string, unknown>>;
+      const details = itemRecord[itemDetailsTableName];
+      return {
+        icon: details?.icon as string | null,
+        id: details?.id as string,
+        name: details?.title as string | null,
+        type: "item",
+      };
+    })
   );
 
   return menuItems;
@@ -173,6 +180,7 @@ const onEditAsync = async () => {
     );
   }
 };
+
 onKeyStroke("e", async (e) => {
   if (e.ctrlKey) {
     await onEditAsync();

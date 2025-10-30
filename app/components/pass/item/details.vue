@@ -78,7 +78,8 @@
 </template>
 
 <script setup lang="ts">
-import type { SelectHaexPasswordsItemDetails } from '~~/src-tauri/database/schemas/vault'
+import { onStartTyping } from '@vueuse/core'
+import type { SelectHaexPasswordsItemDetails } from '~/database'
 
 defineProps<{
   defaultIcon?: string | null

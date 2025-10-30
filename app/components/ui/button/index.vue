@@ -8,16 +8,10 @@
           ...buttonProps,
           ...$attrs,
         }"
-        @click="(e) => $emit('click', e)"
+        @click="$emit('click', $event)"
       >
-        <template
-          v-for="(_, slotName) in $slots"
-          #[slotName]="slotProps"
-        >
-          <slot
-            :name="slotName"
-            v-bind="slotProps"
-          />
+        <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">
+          <slot :name="slotName" v-bind="slotProps" />
         </template>
       </UButton>
     </UTooltip>
@@ -25,13 +19,13 @@
 </template>
 
 <script setup lang="ts">
-import type { ButtonProps } from '@nuxt/ui'
+import type { ButtonProps } from "@nuxt/ui";
 
 interface IButtonProps extends /* @vue-ignore */ ButtonProps {
-  tooltip?: string
+  tooltip?: string;
 }
-const buttonProps = defineProps<IButtonProps>()
-defineEmits<{ click: [Event] }>()
+const buttonProps = defineProps<IButtonProps>();
+defineEmits<{ click: [Event] }>();
 
-const { isSmallScreen } = storeToRefs(useUiStore())
+const { isSmallScreen } = storeToRefs(useUiStore());
 </script>

@@ -11,3 +11,4 @@
 # Codingstyle
 
 - alle asynchronen Funktionen bitte mit Async prependen
+- nutze kein any, wenn es nicht unbedingt notwendig ist

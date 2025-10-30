@@ -49,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import { useClipboard } from '@vueuse/core'
 import type { InputProps } from '@nuxt/ui'
 import type { AcceptableValue } from '@nuxt/ui/runtime/types/utils.js'
 

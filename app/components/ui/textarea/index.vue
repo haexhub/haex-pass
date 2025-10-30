@@ -32,6 +32,7 @@
 </template>
 
 <script setup lang="ts">
+import { useClipboard } from '@vueuse/core'
 import type { TextareaProps } from '@nuxt/ui'
 
 interface ITextareaProps extends /* @vue-ignore */ TextareaProps {

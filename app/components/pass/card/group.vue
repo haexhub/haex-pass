@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import type { RouteLocationNormalizedLoadedGeneric } from 'vue-router'
-import type { SelectHaexPasswordsGroups } from '~~/src-tauri/database/schemas/vault'
+import type { SelectHaexPasswordsGroups } from '~/database'
 
 const { t } = useI18n()
 const showConfirmation = ref(false)

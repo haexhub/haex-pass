@@ -1,7 +1,6 @@
 <template>
   <div
-    class="fixed bottom-4 flex justify-between transition-all pointer-events-none right-0 sm:items-center items-end h-12"
-    :class="[isVisible ? 'left-16' : 'left-0']"
+    class="fixed bottom-4 flex justify-between transition-all pointer-events-none right-0 sm:items-center items-end h-12 left-0"
   >
     <div class="flex items-center justify-center flex-1">
       <UiButton
@@ -60,7 +59,6 @@
 </template>
 
 <script setup lang="ts">
-const { isVisible } = storeToRefs(useSidebarStore())
 const { t } = useI18n()
 
 defineProps<{

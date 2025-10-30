@@ -1,6 +1,6 @@
 <template>
   <div>
-    <HaexPassGroup
+    <PassGroup
       v-model="group"
       :read-only
       mode="edit"
@@ -8,7 +8,7 @@
       @submit="onSaveAsync"
     />
 
-    <HaexPassMenuBottom
+    <PassMenuBottom
       :show-edit-button="readOnly && !hasChanges"
       :show-readonly-button="!readOnly && !hasChanges"
       :show-save-button="hasChanges"
@@ -22,7 +22,7 @@
       @save="onSaveAsync"
     />
 
-    <HaexPassDialogDeleteItem
+    <PassDialogDeleteItem
       v-model:open="showConfirmDeleteDialog"
       :item-name="group.name"
       :final="inTrashGroup"
@@ -30,7 +30,7 @@
       @confirm="onDeleteAsync"
     />
 
-    <HaexPassDialogUnsavedChanges
+    <PassDialogUnsavedChanges
       v-model:ignore-changes="ignoreChanges"
       v-model:open="showUnsavedChangesDialog"
       :has-changes="hasChanges"
@@ -41,109 +41,110 @@
 </template>
 
 <script setup lang="ts">
-import type { SelectHaexPasswordsGroups } from '~~/src-tauri/database/schemas/vault'
+import { watchImmediate } from "@vueuse/core";
+import type { SelectHaexPasswordsGroups } from "~/database";
 
 definePageMeta({
-  name: 'passwordGroupEdit',
-})
+  name: "passwordGroupEdit",
+});
 
-const { t } = useI18n()
+const { t } = useI18n();
 
-const { inTrashGroup, currentGroupId } = storeToRefs(usePasswordGroupStore())
+const { inTrashGroup, currentGroupId } = storeToRefs(usePasswordGroupStore());
 
 const group = ref<SelectHaexPasswordsGroups>({
   color: null,
   createdAt: null,
   description: null,
   icon: null,
-  id: '',
-  name: '',
+  id: "",
+  name: "",
   order: null,
   parentId: null,
   updateAt: null,
-  haex_tombstone: null,
-})
+});
 
-const original = ref<string>('')
-const ignoreChanges = ref(false)
+const original = ref<string>("");
+const ignoreChanges = ref(false);
 
-const { readGroupAsync } = usePasswordGroupStore()
+const { readGroupAsync } = usePasswordGroupStore();
+
 watchImmediate(currentGroupId, async () => {
-  if (!currentGroupId.value) return
-  ignoreChanges.value = false
+  if (!currentGroupId.value) return;
+  ignoreChanges.value = false;
   try {
-    const foundGroup = await readGroupAsync(currentGroupId.value)
+    const foundGroup = await readGroupAsync(currentGroupId.value);
     if (foundGroup) {
-      original.value = JSON.parse(JSON.stringify(foundGroup))
-      group.value = foundGroup
+      original.value = JSON.parse(JSON.stringify(foundGroup));
+      group.value = foundGroup;
     }
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-})
+});
 
 const hasChanges = computed(() => {
-  const current = JSON.stringify(group.value)
-  const origin = JSON.stringify(original.value)
-  console.log('hasChanges', current, origin)
-  return !(current === origin)
-})
+  const current = JSON.stringify(group.value);
+  const origin = JSON.stringify(original.value);
+  console.log("hasChanges", current, origin);
+  return !(current === origin);
+});
 
-const readOnly = ref(false)
+const readOnly = ref(false);
 const onClose = () => {
-  if (showConfirmDeleteDialog.value || showUnsavedChangesDialog.value) return
+  if (showConfirmDeleteDialog.value || showUnsavedChangesDialog.value) return;
 
-  readOnly.value = true
-  useRouter().back()
-}
+  readOnly.value = true;
+  useRouter().back();
+};
 
-const { add } = useToast()
+const { add } = useToast();
 
 const { updateAsync, syncGroupItemsAsync, deleteGroupAsync } =
-  usePasswordGroupStore()
+  usePasswordGroupStore();
 
 const onSaveAsync = async () => {
   try {
-    if (!group.value) return
+    if (!group.value) return;
 
-    ignoreChanges.value = true
-    await updateAsync(group.value)
-    await syncGroupItemsAsync()
-    add({ color: 'success', description: t('change.success') })
-    onClose()
+    ignoreChanges.value = true;
+    await updateAsync(group.value);
+    await syncGroupItemsAsync();
+    add({ color: "success", description: t("change.success") });
+    onClose();
   } catch (error) {
-    add({ color: 'error', description: t('change.error') })
-    console.log(error)
+    add({ color: "error", description: t("change.error") });
+    console.log(error);
   }
-}
+};
 
-const showUnsavedChangesDialog = ref(false)
+const showUnsavedChangesDialog = ref(false);
 const onConfirmIgnoreChanges = () => {
-  showUnsavedChangesDialog.value = false
-  onClose()
-}
+  showUnsavedChangesDialog.value = false;
+  onClose();
+};
 
-const showConfirmDeleteDialog = ref(false)
+const showConfirmDeleteDialog = ref(false);
 const onDeleteAsync = async () => {
   try {
-    const parentId = group.value.parentId
-    await deleteGroupAsync(group.value.id, inTrashGroup.value)
-    await syncGroupItemsAsync()
-    showConfirmDeleteDialog.value = false
-    ignoreChanges.value = true
+    const parentId = group.value.parentId;
+    await deleteGroupAsync(group.value.id, inTrashGroup.value);
+    await syncGroupItemsAsync();
+    showConfirmDeleteDialog.value = false;
+    ignoreChanges.value = true;
     await navigateTo(
       useLocalePath()({
-        name: 'passwordGroupItems',
+        name: "passwordGroupItems",
         params: {
           ...useRouter().currentRoute.value.params,
           groupId: parentId,
         },
-      }),
-    )
+      })
+    );
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-}
+};
 </script>
 
 <i18n lang="yaml">

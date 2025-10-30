@@ -7,12 +7,7 @@
       <li
         v-for="(item, index) in menuItems"
         :key="item.id"
-        v-on-long-press="[
-          onLongPressCallbackHook,
-          {
-            delay: 1000,
-          },
-        ]"
+        :ref="(el) => setupLongPress(el as HTMLElement, item)"
         class="bg-accented rounded-lg hover:bg-base-content/20 origin-to intersect:motion-preset-slide-down intersect:motion-ease-spring-bouncier intersect:motion-delay ease-in-out shadow"
         :class="{
           'bg-elevated/30 outline outline-accent hover:bg-base-content/20':
@@ -31,7 +26,7 @@
             : (currentSelectedItem = item)
         "
       >
-        <HaexPassMobileMenuItem v-bind="item" @click="onClickItemAsync(item)" />
+        <PassMobileMenuItem v-bind="item" @click="onClickItemAsync(item)" />
       </li>
     </ul>
   </div>
@@ -41,9 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { vOnLongPress } from "@vueuse/components";
 import type { IPasswordMenuItem } from "./types";
-import { onClickOutside, useMagicKeys } from "@vueuse/core";
+import { onClickOutside, useMagicKeys, onLongPress } from "@vueuse/core";
 
 defineProps<{
   menuItems: IPasswordMenuItem[];
@@ -58,8 +52,16 @@ const currentSelectedItem = ref<IPasswordMenuItem | null>();
 
 const longPressedHook = ref(false);
 
-const onLongPressCallbackHook = (_: PointerEvent) => {
-  longPressedHook.value = true;
+const setupLongPress = (el: HTMLElement | null, _item: IPasswordMenuItem) => {
+  if (!el) return;
+
+  onLongPress(
+    el,
+    () => {
+      longPressedHook.value = true;
+    },
+    { delay: 1000 }
+  );
 };
 
 watch(longPressedHook, () => {
@@ -109,6 +111,7 @@ const onClickItemAsync = async (item: IPasswordMenuItem) => {
 };
 
 const listRef = useTemplateRef("listRef");
+
 onClickOutside(listRef, async () => {
   // needed cause otherwise the unselect is to fast for other processing like "edit selected group"
   setTimeout(() => {

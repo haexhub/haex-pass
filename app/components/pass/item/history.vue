@@ -63,7 +63,7 @@ import type {
   SelectHaexPasswordsGroupItems,
   SelectHaexPasswordsItemDetails,
   SelectHaexPasswordsItemHistory,
-} from '~~/src-tauri/database/schemas/vault'
+} from '~/database'
 
 const history = defineModel<SelectHaexPasswordsItemHistory[]>()
 

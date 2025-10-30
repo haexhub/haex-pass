@@ -6,7 +6,7 @@
       </p>
       {{ item.details }}
     </div> -->
-    <HaexPassItem
+    <PassItem
       v-model:details="item.details"
       v-model:key-values-add="item.keyValuesAdd"
       v-model:key-values-delete="item.keyValuesDelete"
@@ -17,7 +17,7 @@
       @submit="onUpdateAsync"
     />
 
-    <HaexPassMenuBottom
+    <PassMenuBottom
       :has-changes
       :show-edit-button="readOnly && !hasChanges"
       :show-readonly-button="!readOnly && !hasChanges"
@@ -31,13 +31,13 @@
       @save="onUpdateAsync"
     />
 
-    <HaexPassDialogDeleteItem
+    <PassDialogDeleteItem
       v-model:open="showConfirmDeleteDialog"
       @abort="showConfirmDeleteDialog = false"
       @confirm="deleteItemAsync"
     />
 
-    <HaexPassDialogUnsavedChanges
+    <PassDialogUnsavedChanges
       v-model:ignore-changes="ignoreChanges"
       v-model:open="showUnsavedChangesDialog"
       :has-changes="hasChanges"
@@ -52,11 +52,11 @@ import type {
   SelectHaexPasswordsItemDetails,
   SelectHaexPasswordsItemHistory,
   SelectHaexPasswordsItemKeyValues,
-} from '~~/src-tauri/database/schemas/vault'
+} from "~~/src-tauri/database/schemas/vault";
 
 definePageMeta({
-  name: 'passwordItemEdit',
-})
+  name: "passwordItemEdit",
+});
 
 /* defineProps({
   icon: String,
@@ -64,21 +64,21 @@ definePageMeta({
   withCopyButton: Boolean,
 }) */
 
-const readOnly = ref(true)
-const showConfirmDeleteDialog = ref(false)
-const { t } = useI18n()
+const readOnly = ref(true);
+const showConfirmDeleteDialog = ref(false);
+const { t } = useI18n();
 
 const item = reactive<{
-  details: SelectHaexPasswordsItemDetails
-  history: SelectHaexPasswordsItemHistory[]
-  keyValues: SelectHaexPasswordsItemKeyValues[]
-  keyValuesAdd: SelectHaexPasswordsItemKeyValues[]
-  keyValuesDelete: SelectHaexPasswordsItemKeyValues[]
-  originalDetails: SelectHaexPasswordsItemDetails | null
-  originalKeyValues: SelectHaexPasswordsItemKeyValues[] | null
+  details: SelectHaexPasswordsItemDetails;
+  history: SelectHaexPasswordsItemHistory[];
+  keyValues: SelectHaexPasswordsItemKeyValues[];
+  keyValuesAdd: SelectHaexPasswordsItemKeyValues[];
+  keyValuesDelete: SelectHaexPasswordsItemKeyValues[];
+  originalDetails: SelectHaexPasswordsItemDetails | null;
+  originalKeyValues: SelectHaexPasswordsItemKeyValues[] | null;
 }>({
   details: {
-    id: '',
+    id: "",
     createdAt: null,
     icon: null,
     note: null,
@@ -95,7 +95,7 @@ const item = reactive<{
   keyValuesAdd: [],
   keyValuesDelete: [],
   originalDetails: {
-    id: '',
+    id: "",
     createdAt: null,
     icon: null,
     note: null,
@@ -108,35 +108,35 @@ const item = reactive<{
     haex_tombstone: null,
   },
   originalKeyValues: null,
-})
+});
 
-const { currentItem } = storeToRefs(usePasswordItemStore())
+const { currentItem } = storeToRefs(usePasswordItemStore());
 
 watch(
   currentItem,
   () => {
-    if (!currentItem.value) return
-    item.details = JSON.parse(JSON.stringify(currentItem.value?.details))
-    item.keyValues = JSON.parse(JSON.stringify(currentItem.value?.keyValues))
-    item.history = JSON.parse(JSON.stringify(currentItem.value?.history))
-    item.keyValuesAdd = []
-    item.keyValuesDelete = []
+    if (!currentItem.value) return;
+    item.details = JSON.parse(JSON.stringify(currentItem.value?.details));
+    item.keyValues = JSON.parse(JSON.stringify(currentItem.value?.keyValues));
+    item.history = JSON.parse(JSON.stringify(currentItem.value?.history));
+    item.keyValuesAdd = [];
+    item.keyValuesDelete = [];
     item.originalDetails = JSON.parse(
-      JSON.stringify(currentItem.value?.details),
-    )
+      JSON.stringify(currentItem.value?.details)
+    );
     item.originalKeyValues = JSON.parse(
-      JSON.stringify(currentItem.value?.keyValues),
-    )
+      JSON.stringify(currentItem.value?.keyValues)
+    );
   },
-  { immediate: true },
-)
+  { immediate: true }
+);
 
-const { add } = useToast()
-const { deleteAsync, updateAsync } = usePasswordItemStore()
-const { syncGroupItemsAsync } = usePasswordGroupStore()
-const { currentGroupId, inTrashGroup } = storeToRefs(usePasswordGroupStore())
+const { add } = useToast();
+const { deleteAsync, updateAsync } = usePasswordItemStore();
+const { syncGroupItemsAsync } = usePasswordGroupStore();
+const { currentGroupId, inTrashGroup } = storeToRefs(usePasswordGroupStore());
 
-const ignoreChanges = ref(false)
+const ignoreChanges = ref(false);
 const onUpdateAsync = async () => {
   try {
     const newId = await updateAsync({
@@ -145,42 +145,42 @@ const onUpdateAsync = async () => {
       keyValues: item.keyValues,
       keyValuesAdd: item.keyValuesAdd,
       keyValuesDelete: item.keyValuesDelete,
-    })
-    if (newId) add({ color: 'success', description: t('success.update') })
-    syncGroupItemsAsync()
-    ignoreChanges.value = true
-    onClose()
+    });
+    if (newId) add({ color: "success", description: t("success.update") });
+    syncGroupItemsAsync();
+    ignoreChanges.value = true;
+    onClose();
   } catch (error) {
-    console.log(error)
-    add({ color: 'error', description: t('error.update') })
+    console.log(error);
+    add({ color: "error", description: t("error.update") });
   }
-}
+};
 
 const onClose = () => {
-  if (showConfirmDeleteDialog.value || showUnsavedChangesDialog.value) return
+  if (showConfirmDeleteDialog.value || showUnsavedChangesDialog.value) return;
 
   if (hasChanges.value && !ignoreChanges.value)
-    return (showUnsavedChangesDialog.value = true)
+    return (showUnsavedChangesDialog.value = true);
 
-  readOnly.value = true
-  useRouter().back()
-}
+  readOnly.value = true;
+  useRouter().back();
+};
 
 const deleteItemAsync = async () => {
   try {
-    await deleteAsync(item.details.id, inTrashGroup.value)
-    showConfirmDeleteDialog.value = false
-    add({ color: 'success', description: t('success.delete') })
-    await syncGroupItemsAsync()
-    onClose()
+    await deleteAsync(item.details.id, inTrashGroup.value);
+    showConfirmDeleteDialog.value = false;
+    add({ color: "success", description: t("success.delete") });
+    await syncGroupItemsAsync();
+    onClose();
   } catch (errro) {
-    console.log(errro)
+    console.log(errro);
     add({
-      color: 'error',
-      description: t('error.delete'),
-    })
+      color: "error",
+      description: t("error.delete"),
+    });
   }
-}
+};
 
 const hasChanges = computed(() => {
   return !(
@@ -188,15 +188,15 @@ const hasChanges = computed(() => {
     JSON.stringify(item.originalKeyValues) === JSON.stringify(item.keyValues) &&
     !item.keyValuesAdd.length &&
     !item.keyValuesDelete.length
-  )
-})
+  );
+});
 
-const showUnsavedChangesDialog = ref(false)
+const showUnsavedChangesDialog = ref(false);
 const onConfirmIgnoreChanges = () => {
-  showUnsavedChangesDialog.value = false
-  ignoreChanges.value = true
-  onClose()
-}
+  showUnsavedChangesDialog.value = false;
+  ignoreChanges.value = true;
+  onClose();
+};
 </script>
 
 <i18n lang="yaml">

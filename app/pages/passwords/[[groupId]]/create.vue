@@ -1,13 +1,13 @@
 <template>
   <div class="">
-    <HaexPassGroup
+    <PassGroup
       v-model="group"
       mode="create"
       @close="onClose"
       @submit="createAsync"
     />
 
-    <HaexPassMenuBottom
+    <PassMenuBottom
       show-close-button
       show-save-button
       :has-changes
@@ -15,7 +15,7 @@
       @save="createAsync"
     />
 
-    <HaexPassDialogUnsavedChanges
+    <PassDialogUnsavedChanges
       v-model:ignore-changes="ignoreChanges"
       v-model:open="showUnsavedChangesDialog"
       :has-changes
@@ -26,69 +26,73 @@
 </template>
 
 <script setup lang="ts">
-import type { SelectHaexPasswordsGroups } from '~~/src-tauri/database/schemas/vault'
+import type { SelectHaexPasswordsGroups } from "~/database";
 
 definePageMeta({
-  name: 'passwordGroupCreate',
-})
+  name: "passwordGroupCreate",
+});
 
-const { currentGroupId } = storeToRefs(usePasswordGroupStore())
+const { currentGroupId } = storeToRefs(usePasswordGroupStore());
+
+console.log('[create.vue] currentGroupId:', currentGroupId.value);
+
 const group = ref<SelectHaexPasswordsGroups>({
-  name: '',
-  description: '',
-  id: '',
+  name: "",
+  description: "",
+  id: "",
   color: null,
   icon: null,
   order: null,
   parentId: currentGroupId.value || null,
   createdAt: null,
   updateAt: null,
-  haex_tombstone: null,
-})
+});
+
+console.log('[create.vue] group.parentId:', group.value.parentId);
 
 const errors = ref({
   name: [],
   description: [],
-})
+});
 
-const ignoreChanges = ref(false)
+const ignoreChanges = ref(false);
 
 const onClose = () => {
-  if (showUnsavedChangesDialog.value) return
+  if (showUnsavedChangesDialog.value) return;
 
   if (hasChanges.value && !ignoreChanges.value) {
-    return (showUnsavedChangesDialog.value = true)
+    return (showUnsavedChangesDialog.value = true);
   }
-  useRouter().back()
-}
+  useRouter().back();
+};
 
-const { addGroupAsync } = usePasswordGroupStore()
+const { addGroupAsync } = usePasswordGroupStore();
 const createAsync = async () => {
   try {
-    if (errors.value.name.length || errors.value.description.length) return
+    if (errors.value.name.length || errors.value.description.length) return;
 
-    const newGroup = await addGroupAsync(group.value)
+    const newGroup = await addGroupAsync(group.value);
 
     if (!newGroup.id) {
-      return
+      return;
     }
 
-    ignoreChanges.value = true
+    ignoreChanges.value = true;
     await navigateTo(
       useLocalePath()({
-        name: 'passwordGroupItems',
+        name: "passwordGroupItems",
         params: {
           groupId: newGroup.id,
         },
         query: {
           ...useRoute().query,
         },
-      }),
-    )
+      })
+    );
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
 const hasChanges = computed(() => {
   return !!(
@@ -96,13 +100,13 @@ const hasChanges = computed(() => {
     group.value.description ||
     group.value.icon ||
     group.value.name
-  )
-})
+  );
+});
 
-const showUnsavedChangesDialog = ref(false)
+const showUnsavedChangesDialog = ref(false);
 const onConfirmIgnoreChanges = () => {
-  showUnsavedChangesDialog.value = false
-  ignoreChanges.value = true
-  onClose()
-}
+  showUnsavedChangesDialog.value = false;
+  ignoreChanges.value = true;
+  onClose();
+};
 </script>

@@ -28,3 +28,4 @@ private.key
 # HaexHub Extension
 ./haextension/private.key
 *.haextension
+CLAUDE.md

@@ -1,9 +1,6 @@
 <template>
   <div class="p-1">
-    <UCard
-      class="rounded overflow-auto p-0 h-full"
-      @close="onClose"
-    >
+    <UCard class="rounded overflow-auto p-0 h-full" @close="onClose">
       <div class="">
         <UTabs
           :items="tabs"
@@ -12,7 +9,7 @@
           class="gap-4 w-full"
         >
           <template #details>
-            <HaexPassItemDetails
+            <PassItemDetails
               v-if="details"
               v-model="details"
               with-copy-button
@@ -24,7 +21,7 @@
           </template>
 
           <template #keyValue>
-            <HaexPassItemKeyValue
+            <PassItemKeyValue
               v-if="keyValues"
               v-model="keyValues"
               v-model:items-to-add="keyValuesAdd"
@@ -42,7 +39,7 @@
             class="h-full"
             :aria-labelledby="id.details"
           >
-            <HaexPassItemDetails
+            <PassItemDetails
               v-if="details"
               v-model="details"
               with-copy-button
@@ -59,7 +56,7 @@
             role="tabpanel"
             :aria-labelledby="id.keyValue"
           >
-            <HaexPassItemKeyValue
+            <PassItemKeyValue
               v-if="keyValues"
               v-model="keyValues"
               v-model:items-to-add="keyValuesAdd"
@@ -75,7 +72,7 @@
             role="tabpanel"
             :aria-labelledby="id.history"
           >
-            <HaexPassItemHistory />
+            <PassItemHistory />
           </div>
         </div> -->
       </div>
@@ -84,45 +81,45 @@
 </template>
 
 <script setup lang="ts">
-import type { TabsItem } from '@nuxt/ui'
+import type { TabsItem } from "@nuxt/ui";
 import type {
   SelectHaexPasswordsItemDetails,
   SelectHaexPasswordsItemHistory,
   SelectHaexPasswordsItemKeyValues,
-} from '~~/src-tauri/database/schemas/vault'
+} from "~/database";
 
 defineProps<{
-  defaultIcon?: string | null
-  history: SelectHaexPasswordsItemHistory[]
-}>()
+  defaultIcon?: string | null;
+  history: SelectHaexPasswordsItemHistory[];
+}>();
 
 const emit = defineEmits<{
-  close: []
-  addKeyValue: []
-  removeKeyValue: [string]
-  submit: []
-}>()
+  close: [];
+  addKeyValue: [];
+  removeKeyValue: [string];
+  submit: [];
+}>();
 
-const readOnly = defineModel<boolean>('readOnly', { default: false })
+const readOnly = defineModel<boolean>("readOnly", { default: false });
 
-const details = defineModel<SelectHaexPasswordsItemDetails | null>('details', {
+const details = defineModel<SelectHaexPasswordsItemDetails | null>("details", {
   required: true,
-})
+});
 
-const keyValues = defineModel<SelectHaexPasswordsItemKeyValues[]>('keyValues', {
+const keyValues = defineModel<SelectHaexPasswordsItemKeyValues[]>("keyValues", {
   default: [],
-})
+});
 
 const keyValuesAdd = defineModel<SelectHaexPasswordsItemKeyValues[]>(
-  'keyValuesAdd',
-  { default: [] },
-)
+  "keyValuesAdd",
+  { default: [] }
+);
 const keyValuesDelete = defineModel<SelectHaexPasswordsItemKeyValues[]>(
-  'keyValuesDelete',
-  { default: [] },
-)
+  "keyValuesDelete",
+  { default: [] }
+);
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 /* const id = reactive({
   details: useId(),
@@ -131,31 +128,31 @@ const { t } = useI18n()
   content: {},
 }) */
 
-const preventClose = ref(false)
+const preventClose = ref(false);
 
 const onClose = () => {
-  if (preventClose.value) return
+  if (preventClose.value) return;
 
-  emit('close')
-}
+  emit("close");
+};
 
 const tabs = ref<TabsItem[]>([
   {
-    label: t('tab.details'),
-    icon: 'material-symbols:key-outline',
-    slot: 'details' as const,
+    label: t("tab.details"),
+    icon: "material-symbols:key-outline",
+    slot: "details" as const,
   },
   {
-    label: t('tab.keyValue'),
-    icon: 'fluent:group-list-20-filled',
-    slot: 'keyValue' as const,
+    label: t("tab.keyValue"),
+    icon: "fluent:group-list-20-filled",
+    slot: "keyValue" as const,
   },
   {
-    label: t('tab.history'),
-    icon: 'material-symbols:history',
-    slot: 'history' as const,
+    label: t("tab.history"),
+    icon: "material-symbols:history",
+    slot: "history" as const,
   },
-])
+]);
 </script>
 
 <i18n lang="json">

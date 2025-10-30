@@ -51,9 +51,12 @@ export const useUiStore = defineStore("uiStore", () => {
 
   const context = ref();
 
+  const currentLocale = ref();
+
   return {
     availableThemes,
     context,
+    currentLocale,
     currentTheme,
     currentThemeName,
     defaultTheme,
