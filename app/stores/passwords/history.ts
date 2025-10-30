@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { haexPasswordsItemHistory } from "~/database/schemas";
+import { haexPasswordsItemHistory } from "~/database";
 
 export const usePasswordHistoryStore = defineStore(
   "passwordHistoryStore",
@@ -12,10 +12,11 @@ const getAsync = async (itemId: string | null) => {
   if (!itemId) return null;
 
   try {
-    const { currentVault } = useVaultStore();
+    const haexhubStore = useHaexHubStore();
+    if (!haexhubStore.db) throw new Error("Database not initialized");
 
-    const history = await currentVault?.drizzle
-      ?.select()
+    const history = await haexhubStore.db
+      .select()
       .from(haexPasswordsItemHistory)
       .where(eq(haexPasswordsItemHistory.itemId, itemId));
 

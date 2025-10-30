@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import type { SelectHaexPasswordsItemKeyValues } from '~~/src-tauri/database/schemas/vault'
+import type { SelectHaexPasswordsItemKeyValues } from '~/database'
 
 const { itemId } = defineProps<{ readOnly?: boolean; itemId: string }>()
 
@@ -98,7 +98,6 @@ const addItem = () => {
     key: '',
     value: '',
     updateAt: null,
-    haex_tombstone: null,
   })
 }
 
