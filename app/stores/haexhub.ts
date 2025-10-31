@@ -10,8 +10,7 @@ export const useHaexHubStore = defineStore('haexhub', () => {
 
   const isSetupComplete = ref(false)
   const isInitialized = ref(false)
-
-  let db: SqliteRemoteDatabase<typeof schema> | null = null
+  const db = shallowRef<SqliteRemoteDatabase<typeof schema> | null>(null)
 
   // Initialize database and setup hook (runs once)
   const initializeAsync = async () => {
@@ -20,8 +19,8 @@ export const useHaexHubStore = defineStore('haexhub', () => {
     console.log('[haex-pass] Initializing HaexHub SDK')
 
     // Initialize database schema
-    db = haexhub.client.initializeDatabase(schema)
-    console.log('[haex-pass] Database initialized:', !!db, 'client.db:', !!haexhub.client.db)
+    db.value = haexhub.client.initializeDatabase(schema)
+    console.log('[haex-pass] Database initialized:', !!db.value)
 
     // Register setup hook for table creation
     haexhub.client.onSetup(async () => {
@@ -67,9 +66,7 @@ export const useHaexHubStore = defineStore('haexhub', () => {
   return {
     client: haexhub.client,
     state: haexhub.state,
-    get db() {
-      return db
-    },
+    db,
     getTableName: (tableName: string) => haexhub.client.getTableName(tableName),
     isSetupComplete: readonly(isSetupComplete),
     initializeAsync,
