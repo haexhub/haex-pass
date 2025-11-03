@@ -161,7 +161,20 @@ const parseKeePassXml = (xml: string): KeePassData => {
 
         strings.forEach((str: any) => {
           const key = str.Key;
-          const value = str.Value?.["#text"] || str.Value || "";
+          // Handle different value formats (string, object with #text, or object with Protected flag)
+          let value = "";
+          if (typeof str.Value === "string") {
+            value = str.Value;
+          } else if (str.Value?.["#text"]) {
+            value = str.Value["#text"];
+          } else if (str.Value && typeof str.Value === "object") {
+            // Skip protected/encrypted values
+            if (str.Value.Protected) {
+              value = "";
+            } else {
+              value = String(str.Value);
+            }
+          }
 
           switch (key) {
             case "Title":
@@ -179,14 +192,16 @@ const parseKeePassXml = (xml: string): KeePassData => {
             case "Notes":
               entryData.notes = value;
               // Try to extract OTP secret from notes
-              const otpMatch = value.match(/otpauth:\/\/totp\/[^?]+\?secret=([A-Z0-9]+)/i);
-              if (otpMatch) {
-                entryData.otpSecret = otpMatch[1];
+              if (value && typeof value === "string") {
+                const otpMatch = value.match(/otpauth:\/\/totp\/[^?]+\?secret=([A-Z0-9]+)/i);
+                if (otpMatch) {
+                  entryData.otpSecret = otpMatch[1];
+                }
               }
               break;
             default:
               // Any other String field becomes a key-value pair
-              if (value) {
+              if (value && typeof value === "string") {
                 entryData.keyValues.push({ key, value });
               }
               break;
