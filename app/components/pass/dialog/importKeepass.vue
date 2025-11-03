@@ -33,7 +33,15 @@
           </div>
         </div>
 
-        <!-- Progress -->
+        <!-- Parsing Progress -->
+        <div v-if="parsing" class="space-y-2">
+          <UProgress :value="0" :indeterminate="true" />
+          <div class="text-sm text-center text-dimmed">
+            {{ t('parsing') }}
+          </div>
+        </div>
+
+        <!-- Import Progress -->
         <div v-if="importing" class="space-y-2">
           <UProgress :value="progress" />
           <div class="text-sm text-center text-dimmed">
@@ -60,6 +68,7 @@ const toast = useToast();
 const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
 const xmlContent = ref<string>("");
 const preview = ref<{ groupCount: number; entryCount: number } | null>(null);
+const parsing = ref(false);
 const importing = ref(false);
 const progress = ref(0);
 const error = ref<string | null>(null);
@@ -71,6 +80,8 @@ const onFileChangeAsync = async (event: Event) => {
   if (!file) return;
 
   error.value = null;
+  parsing.value = true;
+  preview.value = null;
 
   try {
     xmlContent.value = await file.text();
@@ -82,6 +93,8 @@ const onFileChangeAsync = async (event: Event) => {
   } catch (err) {
     error.value = t('error.parse');
     console.error(err);
+  } finally {
+    parsing.value = false;
   }
 };
 
@@ -352,6 +365,7 @@ de:
   selectFile: XML-Datei auswählen
   import: Importieren
   cancel: Abbrechen
+  parsing: Datei wird gelesen und verarbeitet...
   importing: Importiere
   preview:
     title: Vorschau
@@ -369,6 +383,7 @@ en:
   selectFile: Select XML file
   import: Import
   cancel: Cancel
+  parsing: Reading and processing file...
   importing: Importing
   preview:
     title: Preview
