@@ -1,6 +1,6 @@
 <template>
   <button
-    class="flex gap-4 w-full px-4 py-2"
+    class="flex gap-4 w-full px-4 py-2 cursor-pointer"
     :style="{ color: menuItem.color ?? '' }"
     @click="$emit('click', menuItem)"
   >

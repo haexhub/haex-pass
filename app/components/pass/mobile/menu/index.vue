@@ -8,14 +8,14 @@
         v-for="(item, index) in menuItems"
         :key="item.id"
         :ref="(el) => setupLongPress(el as HTMLElement, item)"
-        class="bg-accented rounded-lg hover:bg-base-content/20 origin-to intersect:motion-preset-slide-down intersect:motion-ease-spring-bouncier intersect:motion-delay ease-in-out shadow"
+        class="bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 origin-to intersect:motion-preset-slide-down intersect:motion-ease-spring-bouncier intersect:motion-delay ease-in-out shadow cursor-pointer transition-colors"
         :class="{
-          'bg-elevated/30 outline outline-accent hover:bg-base-content/20':
+          'bg-primary-100 dark:bg-primary-900/30 outline outline-primary hover:bg-primary-200 dark:hover:bg-primary-800/30':
             selectedItems.has(item) ||
             (currentSelectedItem?.id === item.id &&
               longPressedHook &&
               !selectedItems.has(item)),
-          'opacity-60 shadow-accent': selectedGroupItems?.some(
+          'opacity-60 shadow-primary': selectedGroupItems?.some(
             (_item) => _item.id === item.id
           ),
         }"

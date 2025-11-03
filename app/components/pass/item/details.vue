@@ -56,6 +56,14 @@
         @keyup.enter="$emit('submit')"
       />
 
+      <UInputTags
+        v-show="!readOnly || tags.length"
+        v-model="tags"
+        :label="t('item.tags.label')"
+        :placeholder="t('item.tags.placeholder')"
+        :disabled="readOnly"
+      />
+
       <!-- <UiSelectIcon
         v-show="!readOnly"
         :default-icon="defaultIcon || 'mdi:key-outline'"
@@ -94,6 +102,21 @@ const itemDetails = defineModel<SelectHaexPasswordsItemDetails>({
   required: true,
 })
 
+// Convert tags from JSON string to array and back
+const tags = computed<string[]>({
+  get: () => {
+    if (!itemDetails.value.tags) return []
+    try {
+      return JSON.parse(itemDetails.value.tags)
+    } catch {
+      return []
+    }
+  },
+  set: (value: string[]) => {
+    itemDetails.value.tags = JSON.stringify(value)
+  }
+})
+
 //const preventClose = defineModel<boolean>('preventClose')
 
 const check = defineModel<boolean>('check-input', { default: false })
@@ -116,6 +139,9 @@ de:
     username: Nutzername
     password: Passwort
     url: Url
+    tags:
+      label: Tags
+      placeholder: Tag hinzufügen...
     note: Notiz
 
 en:
@@ -124,5 +150,8 @@ en:
     username: Username
     password: Password
     url: Url
+    tags:
+      label: Tags
+      placeholder: Add tag...
     note: Note
 </i18n>

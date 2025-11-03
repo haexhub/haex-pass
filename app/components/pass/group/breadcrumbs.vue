@@ -1,7 +1,7 @@
 <template>
   <ul class="flex items-center gap-2 p-2">
     <li>
-      <NuxtLinkLocale :to="{ name: 'passwordGroupItems' }" class="flex items-center">
+      <NuxtLinkLocale :to="{ name: 'passwordGroupItems' }" class="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
         <Icon name="mdi:safe" size="24" />
       </NuxtLinkLocale>
     </li>
@@ -10,6 +10,7 @@
       <Icon name="tabler:chevron-right" class="rtl:rotate-180" />
       <NuxtLinkLocale
         :to="{ name: 'passwordGroupItems', params: { groupId: item.id } }"
+        class="cursor-pointer hover:opacity-80 transition-opacity"
       >
         {{ item.name }}
       </NuxtLinkLocale>
@@ -22,6 +23,7 @@
             name: 'passwordGroupEdit',
             params: { groupId: lastGroup.id },
           }"
+          class="cursor-pointer hover:opacity-80 transition-opacity"
         >
           <Icon name="mdi:pencil" />
         </NuxtLinkLocale>
