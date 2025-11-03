@@ -26,6 +26,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Setup private key
+        run: |
+          mkdir -p haextension
+          echo "${{ secrets.HAEX_PRIVATE_KEY }}" > haextension/private.key
+
       - name: Build extension
         run: pnpm run ext:build
 
