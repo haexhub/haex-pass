@@ -1,0 +1,73 @@
+name: Release Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build extension
+        run: pnpm run ext:build
+
+      - name: Get extension filename
+        id: get_filename
+        run: |
+          FILENAME=$(ls *.xt | head -n 1)
+          echo "filename=$FILENAME" >> $GITHUB_OUTPUT
+          echo "Found extension file: $FILENAME"
+
+      - name: Generate release notes from commits
+        id: generate_notes
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            # If no previous tag, use all commits
+            COMMITS=$(git log --pretty=format:"- %s" HEAD)
+          else
+            # Get commits since previous tag
+            COMMITS=$(git log --pretty=format:"- %s" ${PREVIOUS_TAG}..HEAD)
+          fi
+
+          # Create release notes
+          {
+            echo "## Changes"
+            echo ""
+            echo "$COMMITS"
+            echo ""
+            echo "---"
+            echo ""
+            echo "**Installation:** Download the \`.xt\` file and install it in HaexHub"
+          } > release_notes.md
+
+          cat release_notes.md
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.get_filename.outputs.filename }}
+          body_path: release_notes.md
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@haexhub/sdk':
-        specifier: 1.0.21
-        version: 1.0.21(@nuxt/kit@4.2.0(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.1.12(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3))
+        specifier: 1.0.22
+        version: 1.0.22(@nuxt/kit@4.2.0(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.1.12(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3))
       '@nuxt/eslint':
         specifier: 1.9.0
         version: 1.9.0(@typescript-eslint/utils@8.46.3(eslint@9.39.0(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.22)(eslint@9.39.0(jiti@2.6.1))(magicast@0.5.1)(typescript@5.9.3)(vite@7.1.12(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1))
@@ -634,8 +634,8 @@ packages:
   '@floating-ui/vue@1.1.9':
     resolution: {integrity: sha512-BfNqNW6KA83Nexspgb9DZuz578R7HT8MZw1CfK9I6Ah4QReNWEJsXWHN+SdmOVLNGmTPDi+fDT535Df5PzMLbQ==}
 
-  '@haexhub/sdk@1.0.21':
-    resolution: {integrity: sha512-JsidKqPuqOqz06IoGw0PYQbMuqtIHEMFkX7bUb46io29zeDjXtpoqSFFDEFICgTZG//atx0Yz/JDPhOkp31Gqg==}
+  '@haexhub/sdk@1.0.22':
+    resolution: {integrity: sha512-eRcwZTT1HGTst7Jcm81ueE954e2+K9YE4knsQAaoebTI28JPRP4wnK2HaTxeSXl6Ad31kLZDzeHv9a2pjTgrUg==}
     hasBin: true
     peerDependencies:
       '@nuxt/kit': ^3.0.0 || ^4.0.0
@@ -5488,7 +5488,7 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@haexhub/sdk@1.0.21(@nuxt/kit@4.2.0(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.1.12(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3))':
+  '@haexhub/sdk@1.0.22(@nuxt/kit@4.2.0(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.1.12(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3))':
     dependencies:
       archiver: 7.0.1
       commander: 14.0.2

@@ -18,7 +18,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@haexhub/sdk": "1.0.21",
+    "@haexhub/sdk": "1.0.22",
     "@nuxt/eslint": "1.9.0",
     "@nuxt/ui": "^4.1.0",
     "@nuxtjs/i18n": "^10.2.0",

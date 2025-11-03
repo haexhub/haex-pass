@@ -27,5 +27,5 @@ private.key
 .claude
 # HaexHub Extension
 ./haextension/private.key
-*.haextension
+*.xt
 CLAUDE.md
