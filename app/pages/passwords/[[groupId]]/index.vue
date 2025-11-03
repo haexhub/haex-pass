@@ -1,19 +1,16 @@
 <template>
   <div class="flex flex-1">
-    <!-- <div class="h-screen bg-accented">aaa</div> -->
     <div class="flex flex-col flex-1">
-      <!-- <PassGroupBreadcrumbs
+      <PassGroupBreadcrumbs
         v-show="breadCrumbs.length"
         :items="breadCrumbs"
-        class="px-2 sticky -top-2 z-10"
-      /> -->
-      <!-- <div class="flex-1 py-1 flex"> -->
+        class="px-2 sticky top-0 z-10 bg-background"
+      />
       <PassMobileMenu
         ref="listRef"
         v-model:selected-items="selectedItems"
         :menu-items="groupItems"
       />
-      <!--  </div> -->
 
       <div
         class="fixed bottom-16 flex justify-between transition-all w-full sm:items-center items-end px-8 z-40"
@@ -94,7 +91,7 @@ const { menu } = storeToRefs(usePasswordsActionMenuStore());
 // Initial sync is handled automatically by the watch in usePasswordGroupStore
 const { syncGroupItemsAsync } = usePasswordGroupStore();
 
-const { currentGroupId, inTrashGroup, selectedGroupItems, groups } =
+const { currentGroupId, inTrashGroup, selectedGroupItems, groups, breadCrumbs } =
   storeToRefs(usePasswordGroupStore());
 
 const { items } = storeToRefs(usePasswordItemStore());

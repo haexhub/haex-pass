@@ -1,9 +1,7 @@
 <template>
-  bbb
   <ul class="flex items-center gap-2 p-2">
-    aaaa
     <li>
-      <NuxtLinkLocale :to="{ name: 'passwordGroupItems' }">
+      <NuxtLinkLocale :to="{ name: 'passwordGroupItems' }" class="flex items-center">
         <Icon name="mdi:safe" size="24" />
       </NuxtLinkLocale>
     </li>
@@ -17,12 +15,12 @@
       </NuxtLinkLocale>
     </li>
 
-    <li class="ml-2">
+    <li v-if="lastGroup" class="ml-2">
       <UTooltip :text="t('edit')">
         <NuxtLinkLocale
           :to="{
             name: 'passwordGroupEdit',
-            params: { groupId: lastGroup?.id },
+            params: { groupId: lastGroup.id },
           }"
         >
           <Icon name="mdi:pencil" />
@@ -33,7 +31,9 @@
 </template>
 
 <script setup lang="ts">
-const groups = defineProps<{ items: [] }>();
+import type { SelectHaexPasswordsGroups } from "~/database";
+
+const groups = defineProps<{ items: SelectHaexPasswordsGroups[] }>();
 
 const lastGroup = computed(() => groups.items.at(-1));
 
