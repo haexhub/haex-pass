@@ -13,9 +13,9 @@ const getAsync = async (itemId: string | null) => {
 
   try {
     const haexhubStore = useHaexHubStore();
-    if (!haexhubStore.db) throw new Error("Database not initialized");
+    if (!haexhubStore.orm) throw new Error("Database not initialized");
 
-    const history = await haexhubStore.db
+    const history = await haexhubStore.orm
       .select()
       .from(haexPasswordsItemHistory)
       .where(eq(haexPasswordsItemHistory.itemId, itemId));

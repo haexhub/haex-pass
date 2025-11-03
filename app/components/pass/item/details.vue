@@ -29,22 +29,14 @@
       />
 
       <UiInputPassword
-        v-show="!readOnly || itemDetails.password"
+        v-if="!readOnly || itemDetails.password"
         v-model.trim="itemDetails.password"
         :check-input="check"
         :read-only
         :with-copy-button
+        :with-generator="true"
         @keyup.enter="$emit('submit')"
-      >
-        <template #append>
-          <!-- <UiDialogPasswordGenerator
-            v-if="!readOnly"
-            class="join-item"
-            :password="itemDetails.password"
-            v-model="preventClose"
-          /> -->
-        </template>
-      </UiInputPassword>
+      />
 
       <UiInputUrl
         v-show="!readOnly || itemDetails.url"
@@ -54,6 +46,13 @@
         :read-only
         :with-copy-button
         @keyup.enter="$emit('submit')"
+      />
+
+      <UiInputOtp
+        v-show="!readOnly || itemDetails.otpSecret"
+        v-model="itemDetails.otpSecret"
+        :read-only
+        @submit="$emit('submit')"
       />
 
       <UInputTags
@@ -76,7 +75,7 @@
         v-model="itemDetails.note"
         :label="t('item.note')"
         :placeholder="t('item.note')"
-        :readOnly
+        :read-only
         :with-copy-button
         @keyup.enter.stop
         color="error"
@@ -86,50 +85,50 @@
 </template>
 
 <script setup lang="ts">
-import { onStartTyping } from '@vueuse/core'
-import type { SelectHaexPasswordsItemDetails } from '~/database'
+import { onStartTyping } from "@vueuse/core";
+import type { SelectHaexPasswordsItemDetails } from "~/database";
 
 defineProps<{
-  defaultIcon?: string | null
-  readOnly?: boolean
-  withCopyButton?: boolean
-}>()
+  defaultIcon?: string | null;
+  readOnly?: boolean;
+  withCopyButton?: boolean;
+}>();
 
-defineEmits(['submit'])
-const { t } = useI18n()
+defineEmits(["submit"]);
+const { t } = useI18n();
 
 const itemDetails = defineModel<SelectHaexPasswordsItemDetails>({
   required: true,
-})
+});
 
 // Convert tags from JSON string to array and back
 const tags = computed<string[]>({
   get: () => {
-    if (!itemDetails.value.tags) return []
+    if (!itemDetails.value.tags) return [];
     try {
-      return JSON.parse(itemDetails.value.tags)
+      return JSON.parse(itemDetails.value.tags);
     } catch {
-      return []
+      return [];
     }
   },
   set: (value: string[]) => {
-    itemDetails.value.tags = JSON.stringify(value)
-  }
-})
+    itemDetails.value.tags = JSON.stringify(value);
+  },
+});
 
 //const preventClose = defineModel<boolean>('preventClose')
 
-const check = defineModel<boolean>('check-input', { default: false })
+const check = defineModel<boolean>("check-input", { default: false });
 
 /* onKeyStroke('escape', (e) => {
   e.stopPropagation()
   e.stopImmediatePropagation()
 }) */
 
-const titleRef = useTemplateRef('titleRef')
+const titleRef = useTemplateRef("titleRef");
 onStartTyping(() => {
-  titleRef.value?.$el?.focus()
-})
+  titleRef.value?.$el?.focus();
+});
 </script>
 
 <i18n lang="yaml">

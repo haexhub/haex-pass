@@ -51,9 +51,9 @@ export const usePasswordItemStore = defineStore("passwordItemStore", () => {
 
   const syncItemsAsync = async () => {
     const haexhubStore = useHaexHubStore();
-    if (!haexhubStore.db) throw new Error("Database not initialized");
+    if (!haexhubStore.orm) throw new Error("Database not initialized");
 
-    const result = await haexhubStore.db
+    const result = await haexhubStore.orm
       .select()
       .from(haexPasswordsItemDetails)
       .innerJoin(
@@ -98,6 +98,7 @@ const addAsync = async (
     title: details.title,
     url: details.url,
     username: details.username,
+    otpSecret: details.otpSecret,
   };
 
   const newKeyValues: InserthaexPasswordsItemKeyValues[] = keyValues.map(
@@ -110,18 +111,18 @@ const addAsync = async (
   );
 
   try {
-    if (!haexhubStore.db) throw new Error("Database not initialized");
+    if (!haexhubStore.orm) throw new Error("Database not initialized");
 
     // Insert item details
-    await haexhubStore.db.insert(haexPasswordsItemDetails).values(newDetails);
+    await haexhubStore.orm.insert(haexPasswordsItemDetails).values(newDetails);
 
     // Insert group item relation
     const groupItemData = { itemId: newDetails.id, groupId: group?.id ?? null };
-    await haexhubStore.db.insert(haexPasswordsGroupItems).values(groupItemData);
+    await haexhubStore.orm.insert(haexPasswordsGroupItems).values(groupItemData);
 
     // Insert key values if any
     if (newKeyValues.length) {
-      await haexhubStore.db
+      await haexhubStore.orm
         .insert(haexPasswordsItemKeyValues)
         .values(newKeyValues);
     }
@@ -137,7 +138,7 @@ const addKeyValueAsync = async (
   itemId?: string
 ) => {
   const haexhubStore = useHaexHubStore();
-  if (!haexhubStore.db) throw new Error("Database not initialized");
+  if (!haexhubStore.orm) throw new Error("Database not initialized");
 
   const newKeyValue: InserthaexPasswordsItemKeyValues = {
     id: crypto.randomUUID(),
@@ -147,7 +148,7 @@ const addKeyValueAsync = async (
   };
 
   try {
-    return await haexhubStore.db
+    return await haexhubStore.orm
       .insert(haexPasswordsItemKeyValues)
       .values(newKeyValue);
   } catch (error) {
@@ -160,7 +161,7 @@ const addKeyValuesAsync = async (
   itemId?: string
 ) => {
   const haexhubStore = useHaexHubStore();
-  if (!haexhubStore.db) throw new Error("Database not initialized");
+  if (!haexhubStore.orm) throw new Error("Database not initialized");
 
   const newKeyValues: InserthaexPasswordsItemKeyValues[] = items?.map(
     (item) => ({
@@ -172,7 +173,7 @@ const addKeyValuesAsync = async (
   );
 
   try {
-    return await haexhubStore.db
+    return await haexhubStore.orm
       .insert(haexPasswordsItemKeyValues)
       .values(newKeyValues);
   } catch (error) {
@@ -183,7 +184,7 @@ const addKeyValuesAsync = async (
 const readByGroupIdAsync = async (groupId?: string | null) => {
   try {
     const haexhubStore = useHaexHubStore();
-    if (!haexhubStore.db) throw new Error("Database not initialized");
+    if (!haexhubStore.orm) throw new Error("Database not initialized");
 
     type EntryType = {
       haex_passwords_item_details: SelectHaexPasswordsItemDetails;
@@ -193,7 +194,7 @@ const readByGroupIdAsync = async (groupId?: string | null) => {
     let entries: EntryType[];
 
     if (groupId) {
-      const result = await haexhubStore.db
+      const result = await haexhubStore.orm
         .select()
         .from(haexPasswordsGroupItems)
         .innerJoin(
@@ -203,7 +204,7 @@ const readByGroupIdAsync = async (groupId?: string | null) => {
         .where(eq(haexPasswordsGroupItems.groupId, groupId));
       entries = result as unknown as EntryType[];
     } else {
-      const result = await haexhubStore.db
+      const result = await haexhubStore.orm
         .select()
         .from(haexPasswordsGroupItems)
         .innerJoin(
@@ -226,9 +227,9 @@ const readAsync = async (itemId: string | null) => {
 
   try {
     const haexhubStore = useHaexHubStore();
-    if (!haexhubStore.db) throw new Error("Database not initialized");
+    if (!haexhubStore.orm) throw new Error("Database not initialized");
 
-    const result = await haexhubStore.db
+    const result = await haexhubStore.orm
       .select()
       .from(haexPasswordsItemDetails)
       .where(eq(haexPasswordsItemDetails.id, itemId))
@@ -251,9 +252,9 @@ const readAsync = async (itemId: string | null) => {
 const readKeyValuesAsync = async (itemId: string | null) => {
   if (!itemId) return null;
   const haexhubStore = useHaexHubStore();
-  if (!haexhubStore.db) throw new Error("Database not initialized");
+  if (!haexhubStore.orm) throw new Error("Database not initialized");
 
-  const keyValues = await haexhubStore.db
+  const keyValues = await haexhubStore.orm
     .select()
     .from(haexPasswordsItemKeyValues)
     .where(eq(haexPasswordsItemKeyValues.itemId, itemId));
@@ -287,6 +288,7 @@ const updateAsync = async ({
     title: details.title,
     url: details.url,
     username: details.username,
+    otpSecret: details.otpSecret,
   };
 
   const newKeyValues: InserthaexPasswordsItemKeyValues[] = keyValues
@@ -308,23 +310,23 @@ const updateAsync = async ({
   );
 
   try {
-    if (!haexhubStore.db) throw new Error("Database not initialized");
+    if (!haexhubStore.orm) throw new Error("Database not initialized");
 
     // Update item details
-    await haexhubStore.db
+    await haexhubStore.orm
       .update(haexPasswordsItemDetails)
       .set(newDetails)
       .where(eq(haexPasswordsItemDetails.id, newDetails.id));
 
     // Update group item relation
-    await haexhubStore.db
+    await haexhubStore.orm
       .update(haexPasswordsGroupItems)
       .set({ itemId: newDetails.id, groupId })
       .where(eq(haexPasswordsGroupItems.itemId, newDetails.id));
 
     // Update existing key values
     for (const keyValue of newKeyValues) {
-      await haexhubStore.db
+      await haexhubStore.orm
         .update(haexPasswordsItemKeyValues)
         .set(keyValue)
         .where(eq(haexPasswordsItemKeyValues.id, keyValue.id));
@@ -332,14 +334,14 @@ const updateAsync = async ({
 
     // Add new key values
     if (newKeyValuesAdd.length) {
-      await haexhubStore.db
+      await haexhubStore.orm
         .insert(haexPasswordsItemKeyValues)
         .values(newKeyValuesAdd);
     }
 
     // Delete key values
     for (const keyValue of keyValuesDelete) {
-      await haexhubStore.db
+      await haexhubStore.orm
         .delete(haexPasswordsItemKeyValues)
         .where(eq(haexPasswordsItemKeyValues.id, keyValue.id));
     }
@@ -353,29 +355,29 @@ const updateAsync = async ({
 
 const deleteAsync = async (itemId: string, final: boolean = false) => {
   const haexhubStore = useHaexHubStore();
-  if (!haexhubStore.db) throw new Error("Database not initialized");
+  if (!haexhubStore.orm) throw new Error("Database not initialized");
 
   const { createTrashIfNotExistsAsync, trashId } = usePasswordGroupStore();
 
   if (final) {
     try {
       // Delete key values
-      await haexhubStore.db
+      await haexhubStore.orm
         .delete(haexPasswordsItemKeyValues)
         .where(eq(haexPasswordsItemKeyValues.itemId, itemId));
 
       // Delete history
-      await haexhubStore.db
+      await haexhubStore.orm
         .delete(haexPasswordsItemHistory)
         .where(eq(haexPasswordsItemHistory.itemId, itemId));
 
       // Delete group items
-      await haexhubStore.db
+      await haexhubStore.orm
         .delete(haexPasswordsGroupItems)
         .where(eq(haexPasswordsGroupItems.itemId, itemId));
 
       // Delete item details
-      await haexhubStore.db
+      await haexhubStore.orm
         .delete(haexPasswordsItemDetails)
         .where(eq(haexPasswordsItemDetails.id, itemId));
     } catch (error) {
@@ -384,7 +386,7 @@ const deleteAsync = async (itemId: string, final: boolean = false) => {
     }
   } else {
     if (await createTrashIfNotExistsAsync()) {
-      await haexhubStore.db
+      await haexhubStore.orm
         .update(haexPasswordsGroupItems)
         .set({ groupId: trashId })
         .where(eq(haexPasswordsGroupItems.itemId, itemId));
@@ -394,9 +396,9 @@ const deleteAsync = async (itemId: string, final: boolean = false) => {
 
 const deleteKeyValueAsync = async (id: string) => {
   const haexhubStore = useHaexHubStore();
-  if (!haexhubStore.db) throw new Error("Database not initialized");
+  if (!haexhubStore.orm) throw new Error("Database not initialized");
 
-  return await haexhubStore.db
+  return await haexhubStore.orm
     .delete(haexPasswordsItemKeyValues)
     .where(eq(haexPasswordsItemKeyValues.id, id));
 };

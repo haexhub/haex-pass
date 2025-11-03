@@ -57,11 +57,28 @@ export const usePasswordGroupStore = defineStore('passwordGroupStore', () => {
   }
 
   const syncGroupItemsAsync = async () => {
+    const haexhubStore = useHaexHubStore()
+
+    // Wait for database to be initialized
+    if (!haexhubStore.orm) {
+      console.log('[syncGroupItemsAsync] Database not yet initialized, skipping sync')
+      return
+    }
+
     const { syncItemsAsync } = usePasswordItemStore()
 
     groups.value = (await readGroupsAsync()) ?? []
     await syncItemsAsync()
   }
+
+  // Watch for haexhub initialization and then sync
+  const haexhubStore = useHaexHubStore()
+  watch(() => haexhubStore.orm, (orm) => {
+    if (orm) {
+      console.log('[passwordGroupStore] Database initialized, syncing items')
+      syncGroupItemsAsync()
+    }
+  }, { immediate: true })
 
   watch(currentGroupId, () => syncGroupItemsAsync(), {
     immediate: false,
@@ -97,7 +114,7 @@ export const usePasswordGroupStore = defineStore('passwordGroupStore', () => {
 
 const addGroupAsync = async (group: Partial<InsertHaexPasswordsGroups>) => {
   const haexhubStore = useHaexHubStore()
-  if (!haexhubStore.db) throw new Error('Database not initialized')
+  if (!haexhubStore.orm) throw new Error('Database not initialized')
 
   const newGroup: InsertHaexPasswordsGroups = {
     id: group.id || crypto.randomUUID(),
@@ -108,16 +125,16 @@ const addGroupAsync = async (group: Partial<InsertHaexPasswordsGroups>) => {
     order: group.order,
   }
 
-  await haexhubStore.db.insert(haexPasswordsGroups).values(newGroup)
+  await haexhubStore.orm.insert(haexPasswordsGroups).values(newGroup)
 
   return newGroup
 }
 
 const readGroupAsync = async (groupId: string) => {
   const haexhubStore = useHaexHubStore()
-  if (!haexhubStore.db) throw new Error('Database not initialized')
+  if (!haexhubStore.orm) throw new Error('Database not initialized')
 
-  const result = await haexhubStore.db
+  const result = await haexhubStore.orm
     .select()
     .from(haexPasswordsGroups)
     .where(eq(haexPasswordsGroups.id, groupId))
@@ -128,17 +145,17 @@ const readGroupAsync = async (groupId: string) => {
 
 const readGroupsAsync = async (filter?: { parentId?: string | null }) => {
   const haexhubStore = useHaexHubStore()
-  if (!haexhubStore.db) throw new Error('Database not initialized')
+  if (!haexhubStore.orm) throw new Error('Database not initialized')
 
   let query
   if (filter?.parentId) {
-    query = haexhubStore.db
+    query = haexhubStore.orm
       .select()
       .from(haexPasswordsGroups)
       .where(eq(haexPasswordsGroups.parentId, filter.parentId))
       .orderBy(sql`${haexPasswordsGroups.order} nulls last`)
   } else {
-    query = haexhubStore.db
+    query = haexhubStore.orm
       .select()
       .from(haexPasswordsGroups)
       .orderBy(sql`${haexPasswordsGroups.order} nulls last`)
@@ -151,15 +168,15 @@ const readGroupItemsAsync = async (
   groupId?: string | null
 ): Promise<SelectHaexPasswordsGroupItems[]> => {
   const haexhubStore = useHaexHubStore()
-  if (!haexhubStore.db) throw new Error('Database not initialized')
+  if (!haexhubStore.orm) throw new Error('Database not initialized')
 
   if (groupId) {
-    return await haexhubStore.db
+    return await haexhubStore.orm
       .select()
       .from(haexPasswordsGroupItems)
       .where(eq(haexPasswordsGroupItems.groupId, groupId))
   } else {
-    return await haexhubStore.db
+    return await haexhubStore.orm
       .select()
       .from(haexPasswordsGroupItems)
       .where(isNull(haexPasswordsGroupItems.groupId))
@@ -183,16 +200,16 @@ const getByParentIdAsync = async (
 ): Promise<SelectHaexPasswordsGroups[]> => {
   try {
     const haexhubStore = useHaexHubStore()
-    if (!haexhubStore.db) throw new Error('Database not initialized')
+    if (!haexhubStore.orm) throw new Error('Database not initialized')
 
     if (parentId) {
-      return await haexhubStore.db
+      return await haexhubStore.orm
         .select()
         .from(haexPasswordsGroups)
         .where(eq(haexPasswordsGroups.parentId, parentId))
         .orderBy(sql`${haexPasswordsGroups.order} nulls last`)
     } else {
-      return await haexhubStore.db
+      return await haexhubStore.orm
         .select()
         .from(haexPasswordsGroups)
         .where(isNull(haexPasswordsGroups.parentId))
@@ -219,7 +236,7 @@ const navigateToGroupAsync = (groupId?: string | null) =>
 
 const updateAsync = async (group: InsertHaexPasswordsGroups) => {
   const haexhubStore = useHaexHubStore()
-  if (!haexhubStore.db) throw new Error('Database not initialized')
+  if (!haexhubStore.orm) throw new Error('Database not initialized')
   if (!group.id) return
 
   const newGroup: InsertHaexPasswordsGroups = {
@@ -232,7 +249,7 @@ const updateAsync = async (group: InsertHaexPasswordsGroups) => {
     parentId: group.parentId,
   }
 
-  return await haexhubStore.db
+  return await haexhubStore.orm
     .update(haexPasswordsGroups)
     .set(newGroup)
     .where(eq(haexPasswordsGroups.id, newGroup.id))
@@ -257,7 +274,7 @@ const insertGroupItemsAsync = async (
   groupdId?: string | null
 ) => {
   const haexhubStore = useHaexHubStore()
-  if (!haexhubStore.db) throw new Error('Database not initialized')
+  if (!haexhubStore.orm) throw new Error('Database not initialized')
 
   const { groups } = usePasswordGroupStore()
   const { syncGroupItemsAsync } = usePasswordGroupStore()
@@ -272,14 +289,14 @@ const insertGroupItemsAsync = async (
 
       if (updateGroup) {
         updateGroup.parentId = targetGroup?.id ?? null
-        await haexhubStore.db
+        await haexhubStore.orm
           .update(haexPasswordsGroups)
           .set(updateGroup)
           .where(eq(haexPasswordsGroups.id, updateGroup.id))
       }
     } else {
       if (targetGroup) {
-        await haexhubStore.db
+        await haexhubStore.orm
           .update(haexPasswordsGroupItems)
           .set({ groupId: targetGroup.id, itemId: item.id })
           .where(eq(haexPasswordsGroupItems.itemId, item.id))
@@ -303,7 +320,7 @@ const createTrashIfNotExistsAsync = async () => {
 
 const deleteGroupAsync = async (groupId: string, final: boolean = false) => {
   const haexhubStore = useHaexHubStore()
-  if (!haexhubStore.db) throw new Error('Database not initialized')
+  if (!haexhubStore.orm) throw new Error('Database not initialized')
 
   const { readByGroupIdAsync, deleteAsync } = usePasswordItemStore()
 
@@ -319,7 +336,7 @@ const deleteGroupAsync = async (groupId: string, final: boolean = false) => {
       if (item) await deleteAsync(item.id, true)
     }
 
-    return await haexhubStore.db
+    return await haexhubStore.orm
       .delete(haexPasswordsGroups)
       .where(eq(haexPasswordsGroups.id, groupId))
   } else {

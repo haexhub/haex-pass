@@ -1,6 +1,7 @@
 <template>
   <div class="flex flex-1">
     <div class="flex flex-col flex-1">
+      <PassHeader />
       <PassGroupBreadcrumbs
         v-show="breadCrumbs.length"
         :items="breadCrumbs"
@@ -185,7 +186,7 @@ onKeyStroke("e", async (e) => {
 });
 
 const onCut = () => {
-  selectedGroupItems.value = [...selectedItems.value];
+  selectedGroupItems.value = Array.from(selectedItems.value);
   selectedItems.value.clear();
 };
 onKeyStroke("x", (event) => {
@@ -239,22 +240,61 @@ const { deleteAsync } = usePasswordItemStore();
 const { deleteGroupAsync } = usePasswordGroupStore();
 
 const onDeleteAsync = async () => {
-  for (const item of selectedItems.value) {
-    if (item.type === "group") {
-      await deleteGroupAsync(item.id, inTrashGroup.value);
-    }
-    if (item.type === "item") {
-      await deleteAsync(item.id, inTrashGroup.value);
+  if (selectedItems.value.size === 0) return;
+
+  console.log('[onDeleteAsync] Starting deletion of', selectedItems.value.size, 'items');
+
+  const itemsToDelete = Array.from(selectedItems.value);
+  let successCount = 0;
+  let errorCount = 0;
+
+  for (const item of itemsToDelete) {
+    try {
+      console.log('[onDeleteAsync] Deleting item:', item.type, item.id);
+
+      if (item.type === "group") {
+        await deleteGroupAsync(item.id, inTrashGroup.value);
+      } else if (item.type === "item") {
+        await deleteAsync(item.id, inTrashGroup.value);
+      }
+
+      successCount++;
+    } catch (error) {
+      console.error(`[onDeleteAsync] Error deleting ${item.type} ${item.id}:`, error);
+      errorCount++;
     }
   }
+
   selectedItems.value.clear();
   await syncGroupItemsAsync();
+
+  console.log('[onDeleteAsync] Deletion complete. Success:', successCount, 'Errors:', errorCount);
+
+  if (errorCount > 0) {
+    add({
+      color: "error",
+      description: t("error.deletePartial", { success: successCount, failed: errorCount }),
+    });
+  } else {
+    add({
+      color: "success",
+      description: t(inTrashGroup.value ? "success.deletedPermanently" : "success.deletedToTrash"),
+    });
+  }
 };
-/* const keys = useMagicKeys()
-whenever(keys, async () => {
-  await onDeleteAsync()
-}) */
-onKeyStroke("delete", () => onDeleteAsync());
+onKeyStroke("Delete", (event) => {
+  if (selectedItems.value.size > 0) {
+    event.preventDefault();
+    onDeleteAsync();
+  }
+});
+
+onKeyStroke("Backspace", (event) => {
+  if (selectedItems.value.size > 0) {
+    event.preventDefault();
+    onDeleteAsync();
+  }
+});
 
 const listRef = useTemplateRef<HTMLElement>("listRef");
 onClickOutside(listRef, () =>
@@ -269,9 +309,23 @@ de:
   delete: Löschen
   edit: Bearbeiten
   wtf: "wtf"
+  success:
+    deletedToTrash: Erfolgreich in den Papierkorb verschoben
+    deletedPermanently: Erfolgreich gelöscht
+  error:
+    delete: Fehler beim Löschen
+    paste: Fehler beim Einfügen
+    deletePartial: "{success} erfolgreich gelöscht, {failed} fehlgeschlagen"
 en:
   cut: Cut
   paste: Paste
   delete: Delete
   edit: Edit
+  success:
+    deletedToTrash: Successfully moved to trash
+    deletedPermanently: Successfully deleted
+  error:
+    delete: Error deleting items
+    paste: Error pasting items
+    deletePartial: "{success} deleted successfully, {failed} failed"
 </i18n>

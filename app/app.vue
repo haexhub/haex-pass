@@ -1,5 +1,5 @@
 <template>
-  <div v-if="haexhubStore.isSetupComplete">
+  <div v-if="haexhubStore.state.isSetupComplete">
     <UApp :locale="currentLocaleData">
       <NuxtPage />
     </UApp>
@@ -29,9 +29,5 @@ const currentLocaleData = computed(() => {
 onMounted(async () => {
   await haexhubStore.initializeAsync();
   await haexhubStore.waitForSetupAsync();
-
-  // Trigger initial data sync after setup is complete
-  const { syncGroupItemsAsync } = usePasswordGroupStore();
-  await syncGroupItemsAsync();
 });
 </script>

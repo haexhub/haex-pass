@@ -36,17 +36,19 @@
         @keyup.enter="$emit('submit')"
       />
 
-      <div class="flex flex-wrap gap-4">
-        <!-- <UiSelectIcon
-            v-model="group.icon"
-            default-icon="mdi:folder-outline"
-            :readOnly
-          />
+      <div class="flex flex-col gap-4">
+        <UiSelectIcon
+          v-model="group.icon"
+          :label="t('icon')"
+          default-icon="mdi:folder-outline"
+          :read-only
+        />
 
-          <UiSelectColor
-            v-model="group.color"
-            :readOnly
-          /> -->
+        <UiSelectColor
+          v-model="group.color"
+          :label="t('color')"
+          :read-only
+        />
       </div>
     </form>
   </UCard>

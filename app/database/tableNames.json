@@ -6,9 +6,7 @@
         "id": "id",
         "key": "key",
         "type": "type",
-        "value": "value",
-        "haexTombstone": "haex_tombstone",
-        "haexTimestamp": "haex_timestamp"
+        "value": "value"
       }
     },
     "extensions": {
@@ -25,9 +23,7 @@
         "public_key": "public_key",
         "signature": "signature",
         "url": "url",
-        "version": "version",
-        "haexTombstone": "haex_tombstone",
-        "haexTimestamp": "haex_timestamp"
+        "version": "version"
       }
     },
     "extension_permissions": {
@@ -41,9 +37,7 @@
         "constraints": "constraints",
         "status": "status",
         "createdAt": "created_at",
-        "updateAt": "updated_at",
-        "haexTombstone": "haex_tombstone",
-        "haexTimestamp": "haex_timestamp"
+        "updateAt": "updated_at"
       }
     },
     "notifications": {
@@ -58,9 +52,7 @@
         "source": "source",
         "text": "text",
         "title": "title",
-        "type": "type",
-        "haexTombstone": "haex_tombstone",
-        "haexTimestamp": "haex_timestamp"
+        "type": "type"
       }
     },
     "passwords": {

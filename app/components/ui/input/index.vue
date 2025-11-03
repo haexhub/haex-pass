@@ -2,14 +2,14 @@
   <UInput
     v-model="value"
     :placeholder="props.placeholder || ' '"
-    :readonly="props.readOnly"
+    :disabled="props.readOnly"
     :leading-icon="props.leadingIcon"
     :ui="{ base: 'peer' }"
-    :size="isSmallScreen ? 'lg' : 'md'"
-    @change="(e) => $emit('change', e)"
-    @blur="(e) => $emit('blur', e)"
-    @keyup="(e: KeyboardEvent) => $emit('keyup', e)"
-    @keydown="(e: KeyboardEvent) => $emit('keydown', e)"
+    @input="$emit('input', $event)"
+    @change="$emit('change', $event)"
+    @blur="$emit('blur', $event)"
+    @keyup="$emit('keyup', $event)"
+    @keydown="$emit('keydown', $event)"
   >
     <label
       class="absolute pointer-events-none -top-2.5 left-0 text-highlighted text-xs font-medium px-1.5 transition-all peer-focus:-top-2.5 peer-focus:text-highlighted peer-focus:text-xs peer-focus:font-medium peer-placeholder-shown:text-sm peer-placeholder-shown:text-dimmed peer-placeholder-shown:top-1.5 peer-placeholder-shown:font-normal"
@@ -36,56 +36,49 @@
       />
     </template>
 
-    <template
-      v-for="(_, slotName) in filteredSlots"
-      #[slotName]="slotProps"
-    >
-      <slot
-        :name="slotName"
-        v-bind="slotProps"
-      />
+    <template v-for="(_, slotName) in filteredSlots" #[slotName]="slotProps">
+      <slot :name="slotName" v-bind="slotProps" />
     </template>
   </UInput>
 </template>
 
 <script setup lang="ts">
-import { useClipboard } from '@vueuse/core'
-import type { InputProps } from '@nuxt/ui'
-import type { AcceptableValue } from '@nuxt/ui/runtime/types/utils.js'
+import { useClipboard } from "@vueuse/core";
+import type { InputProps } from "@nuxt/ui";
+import type { AcceptableValue } from "@nuxt/ui/runtime/types/utils.js";
 
-const value = defineModel<AcceptableValue | undefined>()
+const value = defineModel<AcceptableValue | undefined>();
 
 interface IInputProps extends /* @vue-ignore */ InputProps {
-  tooltip?: string
+  tooltip?: string;
 }
 
 const props = defineProps<
   IInputProps & {
-    withCopyButton?: boolean
-    readOnly?: boolean
-    label?: string
-    leadingIcon?: string
+    withCopyButton?: boolean;
+    readOnly?: boolean;
+    label?: string;
+    leadingIcon?: string;
   }
->()
+>();
 
 defineEmits<{
-  change: [Event]
-  blur: [Event]
-  keyup: [KeyboardEvent]
-  keydown: [KeyboardEvent]
-}>()
+  input: [Event];
+  change: [Event];
+  blur: [Event];
+  keyup: [KeyboardEvent];
+  keydown: [KeyboardEvent];
+}>();
 
-const { copy, copied } = useClipboard()
+const { copy, copied } = useClipboard();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const filteredSlots = computed(() => {
   return Object.fromEntries(
-    Object.entries(useSlots()).filter(([name]) => name !== 'trailing'),
-  )
-})
-
-const { isSmallScreen } = storeToRefs(useUiStore())
+    Object.entries(useSlots()).filter(([name]) => name !== "trailing")
+  );
+});
 </script>
 
 <i18n lang="yaml">
