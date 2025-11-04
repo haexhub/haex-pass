@@ -2,10 +2,11 @@
   <div class="flex flex-1">
     <div class="flex flex-col flex-1">
       <PassHeader />
+
       <PassGroupBreadcrumbs
         v-show="breadCrumbs.length"
         :items="breadCrumbs"
-        class="px-2 sticky top-0 z-10 bg-background"
+        class="sticky top-0 z-10 bg-default"
       />
       <PassMobileMenu
         ref="listRef"
@@ -71,7 +72,7 @@
 
 <script setup lang="ts">
 import type { IPasswordMenuItem } from "~/components/pass/mobile/menu/types";
-import { onKeyStroke, onClickOutside } from '@vueuse/core'
+import { onKeyStroke, onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import { getTableName } from "drizzle-orm";
 import { haexPasswordsGroupItems, haexPasswordsItemDetails } from "~/database";
@@ -92,8 +93,13 @@ const { menu } = storeToRefs(usePasswordsActionMenuStore());
 // Initial sync is handled automatically by the watch in usePasswordGroupStore
 const { syncGroupItemsAsync } = usePasswordGroupStore();
 
-const { currentGroupId, inTrashGroup, selectedGroupItems, groups, breadCrumbs } =
-  storeToRefs(usePasswordGroupStore());
+const {
+  currentGroupId,
+  inTrashGroup,
+  selectedGroupItems,
+  groups,
+  breadCrumbs,
+} = storeToRefs(usePasswordGroupStore());
 
 const { items } = storeToRefs(usePasswordItemStore());
 const { search } = storeToRefs(useSearchStore());
@@ -105,16 +111,16 @@ const itemDetailsTableName = getTableName(haexPasswordsItemDetails);
 // Helper function to check if a group is in trash
 const isGroupInTrash = (groupId: string | null | undefined): boolean => {
   if (!groupId) return false;
-  if (groupId === 'trash') return true;
+  if (groupId === "trash") return true;
 
-  const group = groups.value.find(g => g.id === groupId);
+  const group = groups.value.find((g) => g.id === groupId);
   if (!group) return false;
 
   return isGroupInTrash(group.parentId);
 };
 
 // Cache Fuse.js instance for better performance
-let fuseInstance: Fuse<typeof items.value[number]> | null = null;
+let fuseInstance: Fuse<(typeof items.value)[number]> | null = null;
 let lastItemsLength = 0;
 
 const groupItems = computed<IPasswordMenuItem[]>(() => {
@@ -122,7 +128,7 @@ const groupItems = computed<IPasswordMenuItem[]>(() => {
 
   // When searching, only show groups if search is empty
   const filteredGroups = search.value
-    ? []  // Don't show groups when searching
+    ? [] // Don't show groups when searching
     : groups.value.filter((group) => group.parentId == currentGroupId.value);
 
   const filteredItems = search.value
@@ -145,12 +151,10 @@ const groupItems = computed<IPasswordMenuItem[]>(() => {
         }
         return fuseInstance.search(search.value).map((match) => match.item);
       })()
-    : items.value.filter(
-        (item) => {
-          const itemRecord = item as Record<string, Record<string, unknown>>;
-          return itemRecord[groupItemsTableName]?.groupId == currentGroupId.value;
-        }
-      );
+    : items.value.filter((item) => {
+        const itemRecord = item as Record<string, Record<string, unknown>>;
+        return itemRecord[groupItemsTableName]?.groupId == currentGroupId.value;
+      });
 
   menuItems.push(
     ...filteredGroups.map<IPasswordMenuItem>((group) => ({
@@ -292,12 +296,19 @@ const onDeleteAsync = async () => {
   if (errorCount > 0) {
     add({
       color: "error",
-      description: t("error.deletePartial", { success: successCount, failed: errorCount }),
+      description: t("error.deletePartial", {
+        success: successCount,
+        failed: errorCount,
+      }),
     });
   } else {
     add({
       color: "success",
-      description: t(inTrashGroup.value ? "success.deletedPermanently" : "success.deletedToTrash"),
+      description: t(
+        inTrashGroup.value
+          ? "success.deletedPermanently"
+          : "success.deletedToTrash"
+      ),
     });
   }
 };

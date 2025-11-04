@@ -1,5 +1,5 @@
 <template>
-  <div v-if="menuItems?.length" class="flex-1 h-full">
+  <div v-if="menuItems?.length" class="flex-1 h-full p-2">
     <ul
       ref="listRef"
       class="flex flex-col w-full h-full gap-y-2 first:rounded-t-md last:rounded-b-md p-1"

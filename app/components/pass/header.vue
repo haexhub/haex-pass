@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sticky top-0 z-20 bg-accented/50 border-b border-border p-4"
+    class="sticky top-0 z-20 bg-accented/50 border-b border-border px-3 py-2"
     style="backdrop-filter: blur(12px)"
   >
     <div class="flex items-center gap-2">
@@ -47,7 +47,7 @@ const showImportDialog = ref(false);
 
 // Prevent Ctrl+A from selecting all items when focused on search input
 const onSearchKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'a' && event.ctrlKey) {
+  if (event.key === "a" && event.ctrlKey) {
     // Let the default behavior happen (select all text in input)
     // But stop propagation to prevent the global Ctrl+A handler
     event.stopPropagation();

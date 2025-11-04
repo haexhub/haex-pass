@@ -1,7 +1,10 @@
 <template>
-  <ul class="flex items-center gap-2 p-2">
+  <ul class="flex items-center gap-2 px-7 pt-3">
     <li>
-      <NuxtLinkLocale :to="{ name: 'passwordGroupItems' }" class="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
+      <NuxtLinkLocale
+        :to="{ name: 'passwordGroupItems' }"
+        class="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+      >
         <Icon name="mdi:safe" size="24" />
       </NuxtLinkLocale>
     </li>
