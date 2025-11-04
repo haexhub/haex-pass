@@ -40,7 +40,8 @@ export const haexPasswordsItemKeyValues = sqliteTable(
   {
     id: text().primaryKey(),
     itemId: text("item_id").references(
-      (): AnySQLiteColumn => haexPasswordsItemDetails.id
+      (): AnySQLiteColumn => haexPasswordsItemDetails.id,
+      { onDelete: "cascade" }
     ),
     key: text(),
     value: text(),
@@ -59,7 +60,8 @@ export const haexPasswordsItemHistory = sqliteTable(
   {
     id: text().primaryKey(),
     itemId: text("item_id").references(
-      (): AnySQLiteColumn => haexPasswordsItemDetails.id
+      (): AnySQLiteColumn => haexPasswordsItemDetails.id,
+      { onDelete: "cascade" }
     ),
     changedProperty:
       text("changed_property").$type<keyof typeof haexPasswordsItemDetails>(),
@@ -83,7 +85,8 @@ export const haexPasswordsGroups = sqliteTable(
     order: integer(),
     color: text(),
     parentId: text("parent_id").references(
-      (): AnySQLiteColumn => haexPasswordsGroups.id
+      (): AnySQLiteColumn => haexPasswordsGroups.id,
+      { onDelete: "cascade" }
     ),
     createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
     updateAt: integer("updated_at", { mode: "timestamp" }).$onUpdate(
@@ -98,10 +101,12 @@ export const haexPasswordsGroupItems = sqliteTable(
   getTableName(tableNames.haex.passwords.group_items),
   {
     groupId: text("group_id").references(
-      (): AnySQLiteColumn => haexPasswordsGroups.id
+      (): AnySQLiteColumn => haexPasswordsGroups.id,
+      { onDelete: "cascade" }
     ),
     itemId: text("item_id").references(
-      (): AnySQLiteColumn => haexPasswordsItemDetails.id
+      (): AnySQLiteColumn => haexPasswordsItemDetails.id,
+      { onDelete: "cascade" }
     ),
   },
   (table) => [primaryKey({ columns: [table.itemId, table.groupId] })]

@@ -322,20 +322,8 @@ const deleteGroupAsync = async (groupId: string, final: boolean = false) => {
   const haexhubStore = useHaexHubStore()
   if (!haexhubStore.orm) throw new Error('Database not initialized')
 
-  const { readByGroupIdAsync, deleteAsync } = usePasswordItemStore()
-
   if (final || groupId === trashId) {
-    const childGroups = await getByParentIdAsync(groupId)
-
-    for (const child of childGroups) {
-      await deleteGroupAsync(child.id, true)
-    }
-
-    const items = (await readByGroupIdAsync(groupId)) ?? []
-    for (const item of items) {
-      if (item) await deleteAsync(item.id, true)
-    }
-
+    // With CASCADE DELETE in the schema, child groups and items will be automatically deleted
     return await haexhubStore.orm
       .delete(haexPasswordsGroups)
       .where(eq(haexPasswordsGroups.id, groupId))

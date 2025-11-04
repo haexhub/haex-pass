@@ -118,19 +118,12 @@ let fuseInstance: Fuse<typeof items.value[number]> | null = null;
 let lastItemsLength = 0;
 
 const groupItems = computed<IPasswordMenuItem[]>(() => {
-  console.log('[groupItems] currentGroupId:', currentGroupId.value, 'type:', typeof currentGroupId.value)
-  console.log('[groupItems] All groups:', groups.value.map(g => ({ id: g.id, name: g.name, parentId: g.parentId })))
-
   const menuItems: IPasswordMenuItem[] = [];
 
   // When searching, only show groups if search is empty
   const filteredGroups = search.value
     ? []  // Don't show groups when searching
-    : groups.value.filter((group) => {
-        const matches = group.parentId == currentGroupId.value
-        console.log('[groupItems] Group:', group.name, 'parentId:', group.parentId, 'matches:', matches)
-        return matches
-      });
+    : groups.value.filter((group) => group.parentId == currentGroupId.value);
 
   const filteredItems = search.value
     ? (() => {
@@ -271,33 +264,30 @@ const { deleteGroupAsync } = usePasswordGroupStore();
 const onDeleteAsync = async () => {
   if (selectedItems.value.size === 0) return;
 
-  console.log('[onDeleteAsync] Starting deletion of', selectedItems.value.size, 'items');
-
   const itemsToDelete = Array.from(selectedItems.value);
   let successCount = 0;
   let errorCount = 0;
 
   for (const item of itemsToDelete) {
     try {
-      console.log('[onDeleteAsync] Deleting item:', item.type, item.id);
+      // If item is already in trash, delete permanently
+      const deletePermanently = item.inTrash || false;
 
       if (item.type === "group") {
-        await deleteGroupAsync(item.id, inTrashGroup.value);
+        await deleteGroupAsync(item.id, deletePermanently);
       } else if (item.type === "item") {
-        await deleteAsync(item.id, inTrashGroup.value);
+        await deleteAsync(item.id, deletePermanently);
       }
 
       successCount++;
     } catch (error) {
-      console.error(`[onDeleteAsync] Error deleting ${item.type} ${item.id}:`, error);
+      console.error(`Error deleting ${item.type} ${item.id}:`, error);
       errorCount++;
     }
   }
 
   selectedItems.value.clear();
   await syncGroupItemsAsync();
-
-  console.log('[onDeleteAsync] Deletion complete. Success:', successCount, 'Errors:', errorCount);
 
   if (errorCount > 0) {
     add({
