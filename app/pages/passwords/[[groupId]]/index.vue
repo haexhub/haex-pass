@@ -102,18 +102,30 @@ const { search } = storeToRefs(useSearchStore());
 const groupItemsTableName = getTableName(haexPasswordsGroupItems);
 const itemDetailsTableName = getTableName(haexPasswordsItemDetails);
 
+// Helper function to check if a group is in trash
+const isGroupInTrash = (groupId: string | null | undefined): boolean => {
+  if (!groupId) return false;
+  if (groupId === 'trash') return true;
+
+  const group = groups.value.find(g => g.id === groupId);
+  if (!group) return false;
+
+  return isGroupInTrash(group.parentId);
+};
+
+// Cache Fuse.js instance for better performance
+let fuseInstance: Fuse<typeof items.value[number]> | null = null;
+let lastItemsLength = 0;
+
 const groupItems = computed<IPasswordMenuItem[]>(() => {
   console.log('[groupItems] currentGroupId:', currentGroupId.value, 'type:', typeof currentGroupId.value)
   console.log('[groupItems] All groups:', groups.value.map(g => ({ id: g.id, name: g.name, parentId: g.parentId })))
 
   const menuItems: IPasswordMenuItem[] = [];
+
+  // When searching, only show groups if search is empty
   const filteredGroups = search.value
-    ? new Fuse(groups.value, {
-        keys: ["name", "description"],
-        findAllMatches: true,
-      })
-        .search(search.value)
-        .map((match) => match.item)
+    ? []  // Don't show groups when searching
     : groups.value.filter((group) => {
         const matches = group.parentId == currentGroupId.value
         console.log('[groupItems] Group:', group.name, 'parentId:', group.parentId, 'matches:', matches)
@@ -121,11 +133,25 @@ const groupItems = computed<IPasswordMenuItem[]>(() => {
       });
 
   const filteredItems = search.value
-    ? new Fuse(items.value, {
-        keys: ["title", "note", "password", "tags", "url", "username"],
-      })
-        .search(search.value)
-        .map((match) => match.item)
+    ? (() => {
+        // Recreate Fuse instance only when items change
+        if (!fuseInstance || lastItemsLength !== items.value.length) {
+          fuseInstance = new Fuse(items.value, {
+            keys: [
+              `${itemDetailsTableName}.title`,
+              `${itemDetailsTableName}.note`,
+              `${itemDetailsTableName}.password`,
+              `${itemDetailsTableName}.tags`,
+              `${itemDetailsTableName}.url`,
+              `${itemDetailsTableName}.username`,
+            ],
+            threshold: 0.4, // More lenient matching
+            ignoreLocation: true, // Don't care where in the string the match is
+          });
+          lastItemsLength = items.value.length;
+        }
+        return fuseInstance.search(search.value).map((match) => match.item);
+      })()
     : items.value.filter(
         (item) => {
           const itemRecord = item as Record<string, Record<string, unknown>>;
@@ -140,6 +166,7 @@ const groupItems = computed<IPasswordMenuItem[]>(() => {
       id: group.id,
       name: group.name,
       type: "group",
+      inTrash: isGroupInTrash(group.id),
     }))
   );
 
@@ -147,11 +174,13 @@ const groupItems = computed<IPasswordMenuItem[]>(() => {
     ...filteredItems.map<IPasswordMenuItem>((item) => {
       const itemRecord = item as Record<string, Record<string, unknown>>;
       const details = itemRecord[itemDetailsTableName];
+      const groupItem = itemRecord[groupItemsTableName];
       return {
         icon: details?.icon as string | null,
         id: details?.id as string,
         name: details?.title as string | null,
         type: "item",
+        inTrash: isGroupInTrash(groupItem?.groupId as string | null),
       };
     })
   );

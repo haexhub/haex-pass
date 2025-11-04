@@ -26,6 +26,16 @@
       <slot name="trailing" />
 
       <UiButton
+        v-show="props.withClearButton && value"
+        color="neutral"
+        :tooltip="t('clear')"
+        icon="mdi:close"
+        size="sm"
+        variant="link"
+        @click="value = ''"
+      />
+
+      <UiButton
         v-show="props.withCopyButton"
         :color="copied ? 'success' : 'neutral'"
         :tooltip="t('copy')"
@@ -56,6 +66,7 @@ interface IInputProps extends /* @vue-ignore */ InputProps {
 const props = defineProps<
   IInputProps & {
     withCopyButton?: boolean;
+    withClearButton?: boolean;
     readOnly?: boolean;
     label?: string;
     leadingIcon?: string;
@@ -84,7 +95,9 @@ const filteredSlots = computed(() => {
 <i18n lang="yaml">
 de:
   copy: Kopieren
+  clear: Löschen
 
 en:
   copy: Copy
+  clear: Clear
 </i18n>

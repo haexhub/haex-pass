@@ -1,12 +1,17 @@
 <template>
-  <div class="sticky top-0 z-20 bg-background border-b border-border p-4">
+  <div
+    class="sticky top-0 z-20 bg-accented/50 border-b border-border p-4"
+    style="backdrop-filter: blur(12px)"
+  >
     <div class="flex items-center gap-2">
       <!-- Search -->
       <UiInput
-        v-model="search"
+        v-model="searchInput"
         :placeholder="t('search')"
         leading-icon="mdi:magnify"
+        with-clear-button
         class="flex-1"
+        @keydown="onSearchKeydown"
       />
 
       <!-- Sort -->
@@ -36,34 +41,43 @@
 
 <script setup lang="ts">
 const { t } = useI18n();
-const { search } = storeToRefs(useSearchStore());
+const { searchInput } = storeToRefs(useSearchStore());
 
 const showImportDialog = ref(false);
+
+// Prevent Ctrl+A from selecting all items when focused on search input
+const onSearchKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'a' && event.ctrlKey) {
+    // Let the default behavior happen (select all text in input)
+    // But stop propagation to prevent the global Ctrl+A handler
+    event.stopPropagation();
+  }
+};
 
 const sortOptions = computed(() => [
   [
     {
-      label: t('sortBy.name'),
-      icon: 'mdi:sort-alphabetical-ascending',
+      label: t("sortBy.name"),
+      icon: "mdi:sort-alphabetical-ascending",
       onSelect: () => {
         // TODO: Implement sorting
-        console.log('Sort by name');
+        console.log("Sort by name");
       },
     },
     {
-      label: t('sortBy.dateCreated'),
-      icon: 'mdi:sort-calendar-ascending',
+      label: t("sortBy.dateCreated"),
+      icon: "mdi:sort-calendar-ascending",
       onSelect: () => {
         // TODO: Implement sorting
-        console.log('Sort by date');
+        console.log("Sort by date");
       },
     },
     {
-      label: t('sortBy.dateModified'),
-      icon: 'mdi:sort-clock-ascending',
+      label: t("sortBy.dateModified"),
+      icon: "mdi:sort-clock-ascending",
       onSelect: () => {
         // TODO: Implement sorting
-        console.log('Sort by modified');
+        console.log("Sort by modified");
       },
     },
   ],

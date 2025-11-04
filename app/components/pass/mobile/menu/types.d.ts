@@ -4,4 +4,5 @@ export interface IPasswordMenuItem {
   id: string
   name: string | null
   type: 'group' | 'item'
+  inTrash?: boolean
 }

@@ -18,6 +18,7 @@
           'opacity-60 shadow-primary': selectedGroupItems?.some(
             (_item) => _item.id === item.id
           ),
+          'opacity-50': item.inTrash,
         }"
         :style="{ '--motion-delay': `${50 * index}ms` }"
         @mousedown="
@@ -74,7 +75,7 @@ watch(selectedItems, () => {
 
 const localePath = useLocalePath();
 const { ctrl } = useMagicKeys();
-const { search } = storeToRefs(useSearchStore());
+const { searchInput } = storeToRefs(useSearchStore());
 
 const onClickItemAsync = async (item: IPasswordMenuItem) => {
   currentSelectedItem.value = null;
@@ -106,7 +107,7 @@ const onClickItemAsync = async (item: IPasswordMenuItem) => {
         })
       );
     }
-    search.value = "";
+    searchInput.value = "";
   }
 };
 
