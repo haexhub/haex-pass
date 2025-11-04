@@ -19,15 +19,14 @@
       type="color"
     />
 
-    <UiTooltip :tooltip="t('reset')">
-      <UiButton
-        color="error"
-        :class="{ 'btn-disabled': readOnly }"
-        icon="mdi:refresh"
-        :disabled="readOnly"
-        @click="model = ''"
-      />
-    </UiTooltip>
+    <UiButton
+      color="error"
+      :class="{ 'btn-disabled': readOnly }"
+      icon="mdi:refresh"
+      :tooltip="t('reset')"
+      :disabled="readOnly"
+      @click="model = ''"
+    />
   </div>
 </template>
 
