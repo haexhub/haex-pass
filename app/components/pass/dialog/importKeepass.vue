@@ -44,7 +44,7 @@
 
         <!-- Import Progress -->
         <div v-if="importing" class="space-y-2">
-          <UProgress :value="progress" />
+          <UProgress v-model="progress" />
           <div class="text-sm text-center text-dimmed">
             {{ t('importing') }}: {{ progress }}%
           </div>
