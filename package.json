@@ -29,6 +29,7 @@
     "eslint": "^9.39.0",
     "fast-xml-parser": "^5.3.1",
     "fuse.js": "^7.1.0",
+    "kdbxweb": "^2.1.1",
     "nuxt": "^4.2.0",
     "otpauth": "^9.4.1",
     "tailwindcss": "^4.1.16",

@@ -1,18 +1,7 @@
 <template>
-  <UModal
-    v-model:open="open"
-    :title
-    :description
-  >
-    <template
-      v-for="(_, name) in $slots"
-      :key="name"
-      #[name]="slotData"
-    >
-      <slot
-        :name="name"
-        v-bind="slotData"
-      />
+  <UModal v-model:open="open" :title :description>
+    <template v-for="(_, name) in $slots" :key="name" #[name]="slotData">
+      <slot :name="name" v-bind="slotData" />
     </template>
 
     <template #footer>
@@ -28,6 +17,7 @@
         <UiButton
           :icon="confirmIcon || 'mdi:check'"
           :label="confirmLabel || t('confirm')"
+          :disabled="confirmDisabled"
           block
           color="primary"
           variant="solid"
@@ -40,18 +30,19 @@
 
 <script setup lang="ts">
 defineProps<{
-  abortIcon?: string
-  abortLabel?: string
-  confirmIcon?: string
-  confirmLabel?: string
-  description?: string
-  title?: string
-}>()
+  abortIcon?: string;
+  abortLabel?: string;
+  confirmIcon?: string;
+  confirmLabel?: string;
+  confirmDisabled?: boolean;
+  description?: string;
+  title?: string;
+}>();
 
-const open = defineModel<boolean>('open', { default: false })
+const open = defineModel<boolean>("open", { default: false });
 
-const { t } = useI18n()
-defineEmits(['confirm'])
+const { t } = useI18n();
+defineEmits(["confirm"]);
 </script>
 
 <i18n lang="yaml">

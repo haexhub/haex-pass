@@ -1,13 +1,15 @@
 <template>
   <UiInput
+    ref="uiInputRef"
     v-model="value"
-    :label="t('label')"
+    :label="label || t('label')"
     :leading-icon
     :placeholder="placeholder || ' '"
     :read-only
     :type="show ? 'text' : 'password'"
     :with-copy-button
     :check-input="checkInput"
+    v-bind="$attrs"
     @keyup="$emit('keyup', $event)"
   >
     <template #trailing>
@@ -47,7 +49,11 @@
 <script setup lang="ts">
 import type { AcceptableValue } from "@nuxt/ui/runtime/types/utils.js";
 
-const { readOnly, withGenerator, checkInput } = defineProps<{
+defineOptions({
+  inheritAttrs: false,
+});
+
+const { readOnly, withGenerator, checkInput, label, placeholder, leadingIcon, withCopyButton } = defineProps<{
   label?: string;
   placeholder?: string;
   leadingIcon?: string;
@@ -66,6 +72,14 @@ const value = defineModel<AcceptableValue | undefined>();
 const show = ref(false);
 const showGenerator = ref(false);
 const { t } = useI18n();
+
+// Template ref for UiInput
+const uiInputRef = useTemplateRef("uiInputRef");
+
+// Expose inputRef from UiInput so parent components can access it
+defineExpose({
+  inputRef: computed(() => uiInputRef.value?.inputRef),
+});
 </script>
 
 <i18n lang="yaml">

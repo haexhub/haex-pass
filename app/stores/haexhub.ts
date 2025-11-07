@@ -22,16 +22,10 @@ export const useHaexHubStore = defineStore("haexhub", () => {
   const { currentThemeName, context } = storeToRefs(useUiStore());
   const { defaultLocale, locales, setLocale } = useI18n();
 
-  // Initialize database and setup hook (runs once)
-  const initializeAsync = async () => {
-    if (isInitialized.value) return;
-
-    console.log("[haex-pass] Initializing HaexHub SDK");
-
-    // Initialize database schema
-    orm.value = haexhub.client.initializeDatabase(schema);
-    console.log("[haex-pass] Database initialized:", !!orm.value);
-
+  // Register setup hook for database migrations
+  // IMPORTANT: This must be done at store initialization time, BEFORE any component
+  // tries to use the database. The hook will be executed when setupComplete() is called.
+  haexhub.client.onSetup(async () => {
     // Convert migration files to the format expected by the SDK
     const migrations = Object.entries(migrationFiles).map(
       ([path, content]) => {
@@ -44,16 +38,32 @@ export const useHaexHubStore = defineStore("haexhub", () => {
     );
 
     console.log(
-      `[haex-pass] Running ${migrations.length} migration(s)`
+      `[haex-pass] Running ${migrations.length} migration(s) in setup hook`
     );
 
-    // Run migrations immediately - this will create tables on first install
+    // Run migrations - this will create tables on first install
     // and apply schema updates on subsequent runs
     await haexhub.client.runMigrationsAsync(
       manifest.public_key,
       manifest.name,
       migrations
     );
+  });
+
+  // Initialize database and setup hook (runs once)
+  const initializeAsync = async () => {
+    if (isInitialized.value) return;
+
+    console.log("[haex-pass] Initializing HaexHub SDK");
+
+    // Initialize database schema
+    orm.value = haexhub.client.initializeDatabase(schema);
+    console.log("[haex-pass] Database initialized:", !!orm.value);
+
+    // Trigger setup to run the registered hook (migrations)
+    // This will execute the hook we registered above
+    await haexhub.client.setupComplete();
+    console.log("[haex-pass] Setup complete");
 
     // Setup context watcher
     watch(

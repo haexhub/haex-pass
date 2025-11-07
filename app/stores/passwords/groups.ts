@@ -71,11 +71,11 @@ export const usePasswordGroupStore = defineStore('passwordGroupStore', () => {
     await syncItemsAsync()
   }
 
-  // Watch for haexhub initialization and then sync
+  // Watch for haexhub setup completion AND orm initialization, then sync
   const haexhubStore = useHaexHubStore()
-  watch(() => haexhubStore.orm, (orm) => {
-    if (orm) {
-      console.log('[passwordGroupStore] Database initialized, syncing items')
+  watch(() => ({ isSetupComplete: haexhubStore.state.isSetupComplete, orm: haexhubStore.orm }), ({ isSetupComplete, orm }) => {
+    if (isSetupComplete && orm) {
+      console.log('[passwordGroupStore] Setup complete and ORM ready, syncing items')
       syncGroupItemsAsync()
     }
   }, { immediate: true })

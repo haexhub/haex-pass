@@ -65,7 +65,6 @@ defineEmits<{
 }>()
 
 const hasChanges = computed(() => {
-  console.log('group has changes', props.originally, passwordGroup.value)
   if (!props.originally) {
     if (
       passwordGroup.value.color?.length ||
@@ -86,7 +85,6 @@ const hasChanges = computed(() => {
 const onClose = () => {
   /* if (props.originally) passwordGroup.value = { ...props.originally };
   emit('close'); */
-  console.log('close group card')
 }
 </script>
 

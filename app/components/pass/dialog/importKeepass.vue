@@ -2,8 +2,10 @@
   <UiDialogConfirm
     v-model:open="isOpen"
     :title="t('title')"
+    :description="t('selectFile')"
     :confirm-label="t('import')"
     :abort-label="t('cancel')"
+    :confirm-disabled="!canImport"
     confirm-icon="mdi:database-import"
     abort-icon="mdi:close"
     @confirm="importAsync"
@@ -11,35 +13,34 @@
     <template #body>
       <div class="space-y-4 w-full">
         <!-- File Upload -->
-        <div class="space-y-2">
-          <label class="block text-sm font-medium">{{ t('selectFile') }}</label>
+        <div class="relative">
           <input
             ref="fileInput"
             type="file"
-            accept=".xml,.csv"
-            class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+            accept=".kdbx"
+            class="hidden"
             @change="onFileChangeAsync"
+          />
+          <UButton
+            :label="selectedFileName || t('chooseFile')"
+            icon="mdi:file-outline"
+            color="neutral"
+            variant="outline"
+            class="w-full justify-start"
+            @click="fileInput?.click()"
           />
         </div>
 
-        <!-- Preview Stats -->
-        <div v-if="preview" class="p-4 bg-muted rounded-lg space-y-2">
-          <div class="text-sm font-medium">{{ t('preview.title') }}</div>
-          <div class="grid grid-cols-2 gap-2 text-sm">
-            <div>{{ t('preview.groups') }}:</div>
-            <div class="font-semibold">{{ preview.groupCount }}</div>
-            <div>{{ t('preview.entries') }}:</div>
-            <div class="font-semibold">{{ preview.entryCount }}</div>
-          </div>
-        </div>
-
-        <!-- Parsing Progress -->
-        <div v-if="parsing" class="space-y-2">
-          <UProgress :value="0" :indeterminate="true" />
-          <div class="text-sm text-center text-dimmed">
-            {{ t('parsing') }}
-          </div>
-        </div>
+        <!-- Password Input -->
+        <UiInputPassword
+          v-if="fileData"
+          ref="passwordInput"
+          v-model="password"
+          :label="t('password')"
+          :placeholder="t('password')"
+          class="w-full"
+          @keyup.enter="canImport && importAsync()"
+        />
 
         <!-- Import Progress -->
         <div v-if="importing" class="space-y-2">
@@ -59,195 +60,83 @@
 </template>
 
 <script setup lang="ts">
-import { XMLParser } from 'fast-xml-parser';
+import * as kdbxweb from 'kdbxweb';
+import type { SqliteRemoteDatabase } from 'drizzle-orm/sqlite-proxy';
+import { onStartTyping } from '@vueuse/core';
+import { addBinaryAsync } from '~/utils/cleanup';
+import {
+  haexPasswordsItemBinaries,
+  haexPasswordsItemSnapshots,
+  haexPasswordsSnapshotBinaries,
+  type SelectHaexPasswordsItemKeyValues,
+} from '~/database/schemas';
+import * as schema from '~/database/schemas';
+import { getIconForKeePassIndex } from '~/utils/keepassIconMapping';
 
 const isOpen = defineModel<boolean>("open", { default: false });
 const { t } = useI18n();
 const toast = useToast();
 
 const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
-const xmlContent = ref<string>("");
-const preview = ref<{ groupCount: number; entryCount: number } | null>(null);
-const parsing = ref(false);
+const passwordInput = useTemplateRef("passwordInput");
+const fileData = ref<ArrayBuffer | null>(null);
+const selectedFileName = ref<string | null>(null);
+const password = ref("");
 const importing = ref(false);
 const progress = ref(0);
 const error = ref<string | null>(null);
+
+// Auto-focus password input when user starts typing (after file is selected)
+onStartTyping(() => {
+  if (fileData.value && passwordInput.value?.inputRef && !importing.value) {
+    passwordInput.value.inputRef.focus();
+  }
+});
+
+// Computed: Can import when file and password are provided
+const canImport = computed(() => {
+  return !!fileData.value && !!password.value && !importing.value;
+});
 
 const onFileChangeAsync = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
 
-  if (!file) return;
+  if (!file) {
+    selectedFileName.value = null;
+    return;
+  }
+
+  selectedFileName.value = file.name;
 
   error.value = null;
-  parsing.value = true;
-  preview.value = null;
+  password.value = "";
 
   try {
-    xmlContent.value = await file.text();
-    const previewData = parseKeePassXml(xmlContent.value);
-    preview.value = {
-      groupCount: previewData.groups.length,
-      entryCount: previewData.entries.length,
-    };
+    const buffer = await file.arrayBuffer();
+    fileData.value = buffer;
+
+    // Focus password input after file is loaded
+    await nextTick();
+
+    const inputElement = passwordInput.value?.inputRef;
+    if (inputElement) {
+      inputElement.focus();
+    }
   } catch (err) {
     error.value = t('error.parse');
     console.error(err);
-  } finally {
-    parsing.value = false;
   }
-};
-
-interface KeePassKeyValue {
-  key: string;
-  value: string;
-}
-
-interface KeePassEntry {
-  groupPath: string;
-  title: string;
-  username: string;
-  password: string;
-  url: string;
-  notes: string;
-  tags: string;
-  otpSecret?: string;
-  keyValues: KeePassKeyValue[];
-}
-
-interface KeePassGroup {
-  name: string;
-  path: string;
-  uuid: string;
-}
-
-interface KeePassData {
-  groups: KeePassGroup[];
-  entries: KeePassEntry[];
-}
-
-const parseKeePassXml = (xml: string): KeePassData => {
-  const parser = new XMLParser({
-    ignoreAttributes: false,
-    attributeNamePrefix: "@_",
-  });
-
-  const result = parser.parse(xml);
-  const groups: KeePassGroup[] = [];
-  const entries: KeePassEntry[] = [];
-
-  // Recursive function to traverse groups
-  const traverseGroup = (group: any, parentPath: string = "") => {
-    if (!group) return;
-
-    const groupName = group.Name || "Unnamed";
-    const groupPath = parentPath ? `${parentPath} → ${groupName}` : groupName;
-
-    // Skip Root group in path
-    const finalPath = groupName === "Root" ? "" : groupPath;
-
-    if (groupName !== "Root") {
-      groups.push({
-        name: groupName,
-        path: finalPath,
-        uuid: group.UUID || crypto.randomUUID(),
-      });
-    }
-
-    // Process entries in this group
-    if (group.Entry) {
-      const groupEntries = Array.isArray(group.Entry) ? group.Entry : [group.Entry];
-
-      groupEntries.forEach((entry: any) => {
-        const strings = Array.isArray(entry.String) ? entry.String : [entry.String];
-
-        const entryData: any = {
-          groupPath: finalPath || "Root",
-          title: "",
-          username: "",
-          password: "",
-          url: "",
-          notes: "",
-          tags: entry.Tags || "",
-          keyValues: [],
-        };
-
-        strings.forEach((str: any) => {
-          const key = str.Key;
-          // Handle different value formats (string, object with #text, or object with Protected flag)
-          let value = "";
-          if (typeof str.Value === "string") {
-            value = str.Value;
-          } else if (str.Value?.["#text"]) {
-            value = str.Value["#text"];
-          } else if (str.Value && typeof str.Value === "object") {
-            // Skip protected/encrypted values
-            if (str.Value.Protected) {
-              value = "";
-            } else {
-              value = String(str.Value);
-            }
-          }
-
-          switch (key) {
-            case "Title":
-              entryData.title = value;
-              break;
-            case "UserName":
-              entryData.username = value;
-              break;
-            case "Password":
-              entryData.password = value;
-              break;
-            case "URL":
-              entryData.url = value;
-              break;
-            case "Notes":
-              entryData.notes = value;
-              // Try to extract OTP secret from notes
-              if (value && typeof value === "string") {
-                const otpMatch = value.match(/otpauth:\/\/totp\/[^?]+\?secret=([A-Z0-9]+)/i);
-                if (otpMatch) {
-                  entryData.otpSecret = otpMatch[1];
-                }
-              }
-              break;
-            default:
-              // Any other String field becomes a key-value pair
-              if (value && typeof value === "string") {
-                entryData.keyValues.push({ key, value });
-              }
-              break;
-          }
-        });
-
-        if (entryData.title) {
-          entries.push(entryData);
-        }
-      });
-    }
-
-    // Process nested groups
-    if (group.Group) {
-      const subGroups = Array.isArray(group.Group) ? group.Group : [group.Group];
-      subGroups.forEach((subGroup: any) => traverseGroup(subGroup, finalPath));
-    }
-  };
-
-  // Start traversal from root
-  if (result.KeePassFile?.Root?.Group) {
-    traverseGroup(result.KeePassFile.Root.Group);
-  }
-
-  return {
-    groups,
-    entries,
-  };
 };
 
 const importAsync = async () => {
-  if (!xmlContent.value) {
+  if (!fileData.value) {
     error.value = t('error.noFile');
+    return;
+  }
+
+  if (!password.value) {
+    error.value = t('error.noPassword');
     return;
   }
 
@@ -256,142 +145,312 @@ const importAsync = async () => {
   error.value = null;
 
   try {
-    const data = parseKeePassXml(xmlContent.value);
-
-    const { addGroupAsync } = usePasswordGroupStore();
-    const { addAsync } = usePasswordItemStore();
-
-    // Create group mapping from full path to group ID
-    const groupMapping = new Map<string, string>();
-
-    // Parse and create groups with hierarchy
-    // Sort by path depth to ensure parent groups are created first
-    const sortedGroups = [...data.groups].sort((a, b) => {
-      const aDepth = a.path.split(' → ').length;
-      const bDepth = b.path.split(' → ').length;
-      return aDepth - bDepth;
-    });
-
-    for (let i = 0; i < sortedGroups.length; i++) {
-      const group = sortedGroups[i];
-      if (!group) continue;
-
-      const pathParts = group.path.split(' → ');
-      const groupName = pathParts[pathParts.length - 1];
-
-      // Find parent group ID if this is a nested group
-      let parentId: string | null = null;
-      if (pathParts.length > 1) {
-        const parentPath = pathParts.slice(0, -1).join(' → ');
-        parentId = groupMapping.get(parentPath) || null;
-      }
-
-      const newGroup = await addGroupAsync({
-        name: groupName || 'Unnamed',
-        icon: "mdi:folder-outline",
-        parentId: parentId,
-      });
-
-      groupMapping.set(group.path, newGroup.id);
-
-      progress.value = Math.round(((i + 1) / (sortedGroups.length + data.entries.length)) * 100);
-    }
-
-    // Import entries
-    for (let i = 0; i < data.entries.length; i++) {
-      const entry = data.entries[i];
-      if (!entry) continue;
-
-      const groupId = groupMapping.get(entry.groupPath) || null;
-
-      await addAsync(
-        {
-          id: crypto.randomUUID(),
-          title: entry.title,
-          username: entry.username,
-          password: entry.password,
-          url: entry.url,
-          note: entry.notes,
-          otpSecret: entry.otpSecret || null,
-          icon: null,
-          tags: entry.tags || null,
-          createdAt: null,
-          updateAt: null,
-        },
-        entry.keyValues.map((kv) => ({
-          id: crypto.randomUUID(),
-          key: kv.key,
-          value: kv.value,
-          itemId: null,
-          updateAt: null,
-        })),
-        groupId ? { id: groupId, name: null, description: null, icon: null, color: null, parentId: null, order: null, createdAt: null, updateAt: null } : null
-      );
-
-      progress.value = Math.round(
-        ((sortedGroups.length + i + 1) / (sortedGroups.length + data.entries.length)) * 100
-      );
-    }
-
-    // Sync data
-    const { syncGroupItemsAsync } = usePasswordGroupStore();
-    await syncGroupItemsAsync();
+    const stats = await importKdbxAsync(fileData.value, password.value);
 
     toast.add({
       title: t('success'),
       description: t('successDescription', {
-        groups: data.groups.length,
-        entries: data.entries.length,
+        groups: stats.groupCount,
+        entries: stats.entryCount,
       }),
       color: "success",
     });
 
     isOpen.value = false;
-    xmlContent.value = "";
-    preview.value = null;
-  } catch (err) {
-    error.value = t('error.import');
-    console.error(err);
+    fileData.value = null;
+    password.value = "";
+  } catch (err: any) {
+    console.error('[KeePass Import] Error:', err);
+    console.error('[KeePass Import] Error stack:', err.stack);
+    console.error('[KeePass Import] Error message:', err.message);
+
+    if (err.message?.includes('InvalidKey') || err.message?.includes('password')) {
+      error.value = t('error.wrongPassword');
+    } else {
+      error.value = t('error.import') + ': ' + (err.message || String(err));
+    }
   } finally {
     importing.value = false;
     progress.value = 0;
   }
 };
+
+// Helper function to extract field value from kdbxweb
+function getFieldValue(field: kdbxweb.KdbxEntryField | undefined): string {
+  if (!field) return '';
+  if (typeof field === 'string') return field;
+  if (field instanceof kdbxweb.ProtectedValue) return field.getText();
+  // Fallback for any other type
+  return String(field);
+}
+
+// Helper function to extract and store icon from KeePass
+async function extractIconAsync(
+  kdbx: kdbxweb.Kdbx,
+  item: kdbxweb.KdbxGroup | kdbxweb.KdbxEntry,
+  orm: SqliteRemoteDatabase<typeof schema>
+): Promise<string | null> {
+  let icon: string | null = null;
+
+  // Check for custom icon first
+  if (item.customIcon && item.customIcon.id) {
+    const customIconData = kdbx.meta.customIcons.get(item.customIcon.id);
+    if (customIconData) {
+      // Convert ArrayBuffer to Base64
+      const uint8Array = new Uint8Array(customIconData.data);
+      const binaryString = String.fromCharCode(...Array.from(uint8Array));
+      const base64 = btoa(binaryString);
+
+      // Store as binary and reference it
+      const hash = await addBinaryAsync(orm, base64, uint8Array.length);
+      icon = `binary:${hash}`;
+    }
+  }
+
+  // Fallback to standard icon
+  if (!icon && item.icon !== undefined && item.icon !== null) {
+    const mappedIcon = getIconForKeePassIndex(item.icon);
+    icon = mappedIcon;
+  }
+
+  return icon;
+}
+
+async function importKdbxAsync(buffer: ArrayBuffer, pwd: string): Promise<{ groupCount: number; entryCount: number }> {
+  const credentials = new kdbxweb.Credentials(kdbxweb.ProtectedValue.fromString(pwd));
+  const kdbx = await kdbxweb.Kdbx.load(buffer, credentials);
+
+  const { addGroupAsync } = usePasswordGroupStore();
+  const { addAsync } = usePasswordItemStore();
+  const { orm } = storeToRefs(useHaexHubStore());
+
+  if (!orm.value) {
+    throw new Error('Database not initialized');
+  }
+
+  // Group mapping: KeePass UUID → haex Group ID
+  const groupMapping = new Map<string, string>();
+
+  // Collect all groups
+  const allGroups: Array<{ group: kdbxweb.KdbxGroup; parentUuid: string | null }> = [];
+
+  function collectGroups(group: kdbxweb.KdbxGroup, parentUuid: string | null = null) {
+    // Skip Root group
+    if (group.name !== 'Root') {
+      allGroups.push({ group, parentUuid });
+    }
+
+    for (const subGroup of group.groups) {
+      collectGroups(subGroup, group.uuid.id);
+    }
+  }
+
+  collectGroups(kdbx.getDefaultGroup());
+
+  const allEntries = Array.from(kdbx.getDefaultGroup().allEntries());
+  const totalSteps = allGroups.length + allEntries.length;
+  let currentStep = 0;
+
+  // Create groups (parent groups first)
+  for (const { group, parentUuid } of allGroups) {
+    const parentId = parentUuid ? groupMapping.get(parentUuid) || null : null;
+
+    // Extract icon from KeePass
+    const icon = await extractIconAsync(kdbx, group, orm.value!);
+
+    const newGroup = await addGroupAsync({
+      name: group.name,
+      icon,
+      parentId,
+    });
+
+    groupMapping.set(group.uuid.id, newGroup.id);
+    currentStep++;
+    progress.value = Math.round((currentStep / totalSteps) * 100);
+  }
+
+  // Import entries with attachments and history
+  for (const entry of allEntries) {
+    const groupId = entry.parentGroup ? groupMapping.get(entry.parentGroup.uuid.id) || null : null;
+
+    // Extract fields
+    const title = getFieldValue(entry.fields.get('Title'));
+    const username = getFieldValue(entry.fields.get('UserName'));
+    const password = getFieldValue(entry.fields.get('Password'));
+    const url = getFieldValue(entry.fields.get('URL'));
+    const notes = getFieldValue(entry.fields.get('Notes'));
+    const tags = entry.tags?.join(', ') || null;
+
+    // Extract OTP secret (suchen in custom fields oder notes)
+    let otpSecret: string | null = null;
+    const otpField = entry.fields.get('otp') || entry.fields.get('OTP');
+    if (otpField) {
+      otpSecret = getFieldValue(otpField) || null;
+    } else if (notes && typeof notes === 'string') {
+      const otpMatch = notes.match(/otpauth:\/\/totp\/[^?]+\?secret=([A-Z0-9]+)/i);
+      if (otpMatch && otpMatch[1]) {
+        otpSecret = otpMatch[1];
+      }
+    }
+
+    // Custom fields (alle außer Standard-Felder)
+    const keyValues: SelectHaexPasswordsItemKeyValues[] = [];
+    const standardFields = new Set(['Title', 'UserName', 'Password', 'URL', 'Notes']);
+
+    for (const [key, value] of entry.fields) {
+      if (!standardFields.has(key) && key !== 'otp' && key !== 'OTP') {
+        keyValues.push({
+          id: crypto.randomUUID(),
+          itemId: null,
+          key,
+          value: getFieldValue(value),
+          updateAt: null,
+        });
+      }
+    }
+
+    // Extract icon from KeePass
+    const icon = await extractIconAsync(kdbx, entry, orm.value!);
+
+    const newEntryId = await addAsync(
+      {
+        id: crypto.randomUUID(),
+        title,
+        username,
+        password,
+        url,
+        note: notes,
+        otpSecret,
+        icon,
+        tags,
+        createdAt: entry.times.creationTime ? new Date(entry.times.creationTime).toISOString() : null,
+        updateAt: entry.times.lastModTime ? new Date(entry.times.lastModTime) : null,
+      },
+      keyValues,
+      groupId ? { id: groupId, name: null, description: null, icon: null, color: null, parentId: null, order: null, createdAt: null, updateAt: null } : null
+    );
+
+    // Attachments importieren
+    for (const [fileName, binary] of entry.binaries) {
+      const binaryValue = (binary as any).value || binary;
+      const uint8Array = new Uint8Array(binaryValue);
+
+      // Convert zu Base64 (btoa ist immer verfügbar in Nuxt/Browser)
+      const binaryString = String.fromCharCode(...Array.from(uint8Array));
+      const base64 = btoa(binaryString);
+
+      // Binary hinzufügen (dedupliziert via Hash)
+      const hash = await addBinaryAsync(orm.value!, base64, uint8Array.length);
+
+      // Entry → Binary Mapping
+      await orm.value!.insert(haexPasswordsItemBinaries).values({
+        id: crypto.randomUUID(),
+        itemId: newEntryId,
+        binaryHash: hash,
+        fileName,
+      });
+    }
+
+    // Entry History importieren
+    for (const historyEntry of entry.history) {
+      const snapshotData = {
+        title: getFieldValue(historyEntry.fields.get('Title')),
+        username: getFieldValue(historyEntry.fields.get('UserName')),
+        password: getFieldValue(historyEntry.fields.get('Password')),
+        url: getFieldValue(historyEntry.fields.get('URL')),
+        note: getFieldValue(historyEntry.fields.get('Notes')),
+        tags: historyEntry.tags?.join(', ') || null,
+        otpSecret: null,
+        keyValues: [] as any[],
+      };
+
+      // Custom fields in Snapshot
+      for (const [key, value] of historyEntry.fields) {
+        if (!standardFields.has(key)) {
+          snapshotData.keyValues.push({
+            key,
+            value: getFieldValue(value),
+          });
+        }
+      }
+
+      const snapshot = await orm.value!.insert(haexPasswordsItemSnapshots).values({
+        id: crypto.randomUUID(),
+        itemId: newEntryId,
+        snapshotData: JSON.stringify(snapshotData),
+        createdAt: historyEntry.times.creationTime ? new Date(historyEntry.times.creationTime).toISOString() : null,
+        modifiedAt: historyEntry.times.lastModTime ? new Date(historyEntry.times.lastModTime).toISOString() : null,
+      }).returning();
+
+      // History Attachments
+      if (snapshot && snapshot[0]) {
+        for (const [fileName, binary] of historyEntry.binaries) {
+          const binaryValue = (binary as any).value || binary;
+          const uint8Array = new Uint8Array(binaryValue);
+
+          const binaryString = String.fromCharCode(...Array.from(uint8Array));
+          const base64 = btoa(binaryString);
+
+          const hash = await addBinaryAsync(orm.value!, base64, uint8Array.length);
+
+          await orm.value!.insert(haexPasswordsSnapshotBinaries).values({
+            id: crypto.randomUUID(),
+            snapshotId: snapshot[0].id,
+            binaryHash: hash,
+            fileName,
+          });
+        }
+      }
+    }
+
+    currentStep++;
+    progress.value = Math.round((currentStep / totalSteps) * 100);
+  }
+
+  // Sync data
+  const { syncGroupItemsAsync } = usePasswordGroupStore();
+  await syncGroupItemsAsync();
+
+  return {
+    groupCount: allGroups.length,
+    entryCount: allEntries.length,
+  };
+}
 </script>
 
 <i18n lang="yaml">
 de:
   title: KeePass Import
-  selectFile: XML-Datei auswählen
+  selectFile: KeePass-Datei auswählen (.kdbx)
+  chooseFile: Datei auswählen
+  password: Master-Passwort
+  passwordPlaceholder: Gib dein KeePass Master-Passwort ein
   import: Importieren
   cancel: Abbrechen
-  parsing: Datei wird gelesen und verarbeitet...
   importing: Importiere
-  preview:
-    title: Vorschau
-    groups: Gruppen
-    entries: Einträge
   error:
-    parse: Fehler beim Parsen der XML-Datei
+    parse: Fehler beim Lesen der Datei
+    wrongPassword: Falsches Passwort
     noFile: Keine Datei ausgewählt
+    noPassword: Bitte Master-Passwort eingeben
     import: Fehler beim Importieren
   success: Import erfolgreich
   successDescription: "{groups} Gruppen und {entries} Einträge wurden importiert"
 
 en:
   title: KeePass Import
-  selectFile: Select XML file
+  selectFile: Select KeePass file (.kdbx)
+  chooseFile: Choose file
+  password: Master Password
+  passwordPlaceholder: Enter your KeePass master password
   import: Import
   cancel: Cancel
-  parsing: Reading and processing file...
   importing: Importing
-  preview:
-    title: Preview
-    groups: Groups
-    entries: Entries
   error:
-    parse: Error parsing XML file
+    parse: Error reading file
+    wrongPassword: Wrong password
     noFile: No file selected
+    noPassword: Please enter master password
     import: Error importing data
   success: Import successful
   successDescription: "{groups} groups and {entries} entries imported"

@@ -8,6 +8,13 @@
       "when": 1762217420447,
       "tag": "0000_vengeful_inertia",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1762468457315,
+      "tag": "0001_talented_scarlet_spider",
+      "breakpoints": true
     }
   ]
 }

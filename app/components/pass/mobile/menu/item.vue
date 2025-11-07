@@ -4,10 +4,10 @@
     :style="{ color: menuItem.color ?? '' }"
     @click="$emit('click', menuItem)"
   >
-    <Icon
-      :name="menuIcon"
-      size="24"
-      class="shrink-0"
+    <UiIcon
+      :icon="menuItem?.icon"
+      :alt="menuItem?.name"
+      class="shrink-0 w-6 h-6"
     />
     <p class="w-full flex-1 text-start truncate font-bold">
       {{ menuItem?.name }}
@@ -28,12 +28,4 @@ import type { IPasswordMenuItem } from './types'
 defineEmits<{ click: [group?: IPasswordMenuItem] }>()
 
 const menuItem = defineProps<IPasswordMenuItem>()
-
-const menuIcon = computed(() =>
-  menuItem?.icon
-    ? menuItem.icon
-    : menuItem.type === 'group'
-      ? 'mdi:folder-outline'
-      : 'mdi:key-outline',
-)
 </script>

@@ -1,10 +1,12 @@
 <template>
   <UInput
+    ref="inputRef"
     v-model="value"
     :placeholder="props.placeholder || ' '"
     :disabled="props.readOnly"
     :leading-icon="props.leadingIcon"
     :ui="{ base: 'peer' }"
+    v-bind="$attrs"
     @input="$emit('input', $event)"
     @change="$emit('change', $event)"
     @blur="$emit('blur', $event)"
@@ -57,6 +59,10 @@ import { useClipboard } from "@vueuse/core";
 import type { InputProps } from "@nuxt/ui";
 import type { AcceptableValue } from "@nuxt/ui/runtime/types/utils.js";
 
+defineOptions({
+  inheritAttrs: false,
+});
+
 const value = defineModel<AcceptableValue | undefined>();
 
 interface IInputProps extends /* @vue-ignore */ InputProps {
@@ -89,6 +95,14 @@ const filteredSlots = computed(() => {
   return Object.fromEntries(
     Object.entries(useSlots()).filter(([name]) => name !== "trailing")
   );
+});
+
+// Template ref for UInput
+const inputRef = useTemplateRef("inputRef");
+
+// Expose inputRef from UInput so parent components can access the input element
+defineExpose({
+  inputRef: computed(() => inputRef.value?.inputRef),
 });
 </script>
 
