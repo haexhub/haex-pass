@@ -4,7 +4,6 @@
       v-model:details="item.details"
       v-model:key-values-add="item.keyValuesAdd"
       :default-icon="currentGroup?.icon"
-      :history="item.history"
       @close="onClose"
       @submit="onCreateAsync"
     />
@@ -30,9 +29,8 @@
 <script setup lang="ts">
 import type {
   SelectHaexPasswordsItemDetails,
-  SelectHaexPasswordsItemHistory,
   SelectHaexPasswordsItemKeyValues,
-} from "~~/src-tauri/database/schemas/vault";
+} from "~/database";
 
 definePageMeta({
   name: "passwordItemCreate",
@@ -42,14 +40,12 @@ const { t } = useI18n();
 
 const item = reactive<{
   details: SelectHaexPasswordsItemDetails;
-  history: SelectHaexPasswordsItemHistory[];
   keyValuesAdd: SelectHaexPasswordsItemKeyValues[];
   originalDetails: SelectHaexPasswordsItemDetails;
   originalKeyValuesAdd: [];
 }>({
   details: {
     createdAt: null,
-    haex_tombstone: null,
     icon: null,
     id: "",
     note: null,
@@ -59,12 +55,11 @@ const item = reactive<{
     updateAt: null,
     url: null,
     username: null,
+    otpSecret: null,
   },
-  history: [],
   keyValuesAdd: [],
   originalDetails: {
     createdAt: null,
-    haex_tombstone: null,
     icon: null,
     id: "",
     note: null,
@@ -74,6 +69,7 @@ const item = reactive<{
     updateAt: null,
     url: null,
     username: null,
+    otpSecret: null,
   },
   originalKeyValuesAdd: [],
 });

@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full overflow-scroll">
+  <div class="h-full overflow-y-auto">
     <form
       class="flex flex-col gap-4 w-full p-4"
       @submit.prevent="$emit('submit')"

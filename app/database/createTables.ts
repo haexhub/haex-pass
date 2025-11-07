@@ -13,8 +13,11 @@ export async function createTablesAsync(client: any) {
     { table: schema.haexPasswordsGroups, name: 'haexPasswordsGroups' },
     { table: schema.haexPasswordsItemDetails, name: 'haexPasswordsItemDetails' },
     { table: schema.haexPasswordsItemKeyValues, name: 'haexPasswordsItemKeyValues' },
-    { table: schema.haexPasswordsItemHistory, name: 'haexPasswordsItemHistory' },
     { table: schema.haexPasswordsGroupItems, name: 'haexPasswordsGroupItems' },
+    { table: schema.haexPasswordsBinaries, name: 'haexPasswordsBinaries' },
+    { table: schema.haexPasswordsItemBinaries, name: 'haexPasswordsItemBinaries' },
+    { table: schema.haexPasswordsItemSnapshots, name: 'haexPasswordsItemSnapshots' },
+    { table: schema.haexPasswordsSnapshotBinaries, name: 'haexPasswordsSnapshotBinaries' },
   ]
 
   try {

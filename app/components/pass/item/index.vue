@@ -1,14 +1,14 @@
 <template>
-  <div class="p-1">
-    <UCard class="rounded overflow-auto p-0 h-full" @close="onClose">
-      <div class="">
-        <UTabs
-          :items="tabs"
-          variant="link"
-          :ui="{ trigger: 'grow' }"
-          class="gap-4 w-full"
-        >
-          <template #details>
+  <UCard class="rounded p-0" @close="onClose">
+    <div class="">
+      <UTabs
+        :items="tabs"
+        variant="link"
+        :ui="{ trigger: 'grow' }"
+        class="gap-4 w-full h-screen"
+      >
+        <template #details>
+          <div class="h-dvh pb-32">
             <PassItemDetails
               v-if="details"
               v-model="details"
@@ -18,79 +18,50 @@
               v-model:prevent-close="preventClose"
               @submit="$emit('submit')"
             />
-          </template>
+          </div>
+        </template>
 
-          <template #keyValue>
+        <template #keyValue>
+          <div class="h-dvh pb-32">
             <PassItemKeyValue
               v-if="keyValues"
               v-model="keyValues"
               v-model:items-to-add="keyValuesAdd"
               v-model:items-to-delete="keyValuesDelete"
+              v-model:attachments="attachments"
+              v-model:attachments-to-add="attachmentsToAdd"
+              v-model:attachments-to-delete="attachmentsToDelete"
               :read-only
               :item-id="details!.id"
             />
-          </template>
-        </UTabs>
-
-        <!-- <div class="h-full pb-8">
-          <div
-            id="vaultDetailsId"
-            role="tabpanel"
-            class="h-full"
-            :aria-labelledby="id.details"
-          >
-            <PassItemDetails
-              v-if="details"
-              v-model="details"
-              with-copy-button
-              :read_only
-              :defaultIcon
-              v-model:prevent-close="preventClose"
-              @submit="$emit('submit')"
-            />
           </div>
+        </template>
 
-          <div
-            id="tabs-basic-2"
-            class="hidden"
-            role="tabpanel"
-            :aria-labelledby="id.keyValue"
-          >
-            <PassItemKeyValue
-              v-if="keyValues"
-              v-model="keyValues"
-              v-model:items-to-add="keyValuesAdd"
-              v-model:items-to-delete="keyValuesDelete"
-              :read_only
-              :item-id="details!.id"
-            />
+        <template #history>
+          <div class="h-dvh pb-32">
+            <PassItemHistory v-model="snapshots" />
           </div>
-
-          <div
-            id="tabs-basic-3"
-            class="hidden h-full"
-            role="tabpanel"
-            :aria-labelledby="id.history"
-          >
-            <PassItemHistory />
-          </div>
-        </div> -->
-      </div>
-    </UCard>
-  </div>
+        </template>
+      </UTabs>
+    </div>
+  </UCard>
 </template>
 
 <script setup lang="ts">
 import type { TabsItem } from "@nuxt/ui";
 import type {
   SelectHaexPasswordsItemDetails,
-  SelectHaexPasswordsItemHistory,
   SelectHaexPasswordsItemKeyValues,
+  SelectHaexPasswordsItemBinaries,
+  SelectHaexPasswordsItemSnapshots,
 } from "~/database";
+
+interface AttachmentWithSize extends SelectHaexPasswordsItemBinaries {
+  size?: number;
+}
 
 defineProps<{
   defaultIcon?: string | null;
-  history: SelectHaexPasswordsItemHistory[];
 }>();
 
 const emit = defineEmits<{
@@ -118,6 +89,21 @@ const keyValuesDelete = defineModel<SelectHaexPasswordsItemKeyValues[]>(
   "keyValuesDelete",
   { default: [] }
 );
+
+const attachments = defineModel<AttachmentWithSize[]>("attachments", {
+  default: [],
+});
+const attachmentsToAdd = defineModel<AttachmentWithSize[]>("attachmentsToAdd", {
+  default: [],
+});
+const attachmentsToDelete = defineModel<SelectHaexPasswordsItemBinaries[]>(
+  "attachmentsToDelete",
+  { default: [] }
+);
+
+const snapshots = defineModel<SelectHaexPasswordsItemSnapshots[]>("snapshots", {
+  default: [],
+});
 
 const { t } = useI18n();
 

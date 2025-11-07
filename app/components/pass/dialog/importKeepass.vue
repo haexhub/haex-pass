@@ -61,6 +61,7 @@
 
 <script setup lang="ts">
 import * as kdbxweb from 'kdbxweb';
+import { argon2id, argon2i, argon2d } from 'hash-wasm';
 import type { SqliteRemoteDatabase } from 'drizzle-orm/sqlite-proxy';
 import { onStartTyping } from '@vueuse/core';
 import { addBinaryAsync } from '~/utils/cleanup';
@@ -72,6 +73,57 @@ import {
 } from '~/database/schemas';
 import * as schema from '~/database/schemas';
 import { getIconForKeePassIndex } from '~/utils/keepassIconMapping';
+
+// Set argon2 implementation for kdbxweb using hash-wasm
+// Argon2 types: 0 = Argon2d, 1 = Argon2i, 2 = Argon2id
+kdbxweb.CryptoEngine.argon2 = async (password: ArrayBuffer, salt: ArrayBuffer, memory: number, iterations: number, length: number, parallelism: number, type: number) => {
+  console.log('[Argon2] Called with:', { memory, iterations, length, parallelism, type });
+
+  try {
+    const params = {
+      password: new Uint8Array(password),
+      salt: new Uint8Array(salt),
+      parallelism: parallelism,
+      iterations: iterations,
+      memorySize: memory,
+      hashLength: length,
+      outputType: 'binary' as const,
+    };
+
+    console.log('[Argon2] password length:', params.password.length);
+    console.log('[Argon2] salt length:', params.salt.length);
+
+    let result: Uint8Array;
+
+    // Select the correct Argon2 variant based on type parameter
+    if (type === 0) {
+      // Argon2d
+      console.log('[Argon2] Using Argon2d');
+      result = await argon2d(params);
+    } else if (type === 1) {
+      // Argon2i
+      console.log('[Argon2] Using Argon2i');
+      result = await argon2i(params);
+    } else {
+      // Argon2id (default, type === 2)
+      console.log('[Argon2] Using Argon2id');
+      result = await argon2id(params);
+    }
+
+    console.log('[Argon2] Result length:', result.byteLength);
+
+    // Convert Uint8Array to ArrayBuffer (create a new copy)
+    const arrayBuffer = new ArrayBuffer(result.byteLength);
+    const view = new Uint8Array(arrayBuffer);
+    view.set(result);
+
+    console.log('[Argon2] Returning ArrayBuffer with length:', arrayBuffer.byteLength);
+    return arrayBuffer;
+  } catch (error) {
+    console.error('[Argon2] Error:', error);
+    throw error;
+  }
+};
 
 const isOpen = defineModel<boolean>("open", { default: false });
 const { t } = useI18n();
@@ -184,6 +236,17 @@ function getFieldValue(field: kdbxweb.KdbxEntryField | undefined): string {
   return String(field);
 }
 
+// Helper function to convert Uint8Array to Base64 (handles large files)
+function uint8ArrayToBase64(uint8Array: Uint8Array): string {
+  let binaryString = '';
+  const chunkSize = 8192; // Process 8KB at a time to avoid stack overflow
+  for (let i = 0; i < uint8Array.length; i += chunkSize) {
+    const chunk = uint8Array.subarray(i, Math.min(i + chunkSize, uint8Array.length));
+    binaryString += String.fromCharCode(...Array.from(chunk));
+  }
+  return btoa(binaryString);
+}
+
 // Helper function to extract and store icon from KeePass
 async function extractIconAsync(
   kdbx: kdbxweb.Kdbx,
@@ -198,8 +261,7 @@ async function extractIconAsync(
     if (customIconData) {
       // Convert ArrayBuffer to Base64
       const uint8Array = new Uint8Array(customIconData.data);
-      const binaryString = String.fromCharCode(...Array.from(uint8Array));
-      const base64 = btoa(binaryString);
+      const base64 = uint8ArrayToBase64(uint8Array);
 
       // Store as binary and reference it
       const hash = await addBinaryAsync(orm, base64, uint8Array.length);
@@ -217,8 +279,15 @@ async function extractIconAsync(
 }
 
 async function importKdbxAsync(buffer: ArrayBuffer, pwd: string): Promise<{ groupCount: number; entryCount: number }> {
+  console.log('[KeePass Import] Starting import...');
+  console.log('[KeePass Import] Buffer size:', buffer.byteLength);
+  console.log('[KeePass Import] Password length:', pwd.length);
+
   const credentials = new kdbxweb.Credentials(kdbxweb.ProtectedValue.fromString(pwd));
+  console.log('[KeePass Import] Credentials created, loading database...');
+
   const kdbx = await kdbxweb.Kdbx.load(buffer, credentials);
+  console.log('[KeePass Import] Database loaded successfully');
 
   const { addGroupAsync } = usePasswordGroupStore();
   const { addAsync } = usePasswordItemStore();
@@ -332,12 +401,34 @@ async function importKdbxAsync(buffer: ArrayBuffer, pwd: string): Promise<{ grou
 
     // Attachments importieren
     for (const [fileName, binary] of entry.binaries) {
-      const binaryValue = (binary as any).value || binary;
-      const uint8Array = new Uint8Array(binaryValue);
+      console.log(`[KeePass Import] Processing binary: ${fileName}`);
+      console.log(`[KeePass Import] Binary object:`, binary);
 
-      // Convert zu Base64 (btoa ist immer verfügbar in Nuxt/Browser)
-      const binaryString = String.fromCharCode(...Array.from(uint8Array));
-      const base64 = btoa(binaryString);
+      // Use getBinary() to get the actual binary data from the ProtectedValue
+      let uint8Array: Uint8Array;
+      if (binary instanceof kdbxweb.ProtectedValue) {
+        console.log(`[KeePass Import] Binary is ProtectedValue, calling getBinary()`);
+        uint8Array = binary.getBinary();
+      } else if ((binary as any).value instanceof kdbxweb.ProtectedValue) {
+        console.log(`[KeePass Import] Binary.value is ProtectedValue, calling getBinary()`);
+        uint8Array = ((binary as any).value as kdbxweb.ProtectedValue).getBinary();
+      } else {
+        console.log(`[KeePass Import] Binary is not ProtectedValue, using as is`);
+        const binaryValue = (binary as any).value || binary;
+        uint8Array = new Uint8Array(binaryValue);
+      }
+
+      console.log(`[KeePass Import] Uint8Array:`, uint8Array);
+      console.log(`[KeePass Import] Uint8Array length:`, uint8Array.length);
+
+      // Skip empty binaries
+      if (uint8Array.length === 0) {
+        console.warn(`[KeePass Import] Skipping empty binary: ${fileName}`);
+        continue;
+      }
+
+      // Convert to Base64
+      const base64 = uint8ArrayToBase64(uint8Array);
 
       // Binary hinzufügen (dedupliziert via Hash)
       const hash = await addBinaryAsync(orm.value!, base64, uint8Array.length);
@@ -385,11 +476,25 @@ async function importKdbxAsync(buffer: ArrayBuffer, pwd: string): Promise<{ grou
       // History Attachments
       if (snapshot && snapshot[0]) {
         for (const [fileName, binary] of historyEntry.binaries) {
-          const binaryValue = (binary as any).value || binary;
-          const uint8Array = new Uint8Array(binaryValue);
+          // Use getBinary() to get the actual binary data from the ProtectedValue
+          let uint8Array: Uint8Array;
+          if (binary instanceof kdbxweb.ProtectedValue) {
+            uint8Array = binary.getBinary();
+          } else if ((binary as any).value instanceof kdbxweb.ProtectedValue) {
+            uint8Array = ((binary as any).value as kdbxweb.ProtectedValue).getBinary();
+          } else {
+            const binaryValue = (binary as any).value || binary;
+            uint8Array = new Uint8Array(binaryValue);
+          }
 
-          const binaryString = String.fromCharCode(...Array.from(uint8Array));
-          const base64 = btoa(binaryString);
+          // Skip empty binaries
+          if (uint8Array.length === 0) {
+            console.warn(`[KeePass Import] Skipping empty history binary: ${fileName}`);
+            continue;
+          }
+
+          // Convert to Base64
+          const base64 = uint8ArrayToBase64(uint8Array);
 
           const hash = await addBinaryAsync(orm.value!, base64, uint8Array.length);
 

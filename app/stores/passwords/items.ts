@@ -2,15 +2,18 @@ import { eq, isNull } from "drizzle-orm";
 import {
   haexPasswordsGroupItems,
   haexPasswordsItemDetails,
-  haexPasswordsItemHistory,
   haexPasswordsItemKeyValues,
+  haexPasswordsItemSnapshots,
+  haexPasswordsItemBinaries,
+  haexPasswordsBinaries,
   type InsertHaexPasswordsItemDetails,
   type InserthaexPasswordsItemKeyValues,
   type SelectHaexPasswordsGroupItems,
   type SelectHaexPasswordsGroups,
   type SelectHaexPasswordsItemDetails,
-  type SelectHaexPasswordsItemHistory,
   type SelectHaexPasswordsItemKeyValues,
+  type SelectHaexPasswordsItemSnapshots,
+  type SelectHaexPasswordsItemBinaries,
 } from "~/database";
 import { getSingleRouteParam } from "~/utils/helper";
 
@@ -25,8 +28,9 @@ export const usePasswordItemStore = defineStore("passwordItemStore", () => {
 
   const currentItem = ref<{
     details: SelectHaexPasswordsItemDetails;
-    history: SelectHaexPasswordsItemHistory[];
+    snapshots: SelectHaexPasswordsItemSnapshots[];
     keyValues: SelectHaexPasswordsItemKeyValues[];
+    attachments: SelectHaexPasswordsItemBinaries[];
   } | null>(null);
 
   // Watch currentItemId and update currentItem
@@ -77,6 +81,8 @@ export const usePasswordItemStore = defineStore("passwordItemStore", () => {
     readByGroupIdAsync,
     readAsync,
     readKeyValuesAsync,
+    readSnapshotsAsync,
+    readAttachmentsAsync,
     syncItemsAsync,
     updateAsync,
   };
@@ -126,6 +132,26 @@ const addAsync = async (
         .insert(haexPasswordsItemKeyValues)
         .values(newKeyValues);
     }
+
+    // Create initial snapshot
+    const snapshotData = {
+      title: newDetails.title,
+      username: newDetails.username,
+      password: newDetails.password,
+      url: newDetails.url,
+      note: newDetails.note,
+      tags: newDetails.tags,
+      otpSecret: newDetails.otpSecret,
+      keyValues: newKeyValues.map(kv => ({ key: kv.key, value: kv.value })),
+    };
+
+    await haexhubStore.orm.insert(haexPasswordsItemSnapshots).values({
+      id: crypto.randomUUID(),
+      itemId: newDetails.id,
+      snapshotData: JSON.stringify(snapshotData),
+      createdAt: new Date().toISOString(),
+      modifiedAt: new Date().toISOString(),
+    });
   } catch (error) {
     console.error("ERROR addItem", error);
   }
@@ -239,10 +265,11 @@ const readAsync = async (itemId: string | null) => {
 
     if (!details) return null;
 
-    const history = (await usePasswordHistoryStore().getAsync(itemId)) ?? [];
+    const snapshots = await readSnapshotsAsync(itemId);
     const keyValues = (await readKeyValuesAsync(itemId)) ?? [];
+    const attachments = await readAttachmentsAsync(itemId);
 
-    return { details, history, keyValues };
+    return { details, snapshots, keyValues, attachments };
   } catch (error) {
     console.error(error);
     throw error;
@@ -262,17 +289,63 @@ const readKeyValuesAsync = async (itemId: string | null) => {
   return keyValues;
 };
 
+const readSnapshotsAsync = async (itemId: string | null) => {
+  if (!itemId) return [];
+  const haexhubStore = useHaexHubStore();
+  if (!haexhubStore.orm) throw new Error("Database not initialized");
+
+  const snapshots = await haexhubStore.orm
+    .select()
+    .from(haexPasswordsItemSnapshots)
+    .where(eq(haexPasswordsItemSnapshots.itemId, itemId));
+
+  return snapshots;
+};
+
+const readAttachmentsAsync = async (itemId: string | null) => {
+  if (!itemId) return [];
+  const haexhubStore = useHaexHubStore();
+  if (!haexhubStore.orm) throw new Error("Database not initialized");
+
+  const result = await haexhubStore.orm
+    .select({
+      id: haexPasswordsItemBinaries.id,
+      itemId: haexPasswordsItemBinaries.itemId,
+      binaryHash: haexPasswordsItemBinaries.binaryHash,
+      fileName: haexPasswordsItemBinaries.fileName,
+      size: haexPasswordsBinaries.size,
+    })
+    .from(haexPasswordsItemBinaries)
+    .leftJoin(
+      haexPasswordsBinaries,
+      eq(haexPasswordsItemBinaries.binaryHash, haexPasswordsBinaries.hash)
+    )
+    .where(eq(haexPasswordsItemBinaries.itemId, itemId));
+
+  console.log("[Store] readAttachmentsAsync - itemId:", itemId);
+  console.log("[Store] readAttachmentsAsync - result:", result);
+  console.log("[Store] readAttachmentsAsync - result count:", result.length);
+
+  return result;
+};
+
 const updateAsync = async ({
   details,
   keyValues,
   keyValuesAdd,
   keyValuesDelete,
+  attachments,
+  attachmentsToAdd,
+  attachmentsToDelete,
   groupId,
 }: {
   details: SelectHaexPasswordsItemDetails;
   keyValues: SelectHaexPasswordsItemKeyValues[];
   keyValuesAdd: SelectHaexPasswordsItemKeyValues[];
   keyValuesDelete: SelectHaexPasswordsItemKeyValues[];
+  attachments?: SelectHaexPasswordsItemBinaries[];
+  attachmentsToAdd?: SelectHaexPasswordsItemBinaries[];
+  attachmentsToDelete?: SelectHaexPasswordsItemBinaries[];
   groupId: string | null;
 }) => {
   const haexhubStore = useHaexHubStore();
@@ -312,6 +385,27 @@ const updateAsync = async ({
   try {
     if (!haexhubStore.orm) throw new Error("Database not initialized");
 
+    // Create snapshot before updating
+    const allKeyValues = [...newKeyValues, ...newKeyValuesAdd];
+    const snapshotData = {
+      title: newDetails.title,
+      username: newDetails.username,
+      password: newDetails.password,
+      url: newDetails.url,
+      note: newDetails.note,
+      tags: newDetails.tags,
+      otpSecret: newDetails.otpSecret,
+      keyValues: allKeyValues.map(kv => ({ key: kv.key, value: kv.value })),
+    };
+
+    await haexhubStore.orm.insert(haexPasswordsItemSnapshots).values({
+      id: crypto.randomUUID(),
+      itemId: newDetails.id,
+      snapshotData: JSON.stringify(snapshotData),
+      createdAt: new Date().toISOString(),
+      modifiedAt: new Date().toISOString(),
+    });
+
     // Update item details
     await haexhubStore.orm
       .update(haexPasswordsItemDetails)
@@ -346,6 +440,35 @@ const updateAsync = async ({
         .where(eq(haexPasswordsItemKeyValues.id, keyValue.id));
     }
 
+    // Update existing attachments (e.g., fileName changes)
+    if (attachments && attachments.length) {
+      for (const attachment of attachments) {
+        await haexhubStore.orm
+          .update(haexPasswordsItemBinaries)
+          .set({
+            fileName: attachment.fileName,
+            binaryHash: attachment.binaryHash,
+          })
+          .where(eq(haexPasswordsItemBinaries.id, attachment.id));
+      }
+    }
+
+    // Add new attachments
+    if (attachmentsToAdd && attachmentsToAdd.length) {
+      await haexhubStore.orm
+        .insert(haexPasswordsItemBinaries)
+        .values(attachmentsToAdd);
+    }
+
+    // Delete attachments
+    if (attachmentsToDelete && attachmentsToDelete.length) {
+      for (const attachment of attachmentsToDelete) {
+        await haexhubStore.orm
+          .delete(haexPasswordsItemBinaries)
+          .where(eq(haexPasswordsItemBinaries.id, attachment.id));
+      }
+    }
+
     return newDetails.id;
   } catch (error) {
     console.error("ERROR updateItem", error);
@@ -366,10 +489,15 @@ const deleteAsync = async (itemId: string, final: boolean = false) => {
         .delete(haexPasswordsItemKeyValues)
         .where(eq(haexPasswordsItemKeyValues.itemId, itemId));
 
-      // Delete history
+      // Delete snapshots (cascade will handle snapshot binaries)
       await haexhubStore.orm
-        .delete(haexPasswordsItemHistory)
-        .where(eq(haexPasswordsItemHistory.itemId, itemId));
+        .delete(haexPasswordsItemSnapshots)
+        .where(eq(haexPasswordsItemSnapshots.itemId, itemId));
+
+      // Delete attachments (cascade will handle binaries)
+      await haexhubStore.orm
+        .delete(haexPasswordsItemBinaries)
+        .where(eq(haexPasswordsItemBinaries.itemId, itemId));
 
       // Delete group items
       await haexhubStore.orm

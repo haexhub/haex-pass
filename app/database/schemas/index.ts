@@ -54,26 +54,6 @@ export type InserthaexPasswordsItemKeyValues =
 export type SelectHaexPasswordsItemKeyValues =
   typeof haexPasswordsItemKeyValues.$inferSelect;
 
-export const haexPasswordsItemHistory = sqliteTable(
-  getTableName("haex_passwords_item_history"),
-  {
-    id: text().primaryKey(),
-    itemId: text("item_id").references(
-      (): AnySQLiteColumn => haexPasswordsItemDetails.id,
-      { onDelete: "cascade" }
-    ),
-    changedProperty:
-      text("changed_property").$type<keyof typeof haexPasswordsItemDetails>(),
-    oldValue: text("old_value"),
-    newValue: text("new_value"),
-    createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
-  }
-);
-export type InserthaexPasswordsItemHistory =
-  typeof haexPasswordsItemHistory.$inferInsert;
-export type SelectHaexPasswordsItemHistory =
-  typeof haexPasswordsItemHistory.$inferSelect;
-
 export const haexPasswordsGroups = sqliteTable(
   getTableName("haex_passwords_groups"),
   {

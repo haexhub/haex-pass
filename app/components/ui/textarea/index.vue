@@ -4,7 +4,7 @@
       :id
       v-model="value"
       :ui="{ base: 'peer' }"
-      :readonly="readOnly"
+      :disabled="readOnly"
       class="w-full"
       v-bind="$attrs"
     >
@@ -32,17 +32,17 @@
 </template>
 
 <script setup lang="ts">
-import { useClipboard } from '@vueuse/core'
-import type { TextareaProps } from '@nuxt/ui'
+import { useClipboard } from "@vueuse/core";
+import type { TextareaProps } from "@nuxt/ui";
 
 interface ITextareaProps extends /* @vue-ignore */ TextareaProps {
-  tooltip?: string
-  withCopyButton?: boolean
-  readOnly?: boolean
-  label?: string
+  tooltip?: string;
+  withCopyButton?: boolean;
+  readOnly?: boolean;
+  label?: string;
 }
 
-const props = defineProps<ITextareaProps>()
+const props = defineProps<ITextareaProps>();
 
 /* defineProps<{
   placeholder?: string
@@ -51,13 +51,13 @@ const props = defineProps<ITextareaProps>()
   withCopyButton?: boolean
 }>() */
 
-const id = useId()
+const id = useId();
 
-const value = defineModel<string | null | undefined>()
+const value = defineModel<string | null | undefined>();
 
-const { copy, copied } = useClipboard()
+const { copy, copied } = useClipboard();
 
-const { t } = useI18n()
+const { t } = useI18n();
 </script>
 
 <i18n lang="yaml">

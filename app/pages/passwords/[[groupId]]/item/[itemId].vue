@@ -1,17 +1,14 @@
 <template>
-  <div>
-    <!-- <div class="flex flex-col">
-      <p>
-        {{ item.originalDetails }}
-      </p>
-      {{ item.details }}
-    </div> -->
+  <div class="h-screen bg-red-300 overflow-hidden">
     <PassItem
       v-model:details="item.details"
       v-model:key-values-add="item.keyValuesAdd"
       v-model:key-values-delete="item.keyValuesDelete"
       v-model:key-values="item.keyValues"
-      :history="item.history"
+      v-model:snapshots="item.snapshots"
+      v-model:attachments="item.attachments"
+      v-model:attachments-to-add="item.attachmentsToAdd"
+      v-model:attachments-to-delete="item.attachmentsToDelete"
       :read-only
       @close="onClose()"
       @submit="onUpdateAsync"
@@ -50,9 +47,10 @@
 <script setup lang="ts">
 import type {
   SelectHaexPasswordsItemDetails,
-  SelectHaexPasswordsItemHistory,
   SelectHaexPasswordsItemKeyValues,
-} from "~~/src-tauri/database/schemas/vault";
+  SelectHaexPasswordsItemSnapshots,
+  SelectHaexPasswordsItemBinaries,
+} from "~/database";
 
 definePageMeta({
   name: "passwordItemEdit",
@@ -68,14 +66,22 @@ const readOnly = ref(true);
 const showConfirmDeleteDialog = ref(false);
 const { t } = useI18n();
 
+interface AttachmentWithSize extends SelectHaexPasswordsItemBinaries {
+  size?: number;
+}
+
 const item = reactive<{
   details: SelectHaexPasswordsItemDetails;
-  history: SelectHaexPasswordsItemHistory[];
+  snapshots: SelectHaexPasswordsItemSnapshots[];
   keyValues: SelectHaexPasswordsItemKeyValues[];
   keyValuesAdd: SelectHaexPasswordsItemKeyValues[];
   keyValuesDelete: SelectHaexPasswordsItemKeyValues[];
+  attachments: AttachmentWithSize[];
+  attachmentsToAdd: AttachmentWithSize[];
+  attachmentsToDelete: SelectHaexPasswordsItemBinaries[];
   originalDetails: SelectHaexPasswordsItemDetails | null;
   originalKeyValues: SelectHaexPasswordsItemKeyValues[] | null;
+  originalAttachments: AttachmentWithSize[] | null;
 }>({
   details: {
     id: "",
@@ -88,12 +94,15 @@ const item = reactive<{
     updateAt: null,
     url: null,
     username: null,
-    haex_tombstone: null,
+    otpSecret: null,
   },
   keyValues: [],
-  history: [],
+  snapshots: [],
   keyValuesAdd: [],
   keyValuesDelete: [],
+  attachments: [],
+  attachmentsToAdd: [],
+  attachmentsToDelete: [],
   originalDetails: {
     id: "",
     createdAt: null,
@@ -105,9 +114,10 @@ const item = reactive<{
     updateAt: null,
     url: null,
     username: null,
-    haex_tombstone: null,
+    otpSecret: null,
   },
   originalKeyValues: null,
+  originalAttachments: null,
 });
 
 const { currentItem } = storeToRefs(usePasswordItemStore());
@@ -118,14 +128,22 @@ watch(
     if (!currentItem.value) return;
     item.details = JSON.parse(JSON.stringify(currentItem.value?.details));
     item.keyValues = JSON.parse(JSON.stringify(currentItem.value?.keyValues));
-    item.history = JSON.parse(JSON.stringify(currentItem.value?.history));
+    item.snapshots = JSON.parse(JSON.stringify(currentItem.value?.snapshots));
+    item.attachments = JSON.parse(
+      JSON.stringify(currentItem.value?.attachments)
+    );
     item.keyValuesAdd = [];
     item.keyValuesDelete = [];
+    item.attachmentsToAdd = [];
+    item.attachmentsToDelete = [];
     item.originalDetails = JSON.parse(
       JSON.stringify(currentItem.value?.details)
     );
     item.originalKeyValues = JSON.parse(
       JSON.stringify(currentItem.value?.keyValues)
+    );
+    item.originalAttachments = JSON.parse(
+      JSON.stringify(currentItem.value?.attachments)
     );
   },
   { immediate: true }
@@ -145,6 +163,9 @@ const onUpdateAsync = async () => {
       keyValues: item.keyValues,
       keyValuesAdd: item.keyValuesAdd,
       keyValuesDelete: item.keyValuesDelete,
+      attachments: item.attachments,
+      attachmentsToAdd: item.attachmentsToAdd,
+      attachmentsToDelete: item.attachmentsToDelete,
     });
     if (newId) add({ color: "success", description: t("success.update") });
     syncGroupItemsAsync();
@@ -186,8 +207,11 @@ const hasChanges = computed(() => {
   return !(
     JSON.stringify(item.originalDetails) === JSON.stringify(item.details) &&
     JSON.stringify(item.originalKeyValues) === JSON.stringify(item.keyValues) &&
+    JSON.stringify(item.originalAttachments) === JSON.stringify(item.attachments) &&
     !item.keyValuesAdd.length &&
-    !item.keyValuesDelete.length
+    !item.keyValuesDelete.length &&
+    !item.attachmentsToAdd.length &&
+    !item.attachmentsToDelete.length
   );
 });
 
