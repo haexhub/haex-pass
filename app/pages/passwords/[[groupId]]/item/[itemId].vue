@@ -167,7 +167,8 @@ const onUpdateAsync = async () => {
     if (newId) add({ color: "success", description: t("success.update") });
     syncGroupItemsAsync();
     ignoreChanges.value = true;
-    onClose();
+    // Reset read-only state after saving
+    readOnly.value = true;
   } catch (error) {
     console.log(error);
     add({ color: "error", description: t("error.update") });

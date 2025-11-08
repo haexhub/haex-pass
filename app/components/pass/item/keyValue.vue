@@ -24,6 +24,7 @@
           >
             <button class="flex items-center no-underline w-full py-2">
               <input
+                :ref="el => { if (index === [...items, ...itemsToAdd].length - 1) lastKeyInput = el as HTMLInputElement }"
                 v-model="item.key"
                 :readonly="currentSelected !== item || readOnly"
                 class="flex-1 cursor-pointer bg-transparent border-none outline-none truncate"
@@ -81,6 +82,7 @@
 </template>
 
 <script setup lang="ts">
+import { useFocus } from '@vueuse/core';
 import type {
   SelectHaexPasswordsItemKeyValues,
   SelectHaexPasswordsItemBinaries,
@@ -125,6 +127,9 @@ const currentSelected = ref<SelectHaexPasswordsItemKeyValues | undefined>(
   items.value?.at(0)
 );
 
+const lastKeyInput = ref<HTMLInputElement>();
+const { focused: lastKeyInputFocused } = useFocus(lastKeyInput);
+
 watch(
   () => itemId,
   () => (currentSelected.value = items.value?.at(0))
@@ -137,14 +142,20 @@ const currentValue = computed({
   },
 });
 
-const addItem = () => {
-  itemsToAdd.value?.push({
+const addItem = async () => {
+  const newItem = {
     id: crypto.randomUUID(),
     itemId,
     key: "",
     value: "",
     updateAt: null,
-  });
+  };
+  itemsToAdd.value?.push(newItem);
+  currentSelected.value = newItem;
+
+  // Focus the newly added input field
+  await nextTick();
+  lastKeyInputFocused.value = true;
 };
 
 const deleteItem = (id: string) => {
