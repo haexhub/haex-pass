@@ -22,6 +22,7 @@
         <UDropdownMenu v-model:open="open" :items="menu">
           <UButton
             icon="mdi:plus"
+            class="pointer-events-auto"
             :ui="{
               base: 'rotate-45 z-40',
               leadingIcon: [open ? 'rotate-0' : 'rotate-45', 'transition-all'],

@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { watchImmediate } from "@vueuse/core";
+import { watchImmediate, onKeyStroke } from "@vueuse/core";
 import type { SelectHaexPasswordsGroups } from "~/database";
 
 definePageMeta({
@@ -145,6 +145,18 @@ const onDeleteAsync = async () => {
     console.error(error);
   }
 };
+
+// Handle Escape key to close/abort
+onKeyStroke('Escape', (e) => {
+  e.preventDefault();
+  if (readOnly.value) {
+    // In read-only mode: close
+    onClose();
+  } else {
+    // In edit mode: switch to read-only (abort editing)
+    readOnly.value = true;
+  }
+});
 </script>
 
 <i18n lang="yaml">

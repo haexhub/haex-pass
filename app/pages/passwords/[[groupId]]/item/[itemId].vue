@@ -45,6 +45,7 @@
 </template>
 
 <script setup lang="ts">
+import { onKeyStroke } from '@vueuse/core';
 import type {
   SelectHaexPasswordsItemDetails,
   SelectHaexPasswordsItemKeyValues,
@@ -147,7 +148,7 @@ watch(
 );
 
 const { add } = useToast();
-const { deleteAsync, updateAsync } = usePasswordItemStore();
+const { deleteAsync, updateAsync, readSnapshotsAsync } = usePasswordItemStore();
 const { syncGroupItemsAsync } = usePasswordGroupStore();
 const { currentGroupId, inTrashGroup } = storeToRefs(usePasswordGroupStore());
 
@@ -164,7 +165,20 @@ const onUpdateAsync = async () => {
       attachmentsToAdd: item.attachmentsToAdd,
       attachmentsToDelete: item.attachmentsToDelete,
     });
-    if (newId) add({ color: "success", description: t("success.update") });
+    if (newId) {
+      add({ color: "success", description: t("success.update") });
+      // Reload snapshots to show updated history
+      item.snapshots = await readSnapshotsAsync(newId);
+      // Reset keyValuesAdd and keyValuesDelete arrays
+      item.keyValuesAdd = [];
+      item.keyValuesDelete = [];
+      item.attachmentsToAdd = [];
+      item.attachmentsToDelete = [];
+      // Update original state
+      item.originalDetails = JSON.parse(JSON.stringify(item.details));
+      item.originalKeyValues = JSON.parse(JSON.stringify(item.keyValues));
+      item.originalAttachments = JSON.parse(JSON.stringify(item.attachments));
+    }
     syncGroupItemsAsync();
     ignoreChanges.value = true;
     // Reset read-only state after saving
@@ -220,6 +234,18 @@ const onConfirmIgnoreChanges = () => {
   ignoreChanges.value = true;
   onClose();
 };
+
+// Handle Escape key to close/abort
+onKeyStroke('Escape', (e) => {
+  e.preventDefault();
+  if (readOnly.value) {
+    // In read-only mode: close
+    onClose();
+  } else {
+    // In edit mode: switch to read-only (abort editing)
+    readOnly.value = true;
+  }
+});
 </script>
 
 <i18n lang="yaml">
