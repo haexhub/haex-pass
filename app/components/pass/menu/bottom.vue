@@ -59,18 +59,18 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
+const { t } = useI18n();
 
 defineProps<{
-  hasChanges?: boolean
-  showCloseButton?: boolean
-  showDeleteButton?: boolean
-  showEditButton?: boolean
-  showReadonlyButton?: boolean
-  showSaveButton?: boolean
-}>()
+  hasChanges?: boolean;
+  showCloseButton?: boolean;
+  showDeleteButton?: boolean;
+  showEditButton?: boolean;
+  showReadonlyButton?: boolean;
+  showSaveButton?: boolean;
+}>();
 
-defineEmits(['close', 'edit', 'readonly', 'save', 'delete'])
+defineEmits(["close", "edit", "readonly", "save", "delete"]);
 </script>
 
 <i18n lang="yaml">

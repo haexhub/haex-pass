@@ -53,6 +53,18 @@ export const useUiStore = defineStore("uiStore", () => {
 
   const currentLocale = ref();
 
+  // WORKAROUND for Nuxt UI bug: UTabs disappear after UDrawer closes
+  // Related GitHub issues:
+  //   * https://github.com/emilkowalski/vaul/issues/572 (vaul layout shift)
+  //   * https://github.com/nuxt/ui/issues/3523 (UDrawer shifts layout)
+  // TODO: Remove when upstream bug is fixed
+  const tabsRerenderKey = ref(0);
+  const activeTabIndex = ref<string>("0");
+
+  function triggerTabsRerender() {
+    tabsRerenderKey.value++;
+  }
+
   return {
     availableThemes,
     context,
@@ -61,5 +73,8 @@ export const useUiStore = defineStore("uiStore", () => {
     currentThemeName,
     defaultTheme,
     isSmallScreen,
+    tabsRerenderKey,
+    activeTabIndex,
+    triggerTabsRerender,
   };
 });

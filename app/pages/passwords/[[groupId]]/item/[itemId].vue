@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen bg-red-300 overflow-hidden">
+  <div class="h-screen overflow-hidden">
     <PassItem
       v-model:details="item.details"
       v-model:key-values-add="item.keyValuesAdd"
@@ -56,11 +56,8 @@ definePageMeta({
   name: "passwordItemEdit",
 });
 
-/* defineProps({
-  icon: String,
-  title: String,
-  withCopyButton: Boolean,
-}) */
+const { activeTabIndex } = storeToRefs(useUiStore());
+activeTabIndex.value = "0";
 
 const readOnly = ref(true);
 const showConfirmDeleteDialog = ref(false);
@@ -207,7 +204,8 @@ const hasChanges = computed(() => {
   return !(
     JSON.stringify(item.originalDetails) === JSON.stringify(item.details) &&
     JSON.stringify(item.originalKeyValues) === JSON.stringify(item.keyValues) &&
-    JSON.stringify(item.originalAttachments) === JSON.stringify(item.attachments) &&
+    JSON.stringify(item.originalAttachments) ===
+      JSON.stringify(item.attachments) &&
     !item.keyValuesAdd.length &&
     !item.keyValuesDelete.length &&
     !item.attachmentsToAdd.length &&

@@ -15,7 +15,7 @@
       />
 
       <div
-        class="fixed bottom-16 flex justify-between transition-all w-full sm:items-center items-end px-8 z-40"
+        class="fixed bottom-6 flex justify-between transition-all w-full sm:items-center items-end px-8 z-40 pointer-events-none"
       >
         <div class="w-full" />
 

@@ -1,20 +1,23 @@
 <template>
-  <div class="p-2 space-y-6 h-full overflow-y-auto">
+  <div class="p-1 space-y-6 h-full overflow-y-auto">
     <!-- Key-Value Pairs -->
     <UCard>
       <template #header>
         <h3 class="text-lg font-semibold">{{ t("customFields") }}</h3>
       </template>
 
-      <div class="flex flex-wrap gap-2 items-start">
-        <UiList v-if="items.length || itemsToAdd.length" class="flex-1 rounded-lg overflow-hidden">
+      <div class="flex flex-wrap gap-3 items-start">
+        <UiList
+          v-if="items.length || itemsToAdd.length"
+          class="rounded-lg overflow-hidden w-full sm:flex-1"
+        >
           <li
             v-for="(item, index) in [...items, ...itemsToAdd]"
             :key="item.id"
             :class="{
               'bg-primary/20': currentSelected === item,
               'rounded-t-lg': index === 0,
-              'rounded-b-lg': index === [...items, ...itemsToAdd].length - 1
+              'rounded-b-lg': index === [...items, ...itemsToAdd].length - 1,
             }"
             class="flex gap-2 hover:bg-primary/20 px-4 items-center"
             @click="currentSelected = item"
@@ -23,7 +26,7 @@
               <input
                 v-model="item.key"
                 :readonly="currentSelected !== item || readOnly"
-                class="flex-1 cursor-pointer bg-transparent border-none outline-none"
+                class="flex-1 cursor-pointer bg-transparent border-none outline-none truncate"
               />
             </button>
 
@@ -38,7 +41,7 @@
           </li>
         </UiList>
 
-        <UTextarea
+        <UiTextarea
           v-if="items.length || itemsToAdd.length"
           :readOnly="readOnly || !currentSelected"
           :label="t('value')"

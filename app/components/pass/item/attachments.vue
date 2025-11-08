@@ -6,11 +6,11 @@
         v-for="attachment in [...attachments, ...attachmentsToAdd]"
         :key="attachment.id"
         :description="formatFileSize(attachment.size)"
-        icon="mdi:file-outline"
         @click="
-          !editingAttachmentId && (isImage(attachment.fileName)
-            ? viewAttachment(attachment)
-            : downloadAttachment(attachment))
+          !editingAttachmentId &&
+            (isImage(attachment.fileName)
+              ? viewAttachment(attachment)
+              : downloadAttachment(attachment))
         "
       >
         <template #title>
@@ -129,9 +129,8 @@
     <UiDrawer
       v-model:open="showPreview"
       direction="right"
-      :overlay="false"
-      :modal="false"
       :title="previewFile?.fileName || ''"
+      :description="previewFile?.fileName"
     >
       <template #content>
         <div class="p-4 h-full flex flex-col">
@@ -156,7 +155,9 @@
           </div>
 
           <!-- Image Preview -->
-          <div class="flex-1 bg-muted/20 rounded flex items-center justify-center overflow-auto">
+          <div
+            class="flex-1 bg-muted/20 rounded flex items-center justify-center overflow-auto"
+          >
             <img
               v-if="previewDataUrl"
               :src="previewDataUrl"
@@ -166,7 +167,9 @@
           </div>
 
           <!-- Footer Info -->
-          <div class="flex justify-between items-center text-sm text-muted-foreground mt-4 pt-4 border-t">
+          <div
+            class="flex justify-between items-center text-sm text-muted-foreground mt-4 pt-4 border-t"
+          >
             <span>{{ formatFileSize(previewFile?.size) }}</span>
             <span>{{ previewFile?.fileName }}</span>
           </div>
@@ -211,6 +214,15 @@ const previewFile = ref<AttachmentWithSize | null>(null);
 const previewDataUrl = ref<string | null>(null);
 const editingAttachmentId = ref<string | null>(null);
 const editingFileName = ref("");
+
+// WORKAROUND: Trigger tabs rerender when drawer closes
+const { triggerTabsRerender } = useUiStore();
+
+watch(showPreview, (isOpen, wasOpen) => {
+  if (wasOpen && !isOpen) {
+    triggerTabsRerender();
+  }
+});
 
 // File size formatter
 function formatFileSize(bytes?: number): string {
@@ -299,7 +311,10 @@ async function downloadAttachment(attachment: AttachmentWithSize) {
 
     console.log("[Attachments] Download - query result:", result);
     console.log("[Attachments] Download - result length:", result.length);
-    console.log("[Attachments] Download - has data:", result[0]?.data ? "yes" : "no");
+    console.log(
+      "[Attachments] Download - has data:",
+      result[0]?.data ? "yes" : "no"
+    );
 
     if (!result.length || !result[0]?.data) {
       console.error("[Attachments] Download - Binary not found in database");
@@ -368,7 +383,10 @@ async function viewAttachment(attachment: AttachmentWithSize) {
 
     console.log("[Attachments] View - query result:", result);
     console.log("[Attachments] View - result length:", result.length);
-    console.log("[Attachments] View - has data:", result[0]?.data ? "yes" : "no");
+    console.log(
+      "[Attachments] View - has data:",
+      result[0]?.data ? "yes" : "no"
+    );
 
     if (!result.length || !result[0]?.data) {
       console.error("[Attachments] View - Binary not found in database");
@@ -433,7 +451,9 @@ function saveRename(attachment: AttachmentWithSize) {
   }
 
   // Update in attachmentsToAdd array
-  const indexToAdd = attachmentsToAdd.value.findIndex((a) => a.id === attachment.id);
+  const indexToAdd = attachmentsToAdd.value.findIndex(
+    (a) => a.id === attachment.id
+  );
   if (indexToAdd !== -1 && attachmentsToAdd.value[indexToAdd]) {
     attachmentsToAdd.value[indexToAdd].fileName = editingFileName.value.trim();
   }

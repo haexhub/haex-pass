@@ -1,9 +1,6 @@
 <template>
-  <div class="h-full overflow-y-auto">
-    <form
-      class="flex flex-col gap-4 w-full p-4"
-      @submit.prevent="$emit('submit')"
-    >
+  <div class="h-full overflow-y-auto px-1 py-2">
+    <form class="flex flex-col gap-4 w-full" @submit.prevent="$emit('submit')">
       <UiInput
         v-show="!readOnly || itemDetails.title"
         ref="titleRef"

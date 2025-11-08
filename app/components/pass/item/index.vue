@@ -1,49 +1,49 @@
 <template>
-  <UCard class="rounded p-0" @close="onClose">
-    <div class="">
-      <UTabs
-        :items="tabs"
-        variant="link"
-        :ui="{ trigger: 'grow' }"
-        class="gap-4 w-full h-screen"
-      >
-        <template #details>
-          <div class="h-dvh pb-32">
-            <PassItemDetails
-              v-if="details"
-              v-model="details"
-              with-copy-button
-              :read-only
-              :defaultIcon
-              v-model:prevent-close="preventClose"
-              @submit="$emit('submit')"
-            />
-          </div>
-        </template>
+  <UCard class="rounded" @close="onClose">
+    <UTabs
+      :key="tabsRerenderKey"
+      v-model="activeTabIndex"
+      :items="tabs"
+      variant="link"
+      :ui="{ trigger: 'grow' }"
+      class="gap-4 w-full h-full"
+    >
+      <template #details>
+        <div class="h-dvh pb-32">
+          <PassItemDetails
+            v-if="details"
+            v-model="details"
+            with-copy-button
+            :read-only
+            :defaultIcon
+            v-model:prevent-close="preventClose"
+            @submit="$emit('submit')"
+          />
+        </div>
+      </template>
 
-        <template #keyValue>
-          <div class="h-dvh pb-32">
-            <PassItemKeyValue
-              v-if="keyValues"
-              v-model="keyValues"
-              v-model:items-to-add="keyValuesAdd"
-              v-model:items-to-delete="keyValuesDelete"
-              v-model:attachments="attachments"
-              v-model:attachments-to-add="attachmentsToAdd"
-              v-model:attachments-to-delete="attachmentsToDelete"
-              :read-only
-              :item-id="details!.id"
-            />
-          </div>
-        </template>
+      <template #keyValue>
+        <div class="h-dvh pb-32">
+          <PassItemKeyValue
+            v-if="keyValues"
+            v-model="keyValues"
+            v-model:items-to-add="keyValuesAdd"
+            v-model:items-to-delete="keyValuesDelete"
+            v-model:attachments="attachments"
+            v-model:attachments-to-add="attachmentsToAdd"
+            v-model:attachments-to-delete="attachmentsToDelete"
+            :read-only
+            :item-id="details!.id"
+          />
+        </div>
+      </template>
 
-        <template #history>
-          <div class="h-dvh pb-32">
-            <PassItemHistory v-model="snapshots" />
-          </div>
-        </template>
-      </UTabs>
-    </div>
+      <template #history>
+        <div class="h-dvh pb-32">
+          <PassItemHistory v-model="snapshots" />
+        </div>
+      </template>
+    </UTabs>
   </UCard>
 </template>
 
@@ -107,14 +107,11 @@ const snapshots = defineModel<SelectHaexPasswordsItemSnapshots[]>("snapshots", {
 
 const { t } = useI18n();
 
-/* const id = reactive({
-  details: useId(),
-  keyValue: useId(),
-  history: useId(),
-  content: {},
-}) */
-
 const preventClose = ref(false);
+
+// WORKAROUND for Nuxt UI UDrawer + UTabs bug
+// Use UI store to track tab rerender trigger and preserve active tab
+const { tabsRerenderKey, activeTabIndex } = storeToRefs(useUiStore());
 
 const onClose = () => {
   if (preventClose.value) return;
