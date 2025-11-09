@@ -1,2 +1,52 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+/* Global List Animations */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.3s ease;
+}
+
+.list-enter-from {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.list-move {
+  transition: transform 0.3s ease;
+}
+
+/* Page Transition Animations - Hierarchical Navigation */
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Going deeper (forward) - slide from right */
+.slide-left-enter-from {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(-30%);
+}
+
+/* Going back (backward) - slide from left */
+.slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(-30%);
+}
+
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}

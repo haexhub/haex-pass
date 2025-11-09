@@ -4,31 +4,33 @@
       ref="listRef"
       class="flex flex-col w-full h-full gap-y-2 first:rounded-t-md last:rounded-b-md p-1"
     >
-      <li
-        v-for="(item, index) in menuItems"
-        :key="item.id"
-        :ref="(el) => setupLongPress(el as HTMLElement, item)"
-        class="bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 origin-to intersect:motion-preset-slide-down intersect:motion-ease-spring-bouncier intersect:motion-delay ease-in-out shadow cursor-pointer transition-colors"
-        :class="{
-          'bg-primary-100 dark:bg-primary-900/30 outline outline-primary hover:bg-primary-200 dark:hover:bg-primary-800/30':
-            selectedItems.has(item) ||
-            (currentSelectedItem?.id === item.id &&
-              longPressedHook &&
-              !selectedItems.has(item)),
-          'opacity-60 shadow-primary': selectedGroupItems?.some(
-            (_item) => _item.id === item.id
-          ),
-          'opacity-50': item.inTrash,
-        }"
-        :style="{ '--motion-delay': `${50 * index}ms` }"
-        @mousedown="
-          longPressedHook
-            ? (currentSelectedItem = null)
-            : (currentSelectedItem = item)
-        "
-      >
-        <PassMobileMenuItem v-bind="item" @click="onClickItemAsync(item)" />
-      </li>
+      <TransitionGroup name="list">
+        <li
+          v-for="(item, index) in menuItems"
+          :key="item.id"
+          :ref="(el) => setupLongPress(el as HTMLElement, item)"
+          class="bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 origin-to intersect:motion-preset-slide-down intersect:motion-ease-spring-bouncier intersect:motion-delay ease-in-out shadow cursor-pointer transition-colors"
+          :class="{
+            'bg-primary-100 dark:bg-primary-900/30 outline outline-primary hover:bg-primary-200 dark:hover:bg-primary-800/30':
+              selectedItems.has(item) ||
+              (currentSelectedItem?.id === item.id &&
+                longPressedHook &&
+                !selectedItems.has(item)),
+            'opacity-60 shadow-primary': selectedGroupItems?.some(
+              (_item) => _item.id === item.id
+            ),
+            'opacity-50': item.inTrash,
+          }"
+          :style="{ '--motion-delay': `${50 * index}ms` }"
+          @mousedown="
+            longPressedHook
+              ? (currentSelectedItem = null)
+              : (currentSelectedItem = item)
+          "
+        >
+          <PassMobileMenuItem v-bind="item" @click="onClickItemAsync(item)" />
+        </li>
+      </TransitionGroup>
     </ul>
   </div>
   <div v-else class="flex justify-center items-center flex-1">
@@ -89,7 +91,7 @@ const onClickItemAsync = async (item: IPasswordMenuItem) => {
 
     if (!selectedItems.value.size) longPressedHook.value = false;
   } else {
-    if (item.type === "group")
+    if (item.type === "group") {
       await navigateTo(
         localePath({
           name: "passwordGroupItems",
@@ -99,7 +101,7 @@ const onClickItemAsync = async (item: IPasswordMenuItem) => {
           },
         })
       );
-    else {
+    } else {
       await navigateTo(
         localePath({
           name: "passwordItemEdit",

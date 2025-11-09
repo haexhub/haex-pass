@@ -111,10 +111,7 @@
         <!-- Pattern Mode -->
         <div class="space-y-2">
           <div class="flex items-center gap-2">
-            <UCheckbox
-              v-model="usePattern"
-              :label="t('usePattern')"
-            />
+            <UCheckbox v-model="usePattern" :label="t('usePattern')" />
             <UPopover mode="hover" :popper="{ placement: 'right' }">
               <UiButton
                 icon="i-lucide-info"
@@ -124,17 +121,59 @@
               />
               <template #content>
                 <div class="p-4 w-fit">
-                  <h4 class="font-semibold mb-2">{{ t('patternHelpTitle') }}</h4>
+                  <h4 class="font-semibold mb-2">
+                    {{ t("patternHelpTitle") }}
+                  </h4>
                   <ul class="text-sm space-y-1">
-                    <li><code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">c</code> = {{ t('patternHelp.c') }}</li>
-                    <li><code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">C</code> = {{ t('patternHelp.C') }}</li>
-                    <li><code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">v</code> = {{ t('patternHelp.v') }}</li>
-                    <li><code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">V</code> = {{ t('patternHelp.V') }}</li>
-                    <li><code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">d</code> = {{ t('patternHelp.d') }}</li>
-                    <li><code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">a</code> = {{ t('patternHelp.a') }}</li>
-                    <li><code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">A</code> = {{ t('patternHelp.A') }}</li>
-                    <li><code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">s</code> = {{ t('patternHelp.s') }}</li>
-                    <li>{{ t('patternHelp.other') }}</li>
+                    <li>
+                      <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded"
+                        >c</code
+                      >
+                      = {{ t("patternHelp.c") }}
+                    </li>
+                    <li>
+                      <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded"
+                        >C</code
+                      >
+                      = {{ t("patternHelp.C") }}
+                    </li>
+                    <li>
+                      <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded"
+                        >v</code
+                      >
+                      = {{ t("patternHelp.v") }}
+                    </li>
+                    <li>
+                      <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded"
+                        >V</code
+                      >
+                      = {{ t("patternHelp.V") }}
+                    </li>
+                    <li>
+                      <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded"
+                        >d</code
+                      >
+                      = {{ t("patternHelp.d") }}
+                    </li>
+                    <li>
+                      <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded"
+                        >a</code
+                      >
+                      = {{ t("patternHelp.a") }}
+                    </li>
+                    <li>
+                      <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded"
+                        >A</code
+                      >
+                      = {{ t("patternHelp.A") }}
+                    </li>
+                    <li>
+                      <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded"
+                        >s</code
+                      >
+                      = {{ t("patternHelp.s") }}
+                    </li>
+                    <li>{{ t("patternHelp.other") }}</li>
                   </ul>
                 </div>
               </template>
@@ -176,12 +215,14 @@ const options = reactive({
 });
 
 const usePattern = ref(false);
-const pattern = ref<string>("cccc-cccc-cccc");
+const pattern = ref<string>("cvcv-cvcv-cvcv");
 
 const generatedPassword = ref<string>("");
 
 // Toggle option and regenerate password
-const toggleOption = (option: "uppercase" | "lowercase" | "numbers" | "symbols") => {
+const toggleOption = (
+  option: "uppercase" | "lowercase" | "numbers" | "symbols"
+) => {
   options[option] = !options[option];
   generatePasswordAsync();
 };

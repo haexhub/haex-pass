@@ -2,100 +2,194 @@
   <div class="">
     <!-- Attachment Grid -->
     <UPageGrid v-if="attachments.length || attachmentsToAdd.length">
-      <UPageCard
+      <UCard
         v-for="attachment in [...attachments, ...attachmentsToAdd]"
         :key="attachment.id"
-        :description="formatFileSize(attachment.size)"
+        :ui="{ body: 'p-0 sm:p-0' }"
+        class="group cursor-pointer overflow-hidden"
         @click="
           !editingAttachmentId &&
             (isImage(attachment.fileName)
-              ? viewAttachment(attachment)
+              ? openImageAsync(attachment)
               : downloadAttachment(attachment))
         "
       >
-        <template #title>
-          <div class="flex items-center gap-2 w-full">
-            <input
-              v-if="editingAttachmentId === attachment.id"
-              ref="editInput"
-              v-model="editingFileName"
-              type="text"
-              class="flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-primary"
-              @click.stop
-              @keyup.enter="saveRename(attachment)"
-              @keyup.escape="cancelRename"
-              @blur="saveRename(attachment)"
+        <!-- Image attachments with overlay -->
+        <div
+          v-if="isImage(attachment.fileName)"
+          class="relative w-full aspect-video overflow-hidden"
+        >
+          <img
+            v-if="imageDataUrls.get(attachment.id)"
+            :src="imageDataUrls.get(attachment.id)"
+            :alt="attachment.fileName"
+            class="w-full h-full object-cover"
+          />
+          <div
+            v-else
+            class="w-full h-full flex items-center justify-center bg-muted/20"
+          >
+            <Icon
+              name="mdi:image-outline"
+              size="32"
+              class="text-muted-foreground"
             />
-            <span v-else class="flex-1">{{ attachment.fileName }}</span>
+          </div>
 
-            <!-- Edit Button -->
-            <UiButton
-              v-if="!readOnly && editingAttachmentId !== attachment.id"
-              variant="ghost"
-              color="neutral"
-              icon="mdi:pencil"
-              size="sm"
-              :tooltip="t('rename')"
-              @click.stop="startRename(attachment)"
-            />
+          <!-- Info Overlay at Bottom -->
+          <div
+            class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/60 to-transparent p-3"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <div class="min-w-0 flex-1">
+                <input
+                  v-if="editingAttachmentId === attachment.id"
+                  ref="editInput"
+                  v-model="editingFileName"
+                  type="text"
+                  class="w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white/90"
+                  @click.stop
+                  @keyup.enter="saveRename(attachment)"
+                  @keyup.escape="cancelRename"
+                  @blur="saveRename(attachment)"
+                />
+                <div v-else class="text-white font-medium text-sm truncate">
+                  {{ attachment.fileName }}
+                </div>
+                <div class="text-white/70 text-xs mt-0.5">
+                  {{ formatFileSize(attachment.size) }}
+                </div>
+              </div>
 
-            <!-- Save/Cancel Buttons (while editing) -->
-            <template v-if="editingAttachmentId === attachment.id">
+              <!-- Action Buttons -->
+              <div class="flex gap-1 shrink-0">
+                <UiButton
+                  variant="ghost"
+                  color="neutral"
+                  icon="mdi:download"
+                  size="sm"
+                  class="bg-white/10 hover:bg-white/20 text-white"
+                  :tooltip="t('download')"
+                  @click.stop="downloadAttachment(attachment)"
+                />
+                <UiButton
+                  v-if="!readOnly && editingAttachmentId !== attachment.id"
+                  variant="ghost"
+                  color="neutral"
+                  icon="mdi:pencil"
+                  size="sm"
+                  class="bg-white/10 hover:bg-white/20 text-white"
+                  :tooltip="t('rename')"
+                  @click.stop="startRename(attachment)"
+                />
+                <template v-if="editingAttachmentId === attachment.id">
+                  <UiButton
+                    variant="ghost"
+                    color="neutral"
+                    icon="mdi:close"
+                    size="sm"
+                    class="bg-white/10 hover:bg-white/20 text-white"
+                    :tooltip="t('cancel')"
+                    @click.stop="cancelRename"
+                  />
+                  <UiButton
+                    variant="ghost"
+                    color="primary"
+                    icon="mdi:check"
+                    size="sm"
+                    class="bg-white/10 hover:bg-white/20 text-white"
+                    :tooltip="t('save')"
+                    @click.stop="saveRename(attachment)"
+                  />
+                </template>
+                <UiButton
+                  v-if="!readOnly"
+                  variant="ghost"
+                  color="error"
+                  icon="mdi:trash-outline"
+                  size="sm"
+                  class="bg-white/10 hover:bg-white/20 text-white"
+                  :tooltip="t('delete')"
+                  @click.stop="deleteAttachment(attachment.id)"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Non-image files: compact card layout -->
+        <div v-if="!isImage(attachment.fileName)" class="p-3">
+          <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0 flex-1">
+              <input
+                v-if="editingAttachmentId === attachment.id"
+                ref="editInput"
+                v-model="editingFileName"
+                type="text"
+                class="w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                @click.stop
+                @keyup.enter="saveRename(attachment)"
+                @keyup.escape="cancelRename"
+                @blur="saveRename(attachment)"
+              />
+              <div v-else class="font-medium text-sm truncate">
+                {{ attachment.fileName }}
+              </div>
+              <div class="text-muted-foreground text-xs mt-0.5">
+                {{ formatFileSize(attachment.size) }}
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-1 shrink-0">
               <UiButton
                 variant="ghost"
                 color="neutral"
-                icon="mdi:close"
+                icon="mdi:download"
                 size="sm"
-                :tooltip="t('cancel')"
-                @click.stop="cancelRename"
+                :tooltip="t('download')"
+                @click.stop="downloadAttachment(attachment)"
               />
               <UiButton
+                v-if="!readOnly && editingAttachmentId !== attachment.id"
                 variant="ghost"
-                color="primary"
-                icon="mdi:check"
+                color="neutral"
+                icon="mdi:pencil"
                 size="sm"
-                :tooltip="t('save')"
-                @click.stop="saveRename(attachment)"
+                :tooltip="t('rename')"
+                @click.stop="startRename(attachment)"
               />
-            </template>
+              <template v-if="editingAttachmentId === attachment.id">
+                <UiButton
+                  variant="ghost"
+                  color="neutral"
+                  icon="mdi:close"
+                  size="sm"
+                  :tooltip="t('cancel')"
+                  @click.stop="cancelRename"
+                />
+                <UiButton
+                  variant="ghost"
+                  color="primary"
+                  icon="mdi:check"
+                  size="sm"
+                  :tooltip="t('save')"
+                  @click.stop="saveRename(attachment)"
+                />
+              </template>
+              <UiButton
+                v-if="!readOnly"
+                variant="ghost"
+                color="error"
+                icon="mdi:trash-outline"
+                size="sm"
+                :tooltip="t('delete')"
+                @click.stop="deleteAttachment(attachment.id)"
+              />
+            </div>
           </div>
-        </template>
-        <template #footer>
-          <div class="flex gap-2">
-            <!-- View/Preview Button (for images) -->
-            <UiButton
-              v-if="isImage(attachment.fileName)"
-              variant="ghost"
-              color="neutral"
-              icon="mdi:eye-outline"
-              size="sm"
-              :tooltip="t('view')"
-              @click.stop="viewAttachment(attachment)"
-            />
-
-            <!-- Download Button -->
-            <UiButton
-              variant="ghost"
-              color="neutral"
-              icon="mdi:download"
-              size="sm"
-              :tooltip="t('download')"
-              @click.stop="downloadAttachment(attachment)"
-            />
-
-            <!-- Delete Button -->
-            <UiButton
-              v-if="!readOnly"
-              variant="ghost"
-              color="error"
-              icon="mdi:trash-outline"
-              size="sm"
-              :tooltip="t('delete')"
-              @click.stop="deleteAttachment(attachment.id)"
-            />
-          </div>
-        </template>
-      </UPageCard>
+        </div>
+      </UCard>
     </UPageGrid>
 
     <!-- No Attachments Message -->
@@ -214,6 +308,7 @@ const previewFile = ref<AttachmentWithSize | null>(null);
 const previewDataUrl = ref<string | null>(null);
 const editingAttachmentId = ref<string | null>(null);
 const editingFileName = ref("");
+const imageDataUrls = reactive(new Map<string, string>());
 
 // WORKAROUND: Trigger tabs rerender when drawer closes
 const { triggerTabsRerender } = useUiStore();
@@ -223,6 +318,44 @@ watch(showPreview, (isOpen, wasOpen) => {
     triggerTabsRerender();
   }
 });
+
+// Load all images when attachments change
+async function loadAllImagesAsync() {
+  if (!orm.value) return;
+
+  const allAttachments = [...attachments.value, ...attachmentsToAdd.value];
+
+  for (const attachment of allAttachments) {
+    if (isImage(attachment.fileName) && !imageDataUrls.has(attachment.id)) {
+      try {
+        const result = await orm.value
+          .select()
+          .from(haexPasswordsBinaries)
+          .where(eq(haexPasswordsBinaries.hash, attachment.binaryHash))
+          .limit(1);
+
+        if (result.length && result[0]?.data) {
+          const dataUrl = `data:image/png;base64,${result[0].data}`;
+          imageDataUrls.set(attachment.id, dataUrl);
+          console.log("[Attachments] Loaded image for:", attachment.fileName);
+        } else {
+          console.log("[Attachments] No data found for:", attachment.fileName);
+        }
+      } catch (error) {
+        console.error("[Attachments] Error loading image:", error);
+      }
+    }
+  }
+}
+
+// Watch for changes in attachments and load images
+watch(
+  () => [...attachments.value, ...attachmentsToAdd.value],
+  () => {
+    loadAllImagesAsync();
+  },
+  { immediate: true, deep: true }
+);
 
 // File size formatter
 function formatFileSize(bytes?: number): string {
@@ -292,6 +425,79 @@ async function onFileChange(event: Event) {
   // Reset input
   if (fileInput.value) {
     fileInput.value.value = "";
+  }
+}
+
+// Open image with system viewer
+async function openImageAsync(attachment: AttachmentWithSize) {
+  if (!client) {
+    toast.add({
+      title: t("viewError"),
+      description: "HaexHub client not available",
+      color: "error",
+    });
+    return;
+  }
+
+  try {
+    // Get the already loaded image data URL
+    const dataUrl = imageDataUrls.get(attachment.id);
+    if (!dataUrl) {
+      toast.add({
+        title: t("viewError"),
+        description: t("binaryNotFound"),
+        color: "error",
+      });
+      return;
+    }
+
+    // Convert base64 data URL to Uint8Array
+    const base64 = dataUrl.split(",")[1];
+    if (!base64) {
+      toast.add({
+        title: t("viewError"),
+        color: "error",
+      });
+      return;
+    }
+
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    // Determine MIME type from file extension
+    const ext = attachment.fileName.split(".").pop()?.toLowerCase();
+    const mimeTypes: Record<string, string> = {
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      gif: "image/gif",
+      webp: "image/webp",
+      bmp: "image/bmp",
+      svg: "image/svg+xml",
+    };
+    const mimeType = mimeTypes[ext || ""] || "image/png";
+
+    // Open file with system viewer
+    const openResult = await client.filesystem.openFileAsync(bytes, {
+      fileName: attachment.fileName,
+      mimeType,
+    });
+
+    if (!openResult.success) {
+      toast.add({
+        title: t("viewError"),
+        color: "error",
+      });
+    }
+  } catch (error) {
+    console.error("[Attachments] Open error:", error);
+    toast.add({
+      title: t("viewError"),
+      color: "error",
+    });
   }
 }
 

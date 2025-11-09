@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@haexhub/sdk':
-        specifier: 1.2.1
-        version: 1.2.1(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
+        specifier: 1.2.2
+        version: 1.2.2(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
       '@nuxt/eslint':
         specifier: 1.9.0
         version: 1.9.0(@typescript-eslint/utils@8.46.3(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.24)(eslint@9.39.1(jiti@2.6.1))(magicast@0.5.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))
@@ -19,7 +19,7 @@ importers:
         version: 4.1.0(@babel/parser@7.28.5)(change-case@5.4.4)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(embla-carousel@8.6.0)(ioredis@5.8.2)(magicast@0.5.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue-router@4.6.3(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))(zod@4.1.12)
       '@nuxtjs/i18n':
         specifier: ^10.2.0
-        version: 10.2.0(@vue/compiler-dom@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(magicast@0.5.1)(rollup@4.53.0)(vue@3.5.24(typescript@5.9.3))
+        version: 10.2.0(@vue/compiler-dom@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(magicast@0.5.1)(rollup@4.53.1)(vue@3.5.24(typescript@5.9.3))
       '@pinia/nuxt':
         specifier: ^0.11.3
         version: 0.11.3(magicast@0.5.1)(pinia@3.0.3(typescript@5.9.3)(vue@3.5.24(typescript@5.9.3)))
@@ -49,7 +49,7 @@ importers:
         version: 2.1.1
       nuxt:
         specifier: ^4.2.1
-        version: 4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.0)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1)
+        version: 4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.1)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1)
       otpauth:
         specifier: ^9.4.1
         version: 9.4.1
@@ -640,8 +640,8 @@ packages:
   '@floating-ui/vue@1.1.9':
     resolution: {integrity: sha512-BfNqNW6KA83Nexspgb9DZuz578R7HT8MZw1CfK9I6Ah4QReNWEJsXWHN+SdmOVLNGmTPDi+fDT535Df5PzMLbQ==}
 
-  '@haexhub/sdk@1.2.1':
-    resolution: {integrity: sha512-g7VYI1hUT3dzWNHHHDJZ2PJy2zLR1dflcq8cTT5xlKlvn30YzmDFE7IMSuNdN2JTU+SRBoYc44csKm4VuFW1VQ==}
+  '@haexhub/sdk@1.2.2':
+    resolution: {integrity: sha512-q/yDA7GCy3wwpM290FEYpUAa/LMPM9hRdeqXAEUmtLl2lpQerGzut/8hPRtpSdYLMaeqfhB6r9+xSRwffO18LA==}
     hasBin: true
     peerDependencies:
       '@nuxt/kit': ^3.0.0 || ^4.0.0
@@ -677,8 +677,8 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@iconify/collections@1.0.615':
-    resolution: {integrity: sha512-OBBvPu0CAdl042CfDBxt4zWVUxTwnK2kRBatab/y8d/t2XML9QGrA8A2hpaIFpYPPILSs6a4+gBkAGVXSKkBsQ==}
+  '@iconify/collections@1.0.616':
+    resolution: {integrity: sha512-wQiteLwSNllq4ym4JfC1wg3FOKUYBBMmT++nTHWtZd1HVuwAG3j4Fwh2Ewd0m6lwxTM51wisJQfrDf8i8pJMgA==}
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -1636,113 +1636,113 @@ packages:
       rollup:
         optional: true
 
-  '@rollup/rollup-android-arm-eabi@4.53.0':
-    resolution: {integrity: sha512-MX3DD/o2W36nlgQb8KA5QtUw/bK5aR9YDzNmX1PRHZAa6LF/MQCWMN477CgBMg8gH1vEiEZsjWRIZeL/7ttUVA==}
+  '@rollup/rollup-android-arm-eabi@4.53.1':
+    resolution: {integrity: sha512-bxZtughE4VNVJlL1RdoSE545kc4JxL7op57KKoi59/gwuU5rV6jLWFXXc8jwgFoT6vtj+ZjO+Z2C5nrY0Cl6wA==}
     cpu: [arm]
     os: [android]
 
-  '@rollup/rollup-android-arm64@4.53.0':
-    resolution: {integrity: sha512-U4/R8ZvikDYLkl+hyAGP23SRHp3LwYSRy9SvJqsnva7TYLhVMy39RTVCYn1DdRNxXl1CyCQgE/mXKm9jaQT4ig==}
+  '@rollup/rollup-android-arm64@4.53.1':
+    resolution: {integrity: sha512-44a1hreb02cAAfAKmZfXVercPFaDjqXCK+iKeVOlJ9ltvnO6QqsBHgKVPTu+MJHSLLeMEUbeG2qiDYgbFPU48g==}
     cpu: [arm64]
     os: [android]
 
-  '@rollup/rollup-darwin-arm64@4.53.0':
-    resolution: {integrity: sha512-nBG2BXRU3ifdK0HdqBKaT5VI6ScoIpABYZ+dWwQkIOYd8Suo4iykgPikjhsTd7NeHgJJ3OqlKYCcNkZtB1iLVQ==}
+  '@rollup/rollup-darwin-arm64@4.53.1':
+    resolution: {integrity: sha512-usmzIgD0rf1syoOZ2WZvy8YpXK5G1V3btm3QZddoGSa6mOgfXWkkv+642bfUUldomgrbiLQGrPryb7DXLovPWQ==}
     cpu: [arm64]
     os: [darwin]
 
-  '@rollup/rollup-darwin-x64@4.53.0':
-    resolution: {integrity: sha512-QuZ5hYStB/vW7b8zQYtdIPpIfNNlUXtGk8zVTkoTMKzMhE2/6tVvcCWqdWqCVhx6eguJJjKjtZ9lAAG/D3yNeA==}
+  '@rollup/rollup-darwin-x64@4.53.1':
+    resolution: {integrity: sha512-is3r/k4vig2Gt8mKtTlzzyaSQ+hd87kDxiN3uDSDwggJLUV56Umli6OoL+/YZa/KvtdrdyNfMKHzL/P4siOOmg==}
     cpu: [x64]
     os: [darwin]
 
-  '@rollup/rollup-freebsd-arm64@4.53.0':
-    resolution: {integrity: sha512-4yYPm1PJwK/HKI4FzElAPj2EAAFaaLUWzXV3S3edKy71JcEVzBCpgaXyEcDh3blBIjLml+aMkj6HEVGSuzpz+g==}
+  '@rollup/rollup-freebsd-arm64@4.53.1':
+    resolution: {integrity: sha512-QJ1ksgp/bDJkZB4daldVmHaEQkG4r8PUXitCOC2WRmRaSaHx5RwPoI3DHVfXKwDkB+Sk6auFI/+JHacTekPRSw==}
     cpu: [arm64]
     os: [freebsd]
 
-  '@rollup/rollup-freebsd-x64@4.53.0':
-    resolution: {integrity: sha512-1SvE5euwWV8JqFc4zEAqHbJbf2yJl00EoHVcnlFqLzjrIExYttLxfZeMDIXY6Yx+bskphrQakpChZKzE2JECEg==}
+  '@rollup/rollup-freebsd-x64@4.53.1':
+    resolution: {integrity: sha512-J6ma5xgAzvqsnU6a0+jgGX/gvoGokqpkx6zY4cWizRrm0ffhHDpJKQgC8dtDb3+MqfZDIqs64REbfHDMzxLMqQ==}
     cpu: [x64]
     os: [freebsd]
 
-  '@rollup/rollup-linux-arm-gnueabihf@4.53.0':
-    resolution: {integrity: sha512-9tS4QyfU5NF5CdUugEi7kWbcGD7pbu6Fm8SunuePH6beeQgtcRZ9K9KVwKHEgfBHeeyrr5OvfV1qWs7PMDOf5w==}
+  '@rollup/rollup-linux-arm-gnueabihf@4.53.1':
+    resolution: {integrity: sha512-JzWRR41o2U3/KMNKRuZNsDUAcAVUYhsPuMlx5RUldw0E4lvSIXFUwejtYz1HJXohUmqs/M6BBJAUBzKXZVddbg==}
     cpu: [arm]
     os: [linux]
 
-  '@rollup/rollup-linux-arm-musleabihf@4.53.0':
-    resolution: {integrity: sha512-U+0ovxGU9bVJIHfW+oALpHd0ho1YDwhj0yHASDzIj+bOeo+VzEpNtHxcjhFab0YcHUorIMoqyxckC98+81oTJw==}
+  '@rollup/rollup-linux-arm-musleabihf@4.53.1':
+    resolution: {integrity: sha512-L8kRIrnfMrEoHLHtHn+4uYA52fiLDEDyezgxZtGUTiII/yb04Krq+vk3P2Try+Vya9LeCE9ZHU8CXD6J9EhzHQ==}
     cpu: [arm]
     os: [linux]
 
-  '@rollup/rollup-linux-arm64-gnu@4.53.0':
-    resolution: {integrity: sha512-Cp/TQ+wLjRTqTuiVwLz4XPZMo3ROl7EJYMF8HhMp8Uf+9kOOATB3/p4gGZPpuQ4BP7qEXG29ET24u9+F0ERYkQ==}
+  '@rollup/rollup-linux-arm64-gnu@4.53.1':
+    resolution: {integrity: sha512-ysAc0MFRV+WtQ8li8hi3EoFi7us6d1UzaS/+Dp7FYZfg3NdDljGMoVyiIp6Ucz7uhlYDBZ/zt6XI0YEZbUO11Q==}
     cpu: [arm64]
     os: [linux]
 
-  '@rollup/rollup-linux-arm64-musl@4.53.0':
-    resolution: {integrity: sha512-SuGoAwhsSonrSTEZTiQOGC3+XZfq7rc/qAdAOBrYYIp8pu+Wh4EFFXl6+QYYNbNrHL3DnVoWACLwnfwlTa0neA==}
+  '@rollup/rollup-linux-arm64-musl@4.53.1':
+    resolution: {integrity: sha512-UV6l9MJpDbDZZ/fJvqNcvO1PcivGEf1AvKuTcHoLjVZVFeAMygnamCTDikCVMRnA+qJe+B3pSbgX2+lBMqgBhA==}
     cpu: [arm64]
     os: [linux]
 
-  '@rollup/rollup-linux-loong64-gnu@4.53.0':
-    resolution: {integrity: sha512-EOKej1x0WoePnJWfg7ZbnUqiuiQunshzsKZSIfTHFDiCY9pnsr3Weit1GjcpGnun7H5HuRREqkT2c9CcKxNwSg==}
+  '@rollup/rollup-linux-loong64-gnu@4.53.1':
+    resolution: {integrity: sha512-UDUtelEprkA85g95Q+nj3Xf0M4hHa4DiJ+3P3h4BuGliY4NReYYqwlc0Y8ICLjN4+uIgCEvaygYlpf0hUj90Yg==}
     cpu: [loong64]
     os: [linux]
 
-  '@rollup/rollup-linux-ppc64-gnu@4.53.0':
-    resolution: {integrity: sha512-YAvv2aMFlfiawJ97lutomuehG2Yowd4YgsAqI85XNiMK9eBA1vEMZHt3BShg8cUvak71BM+VFRHddqc+OrRdVA==}
+  '@rollup/rollup-linux-ppc64-gnu@4.53.1':
+    resolution: {integrity: sha512-vrRn+BYhEtNOte/zbc2wAUQReJXxEx2URfTol6OEfY2zFEUK92pkFBSXRylDM7aHi+YqEPJt9/ABYzmcrS4SgQ==}
     cpu: [ppc64]
     os: [linux]
 
-  '@rollup/rollup-linux-riscv64-gnu@4.53.0':
-    resolution: {integrity: sha512-DxZe/sMVaqN+s5kVk3Iq619Rgyl1JCTob7xOLSNC84mbzg3NYTSheqqrtVllYjLYo4wm9YyqjVS57miuzNyXbQ==}
+  '@rollup/rollup-linux-riscv64-gnu@4.53.1':
+    resolution: {integrity: sha512-gto/1CxHyi4A7YqZZNznQYrVlPSaodOBPKM+6xcDSCMVZN/Fzb4K+AIkNz/1yAYz9h3Ng+e2fY9H6bgawVq17w==}
     cpu: [riscv64]
     os: [linux]
 
-  '@rollup/rollup-linux-riscv64-musl@4.53.0':
-    resolution: {integrity: sha512-N7+iZ0jEhwLY1FEsjbCR9lAxIZP0k+3Cghx9vSQWn+rcW8SgN8VcCmwJDoPDaGKTzWWB791U1s79BSLnEhUa0Q==}
+  '@rollup/rollup-linux-riscv64-musl@4.53.1':
+    resolution: {integrity: sha512-KZ6Vx7jAw3aLNjFR8eYVcQVdFa/cvBzDNRFM3z7XhNNunWjA03eUrEwJYPk0G8V7Gs08IThFKcAPS4WY/ybIrQ==}
     cpu: [riscv64]
     os: [linux]
 
-  '@rollup/rollup-linux-s390x-gnu@4.53.0':
-    resolution: {integrity: sha512-MA/NVneZyIskjvXdh2NR9YcPi7eHWBlQOWP2X8OymzyeUEB0JfUpmbKQZngHmOlyleV2IoR5nHIgMSRjLskOnA==}
+  '@rollup/rollup-linux-s390x-gnu@4.53.1':
+    resolution: {integrity: sha512-HvEixy2s/rWNgpwyKpXJcHmE7om1M89hxBTBi9Fs6zVuLU4gOrEMQNbNsN/tBVIMbLyysz/iwNiGtMOpLAOlvA==}
     cpu: [s390x]
     os: [linux]
 
-  '@rollup/rollup-linux-x64-gnu@4.53.0':
-    resolution: {integrity: sha512-iYEYzYpfaSCkunVD0LOYrD9OMc357be7+rBuCxW1qvsjCGl+95iWnYAFfyEoxAm6koasNN3tFxFYze5MKl5S3A==}
+  '@rollup/rollup-linux-x64-gnu@4.53.1':
+    resolution: {integrity: sha512-E/n8x2MSjAQgjj9IixO4UeEUeqXLtiA7pyoXCFYLuXpBA/t2hnbIdxHfA7kK9BFsYAoNU4st1rHYdldl8dTqGA==}
     cpu: [x64]
     os: [linux]
 
-  '@rollup/rollup-linux-x64-musl@4.53.0':
-    resolution: {integrity: sha512-FoRekOqhRUKbJMsB5LvhQchDeFeNlS6UGUwi0p3860sxE4zE+lp07FnkuR+yQH0rSn6iLXsnr44jnorgl8mGlQ==}
+  '@rollup/rollup-linux-x64-musl@4.53.1':
+    resolution: {integrity: sha512-IhJ087PbLOQXCN6Ui/3FUkI9pWNZe/Z7rEIVOzMsOs1/HSAECCvSZ7PkIbkNqL/AZn6WbZvnoVZw/qwqYMo4/w==}
     cpu: [x64]
     os: [linux]
 
-  '@rollup/rollup-openharmony-arm64@4.53.0':
-    resolution: {integrity: sha512-mEN2k1zKO5PUzW8W15hKpLh+zZI2by1onX2GfI93OekGbKN5aTjWGo7yAjwRZLjhAgs2UQcXmEWbIw0R5B4RnQ==}
+  '@rollup/rollup-openharmony-arm64@4.53.1':
+    resolution: {integrity: sha512-0++oPNgLJHBblreu0SFM7b3mAsBJBTY0Ksrmu9N6ZVrPiTkRgda52mWR7TKhHAsUb9noCjFvAw9l6ZO1yzaVbA==}
     cpu: [arm64]
     os: [openharmony]
 
-  '@rollup/rollup-win32-arm64-msvc@4.53.0':
-    resolution: {integrity: sha512-V1dEKUXqevG0wxo6ysGrL7g2T6tndmo6Uqw5vzOqCXv+DHc8m0RRgcCm+96iigDniwpvV6o4HZtkRUnuTz9XiA==}
+  '@rollup/rollup-win32-arm64-msvc@4.53.1':
+    resolution: {integrity: sha512-VJXivz61c5uVdbmitLkDlbcTk9Or43YC2QVLRkqp86QoeFSqI81bNgjhttqhKNMKnQMWnecOCm7lZz4s+WLGpQ==}
     cpu: [arm64]
     os: [win32]
 
-  '@rollup/rollup-win32-ia32-msvc@4.53.0':
-    resolution: {integrity: sha512-93mJ8Hm9+vbhtu+A1VtmwptSqCYojtMQkBGDjLytCWC8muxmZLGo/MA/4CMAWf6+QpKlxTTMDAHdTC+kxn9ZcQ==}
+  '@rollup/rollup-win32-ia32-msvc@4.53.1':
+    resolution: {integrity: sha512-NmZPVTUOitCXUH6erJDzTQ/jotYw4CnkMDjCYRxNHVD9bNyfrGoIse684F9okwzKCV4AIHRbUkeTBc9F2OOH5Q==}
     cpu: [ia32]
     os: [win32]
 
-  '@rollup/rollup-win32-x64-gnu@4.53.0':
-    resolution: {integrity: sha512-1OrYs0p/deXEFLUW1gvyjIabmsJKY3I/9fCUA1K6demaNc4iEhXDW6RnyPv/BWqb7NRmQ9+i+SKoi1HgJxWcwg==}
+  '@rollup/rollup-win32-x64-gnu@4.53.1':
+    resolution: {integrity: sha512-2SNj7COIdAf6yliSpLdLG8BEsp5lgzRehgfkP0Av8zKfQFKku6JcvbobvHASPJu4f3BFxej5g+HuQPvqPhHvpQ==}
     cpu: [x64]
     os: [win32]
 
-  '@rollup/rollup-win32-x64-msvc@4.53.0':
-    resolution: {integrity: sha512-xtSei8paPcLy3GzeeOjoRrllJn6EN8PB+/bXnhZ4R0AaviJsRwtKxFZRVnfFXNZTTp0nLeDo+BcEuIfdZS14/A==}
+  '@rollup/rollup-win32-x64-msvc@4.53.1':
+    resolution: {integrity: sha512-rLarc1Ofcs3DHtgSzFO31pZsCh8g05R2azN1q3fF+H423Co87My0R+tazOEvYVKXSLh8C4LerMK41/K7wlklcg==}
     cpu: [x64]
     os: [win32]
 
@@ -2289,8 +2289,8 @@ packages:
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
-  alien-signals@3.0.6:
-    resolution: {integrity: sha512-gCs0YqC1mkYGC6IRXsSrA62ShOSv1FlVN5tRp/Cs2vRWLK/BAeluWIdfsl253pFQPznKEvRmHhfep7crWfyfWQ==}
+  alien-signals@3.1.0:
+    resolution: {integrity: sha512-yufC6VpSy8tK3I0lO67pjumo5JvDQVQyr38+3OHqe6CHl1t2VZekKZ7EKKZSqk0cRmE7U7tfZbpXiKNzuc+ckg==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -2385,8 +2385,8 @@ packages:
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
 
-  birpc@2.7.0:
-    resolution: {integrity: sha512-tub/wFGH49vNCm0xraykcY3TcRgX/3JsALYq/Lwrtti+bTyFHkCUAWF5wgYoie8P41wYwig2mIKiqoocr1EkEQ==}
+  birpc@2.8.0:
+    resolution: {integrity: sha512-Bz2a4qD/5GRhiHSwj30c/8kC8QGj12nNDwz3D4ErQ4Xhy35dsSDvF+RA/tWpjyU0pdGtSDiEk6B5fBGE1qNVhw==}
 
   blob-to-buffer@1.2.9:
     resolution: {integrity: sha512-BF033y5fN6OCofD3vgHmNtwZWRcq9NLyyxyILx9hfMy1sXYy4ojFl765hJ2lP0YaN2fuxPaLO2Vzzoxy0FLFFA==}
@@ -2865,8 +2865,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  electron-to-chromium@1.5.248:
-    resolution: {integrity: sha512-zsur2yunphlyAO4gIubdJEXCK6KOVvtpiuDfCIqbM9FjcnMYiyn0ICa3hWfPr0nc41zcLWobgy1iL7VvoOyA2Q==}
+  electron-to-chromium@1.5.249:
+    resolution: {integrity: sha512-5vcfL3BBe++qZ5kuFhD/p8WOM1N9m3nwvJPULJx+4xf2usSlZFJ0qoNYO2fOX4hi3ocuDcmDobtA+5SFr4OmBg==}
 
   embla-carousel-auto-height@8.6.0:
     resolution: {integrity: sha512-/HrJQOEM6aol/oF33gd2QlINcXy3e19fJWvHDuHWp2bpyTa+2dm9tVVJak30m2Qy6QyQ6Fc8DkImtv7pxWOJUQ==}
@@ -4413,8 +4413,8 @@ packages:
       rollup:
         optional: true
 
-  rollup@4.53.0:
-    resolution: {integrity: sha512-43Z5T+4YTdfYkkA6CStU2DUYh7Ha9dLtvK+K3n0yEE/QS+4i28vSxrQsM59KqpvmT4tbOwJsFnRGMj/tvmQwWw==}
+  rollup@4.53.1:
+    resolution: {integrity: sha512-n2I0V0lN3E9cxxMqBCT3opWOiQBzRN7UG60z/WDKqdX2zHUS/39lezBcsckZFsV6fUTSnfqI7kHf60jDAPGKug==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
@@ -4644,8 +4644,8 @@ packages:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
 
-  tailwind-merge@3.3.1:
-    resolution: {integrity: sha512-gBXpgUm/3rp1lMZZrM/w7D8GKqshif0zAymAhbCyIt8KMe+0v9DQ7cdYLR4FHH/cKpdTXb+A/tKKU3eolfsI+g==}
+  tailwind-merge@3.4.0:
+    resolution: {integrity: sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g==}
 
   tailwind-variants@3.1.1:
     resolution: {integrity: sha512-ftLXe3krnqkMHsuBTEmaVUXYovXtPyTK7ckEfDRXS8PBZx0bAUas+A0jYxuKA5b8qg++wvQ3d2MQ7l/xeZxbZQ==}
@@ -4981,8 +4981,8 @@ packages:
       '@nuxt/kit':
         optional: true
 
-  vite-plugin-vue-tracer@1.1.2:
-    resolution: {integrity: sha512-cuJaOlvnv6oy4kaM8Ntw6ksrqM+fBDIpqVk41HW/EqoIoAj2tNRFfHKqjC5XQe3X/JDeUTv+BugF4kivvi/kYQ==}
+  vite-plugin-vue-tracer@1.1.3:
+    resolution: {integrity: sha512-fM7hfHELZvbPnSn8EKZwHfzxm5EfYFQIclz8rwcNXfodNbRkwNvh0AGMtaBfMxQ9HC5KVa3KitwHnmE4ezDemw==}
     peerDependencies:
       vite: ^6.0.0 || ^7.0.0
       vue: ^3.5.0
@@ -5710,7 +5710,7 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@haexhub/sdk@1.2.1(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))':
+  '@haexhub/sdk@1.2.2(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))':
     dependencies:
       archiver: 7.0.1
       commander: 14.0.2
@@ -5763,7 +5763,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@iconify/collections@1.0.615':
+  '@iconify/collections@1.0.616':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -5831,13 +5831,13 @@ snapshots:
 
   '@intlify/shared@11.1.12': {}
 
-  '@intlify/unplugin-vue-i18n@11.0.1(@vue/compiler-dom@3.5.24)(eslint@9.39.1(jiti@2.6.1))(rollup@4.53.0)(typescript@5.9.3)(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))':
+  '@intlify/unplugin-vue-i18n@11.0.1(@vue/compiler-dom@3.5.24)(eslint@9.39.1(jiti@2.6.1))(rollup@4.53.1)(typescript@5.9.3)(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.0(eslint@9.39.1(jiti@2.6.1))
       '@intlify/bundle-utils': 11.0.1(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))
       '@intlify/shared': 11.1.12
       '@intlify/vue-i18n-extensions': 8.0.0(@intlify/shared@11.1.12)(@vue/compiler-dom@3.5.24)(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
-      '@rollup/pluginutils': 5.3.0(rollup@4.53.0)
+      '@rollup/pluginutils': 5.3.0(rollup@4.53.1)
       '@typescript-eslint/scope-manager': 8.46.3
       '@typescript-eslint/typescript-estree': 8.46.3(typescript@5.9.3)
       debug: 4.4.3
@@ -5932,11 +5932,11 @@ snapshots:
       - encoding
       - supports-color
 
-  '@miyaneee/rollup-plugin-json5@1.2.0(rollup@4.53.0)':
+  '@miyaneee/rollup-plugin-json5@1.2.0(rollup@4.53.1)':
     dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.53.0)
+      '@rollup/pluginutils': 5.3.0(rollup@4.53.1)
       json5: 2.2.3
-      rollup: 4.53.0
+      rollup: 4.53.1
 
   '@napi-rs/wasm-runtime@0.2.12':
     dependencies:
@@ -6043,7 +6043,7 @@ snapshots:
       '@nuxt/kit': 4.2.1(magicast@0.5.1)
       '@vue/devtools-core': 8.0.3(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
       '@vue/devtools-kit': 8.0.3
-      birpc: 2.7.0
+      birpc: 2.8.0
       consola: 3.4.2
       destr: 2.0.5
       error-stack-parser-es: 1.0.5
@@ -6068,7 +6068,7 @@ snapshots:
       tinyglobby: 0.2.15
       vite: 7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1)
       vite-plugin-inspect: 11.3.3(@nuxt/kit@4.2.1(magicast@0.5.1))(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))
-      vite-plugin-vue-tracer: 1.1.2(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
+      vite-plugin-vue-tracer: 1.1.3(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
       which: 5.0.0
       ws: 8.18.3
     transitivePeerDependencies:
@@ -6193,7 +6193,7 @@ snapshots:
 
   '@nuxt/icon@2.1.0(magicast@0.5.1)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))':
     dependencies:
-      '@iconify/collections': 1.0.615
+      '@iconify/collections': 1.0.616
       '@iconify/types': 2.0.0
       '@iconify/utils': 3.0.2
       '@iconify/vue': 5.0.0(vue@3.5.24(typescript@5.9.3))
@@ -6264,7 +6264,7 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  '@nuxt/nitro-server@4.2.1(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(ioredis@5.8.2)(magicast@0.5.1)(nuxt@4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.0)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1))(typescript@5.9.3)':
+  '@nuxt/nitro-server@4.2.1(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(ioredis@5.8.2)(magicast@0.5.1)(nuxt@4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.1)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1))(typescript@5.9.3)':
     dependencies:
       '@nuxt/devalue': 2.0.2
       '@nuxt/kit': 4.2.1(magicast@0.5.1)
@@ -6282,7 +6282,7 @@ snapshots:
       klona: 2.0.6
       mocked-exports: 0.1.1
       nitropack: 2.12.9(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))
-      nuxt: 4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.0)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1)
+      nuxt: 4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.1)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1)
       pathe: 2.0.3
       pkg-types: 2.3.0
       radix3: 1.1.2
@@ -6392,8 +6392,8 @@ snapshots:
       pathe: 2.0.3
       reka-ui: 2.6.0(typescript@5.9.3)(vue@3.5.24(typescript@5.9.3))
       scule: 1.3.0
-      tailwind-merge: 3.3.1
-      tailwind-variants: 3.1.1(tailwind-merge@3.3.1)(tailwindcss@4.1.17)
+      tailwind-merge: 3.4.0
+      tailwind-variants: 3.1.1(tailwind-merge@3.4.0)(tailwindcss@4.1.17)
       tailwindcss: 4.1.17
       tinyglobby: 0.2.15
       typescript: 5.9.3
@@ -6447,10 +6447,10 @@ snapshots:
       - vite
       - vue
 
-  '@nuxt/vite-builder@4.2.1(eslint@9.39.1(jiti@2.6.1))(lightningcss@1.30.2)(magicast@0.5.1)(nuxt@4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.0)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1))(optionator@0.9.4)(rollup@4.53.0)(terser@5.44.1)(typescript@5.9.3)(vue@3.5.24(typescript@5.9.3))(yaml@2.8.1)':
+  '@nuxt/vite-builder@4.2.1(eslint@9.39.1(jiti@2.6.1))(lightningcss@1.30.2)(magicast@0.5.1)(nuxt@4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.1)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1))(optionator@0.9.4)(rollup@4.53.1)(terser@5.44.1)(typescript@5.9.3)(vue@3.5.24(typescript@5.9.3))(yaml@2.8.1)':
     dependencies:
       '@nuxt/kit': 4.2.1(magicast@0.5.1)
-      '@rollup/plugin-replace': 6.0.3(rollup@4.53.0)
+      '@rollup/plugin-replace': 6.0.3(rollup@4.53.1)
       '@vitejs/plugin-vue': 6.0.1(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
       '@vitejs/plugin-vue-jsx': 5.1.1(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
       autoprefixer: 10.4.21(postcss@8.5.6)
@@ -6467,11 +6467,11 @@ snapshots:
       magic-string: 0.30.21
       mlly: 1.8.0
       mocked-exports: 0.1.1
-      nuxt: 4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.0)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1)
+      nuxt: 4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.1)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1)
       pathe: 2.0.3
       pkg-types: 2.3.0
       postcss: 8.5.6
-      rollup-plugin-visualizer: 6.0.5(rollup@4.53.0)
+      rollup-plugin-visualizer: 6.0.5(rollup@4.53.1)
       seroval: 1.3.2
       std-env: 3.10.0
       ufo: 1.6.1
@@ -6515,16 +6515,16 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  '@nuxtjs/i18n@10.2.0(@vue/compiler-dom@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(magicast@0.5.1)(rollup@4.53.0)(vue@3.5.24(typescript@5.9.3))':
+  '@nuxtjs/i18n@10.2.0(@vue/compiler-dom@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(magicast@0.5.1)(rollup@4.53.1)(vue@3.5.24(typescript@5.9.3))':
     dependencies:
       '@intlify/core': 11.1.12
       '@intlify/h3': 0.7.4
       '@intlify/shared': 11.1.12
-      '@intlify/unplugin-vue-i18n': 11.0.1(@vue/compiler-dom@3.5.24)(eslint@9.39.1(jiti@2.6.1))(rollup@4.53.0)(typescript@5.9.3)(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
+      '@intlify/unplugin-vue-i18n': 11.0.1(@vue/compiler-dom@3.5.24)(eslint@9.39.1(jiti@2.6.1))(rollup@4.53.1)(typescript@5.9.3)(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
       '@intlify/utils': 0.13.0
-      '@miyaneee/rollup-plugin-json5': 1.2.0(rollup@4.53.0)
+      '@miyaneee/rollup-plugin-json5': 1.2.0(rollup@4.53.1)
       '@nuxt/kit': 4.2.1(magicast@0.5.1)
-      '@rollup/plugin-yaml': 4.1.2(rollup@4.53.0)
+      '@rollup/plugin-yaml': 4.1.2(rollup@4.53.1)
       '@vue/compiler-sfc': 3.5.24
       defu: 6.1.4
       devalue: 5.4.2
@@ -6907,13 +6907,13 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-beta.47': {}
 
-  '@rollup/plugin-alias@5.1.1(rollup@4.53.0)':
+  '@rollup/plugin-alias@5.1.1(rollup@4.53.1)':
     optionalDependencies:
-      rollup: 4.53.0
+      rollup: 4.53.1
 
-  '@rollup/plugin-commonjs@28.0.9(rollup@4.53.0)':
+  '@rollup/plugin-commonjs@28.0.9(rollup@4.53.1)':
     dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.53.0)
+      '@rollup/pluginutils': 5.3.0(rollup@4.53.1)
       commondir: 1.0.1
       estree-walker: 2.0.2
       fdir: 6.5.0(picomatch@4.0.3)
@@ -6921,127 +6921,127 @@ snapshots:
       magic-string: 0.30.21
       picomatch: 4.0.3
     optionalDependencies:
-      rollup: 4.53.0
+      rollup: 4.53.1
 
-  '@rollup/plugin-inject@5.0.5(rollup@4.53.0)':
+  '@rollup/plugin-inject@5.0.5(rollup@4.53.1)':
     dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.53.0)
+      '@rollup/pluginutils': 5.3.0(rollup@4.53.1)
       estree-walker: 2.0.2
       magic-string: 0.30.21
     optionalDependencies:
-      rollup: 4.53.0
+      rollup: 4.53.1
 
-  '@rollup/plugin-json@6.1.0(rollup@4.53.0)':
+  '@rollup/plugin-json@6.1.0(rollup@4.53.1)':
     dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.53.0)
+      '@rollup/pluginutils': 5.3.0(rollup@4.53.1)
     optionalDependencies:
-      rollup: 4.53.0
+      rollup: 4.53.1
 
-  '@rollup/plugin-node-resolve@16.0.3(rollup@4.53.0)':
+  '@rollup/plugin-node-resolve@16.0.3(rollup@4.53.1)':
     dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.53.0)
+      '@rollup/pluginutils': 5.3.0(rollup@4.53.1)
       '@types/resolve': 1.20.2
       deepmerge: 4.3.1
       is-module: 1.0.0
       resolve: 1.22.11
     optionalDependencies:
-      rollup: 4.53.0
+      rollup: 4.53.1
 
-  '@rollup/plugin-replace@6.0.3(rollup@4.53.0)':
+  '@rollup/plugin-replace@6.0.3(rollup@4.53.1)':
     dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.53.0)
+      '@rollup/pluginutils': 5.3.0(rollup@4.53.1)
       magic-string: 0.30.21
     optionalDependencies:
-      rollup: 4.53.0
+      rollup: 4.53.1
 
-  '@rollup/plugin-terser@0.4.4(rollup@4.53.0)':
+  '@rollup/plugin-terser@0.4.4(rollup@4.53.1)':
     dependencies:
       serialize-javascript: 6.0.2
       smob: 1.5.0
       terser: 5.44.1
     optionalDependencies:
-      rollup: 4.53.0
+      rollup: 4.53.1
 
-  '@rollup/plugin-yaml@4.1.2(rollup@4.53.0)':
+  '@rollup/plugin-yaml@4.1.2(rollup@4.53.1)':
     dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.53.0)
+      '@rollup/pluginutils': 5.3.0(rollup@4.53.1)
       js-yaml: 4.1.0
       tosource: 2.0.0-alpha.3
     optionalDependencies:
-      rollup: 4.53.0
+      rollup: 4.53.1
 
-  '@rollup/pluginutils@5.3.0(rollup@4.53.0)':
+  '@rollup/pluginutils@5.3.0(rollup@4.53.1)':
     dependencies:
       '@types/estree': 1.0.8
       estree-walker: 2.0.2
       picomatch: 4.0.3
     optionalDependencies:
-      rollup: 4.53.0
+      rollup: 4.53.1
 
-  '@rollup/rollup-android-arm-eabi@4.53.0':
+  '@rollup/rollup-android-arm-eabi@4.53.1':
     optional: true
 
-  '@rollup/rollup-android-arm64@4.53.0':
+  '@rollup/rollup-android-arm64@4.53.1':
     optional: true
 
-  '@rollup/rollup-darwin-arm64@4.53.0':
+  '@rollup/rollup-darwin-arm64@4.53.1':
     optional: true
 
-  '@rollup/rollup-darwin-x64@4.53.0':
+  '@rollup/rollup-darwin-x64@4.53.1':
     optional: true
 
-  '@rollup/rollup-freebsd-arm64@4.53.0':
+  '@rollup/rollup-freebsd-arm64@4.53.1':
     optional: true
 
-  '@rollup/rollup-freebsd-x64@4.53.0':
+  '@rollup/rollup-freebsd-x64@4.53.1':
     optional: true
 
-  '@rollup/rollup-linux-arm-gnueabihf@4.53.0':
+  '@rollup/rollup-linux-arm-gnueabihf@4.53.1':
     optional: true
 
-  '@rollup/rollup-linux-arm-musleabihf@4.53.0':
+  '@rollup/rollup-linux-arm-musleabihf@4.53.1':
     optional: true
 
-  '@rollup/rollup-linux-arm64-gnu@4.53.0':
+  '@rollup/rollup-linux-arm64-gnu@4.53.1':
     optional: true
 
-  '@rollup/rollup-linux-arm64-musl@4.53.0':
+  '@rollup/rollup-linux-arm64-musl@4.53.1':
     optional: true
 
-  '@rollup/rollup-linux-loong64-gnu@4.53.0':
+  '@rollup/rollup-linux-loong64-gnu@4.53.1':
     optional: true
 
-  '@rollup/rollup-linux-ppc64-gnu@4.53.0':
+  '@rollup/rollup-linux-ppc64-gnu@4.53.1':
     optional: true
 
-  '@rollup/rollup-linux-riscv64-gnu@4.53.0':
+  '@rollup/rollup-linux-riscv64-gnu@4.53.1':
     optional: true
 
-  '@rollup/rollup-linux-riscv64-musl@4.53.0':
+  '@rollup/rollup-linux-riscv64-musl@4.53.1':
     optional: true
 
-  '@rollup/rollup-linux-s390x-gnu@4.53.0':
+  '@rollup/rollup-linux-s390x-gnu@4.53.1':
     optional: true
 
-  '@rollup/rollup-linux-x64-gnu@4.53.0':
+  '@rollup/rollup-linux-x64-gnu@4.53.1':
     optional: true
 
-  '@rollup/rollup-linux-x64-musl@4.53.0':
+  '@rollup/rollup-linux-x64-musl@4.53.1':
     optional: true
 
-  '@rollup/rollup-openharmony-arm64@4.53.0':
+  '@rollup/rollup-openharmony-arm64@4.53.1':
     optional: true
 
-  '@rollup/rollup-win32-arm64-msvc@4.53.0':
+  '@rollup/rollup-win32-arm64-msvc@4.53.1':
     optional: true
 
-  '@rollup/rollup-win32-ia32-msvc@4.53.0':
+  '@rollup/rollup-win32-ia32-msvc@4.53.1':
     optional: true
 
-  '@rollup/rollup-win32-x64-gnu@4.53.0':
+  '@rollup/rollup-win32-x64-gnu@4.53.1':
     optional: true
 
-  '@rollup/rollup-win32-x64-msvc@4.53.0':
+  '@rollup/rollup-win32-x64-msvc@4.53.1':
     optional: true
 
   '@sindresorhus/is@7.1.1': {}
@@ -7333,10 +7333,10 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@vercel/nft@0.30.3(rollup@4.53.0)':
+  '@vercel/nft@0.30.3(rollup@4.53.1)':
     dependencies:
       '@mapbox/node-pre-gyp': 2.0.0
-      '@rollup/pluginutils': 5.3.0(rollup@4.53.0)
+      '@rollup/pluginutils': 5.3.0(rollup@4.53.1)
       acorn: 8.15.0
       acorn-import-attributes: 1.9.5(acorn@8.15.0)
       async-sema: 3.1.1
@@ -7468,7 +7468,7 @@ snapshots:
   '@vue/devtools-kit@7.7.7':
     dependencies:
       '@vue/devtools-shared': 7.7.7
-      birpc: 2.7.0
+      birpc: 2.8.0
       hookable: 5.5.3
       mitt: 3.0.1
       perfect-debounce: 1.0.0
@@ -7478,7 +7478,7 @@ snapshots:
   '@vue/devtools-kit@8.0.3':
     dependencies:
       '@vue/devtools-shared': 8.0.3
-      birpc: 2.7.0
+      birpc: 2.8.0
       hookable: 5.5.3
       mitt: 3.0.1
       perfect-debounce: 2.0.0
@@ -7498,7 +7498,7 @@ snapshots:
       '@volar/language-core': 2.4.23
       '@vue/compiler-dom': 3.5.24
       '@vue/shared': 3.5.24
-      alien-signals: 3.0.6
+      alien-signals: 3.1.0
       muggle-string: 0.4.1
       path-browserify: 1.0.1
       picomatch: 4.0.3
@@ -7622,7 +7622,7 @@ snapshots:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
 
-  alien-signals@3.0.6: {}
+  alien-signals@3.1.0: {}
 
   ansi-regex@5.0.1: {}
 
@@ -7710,7 +7710,7 @@ snapshots:
     dependencies:
       file-uri-to-path: 1.0.0
 
-  birpc@2.7.0: {}
+  birpc@2.8.0: {}
 
   blob-to-buffer@1.2.9: {}
 
@@ -7737,7 +7737,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.8.25
       caniuse-lite: 1.0.30001754
-      electron-to-chromium: 1.5.248
+      electron-to-chromium: 1.5.249
       node-releases: 2.0.27
       update-browserslist-db: 1.1.4(browserslist@4.27.0)
 
@@ -8075,7 +8075,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  electron-to-chromium@1.5.248: {}
+  electron-to-chromium@1.5.249: {}
 
   embla-carousel-auto-height@8.6.0(embla-carousel@8.6.0):
     dependencies:
@@ -9089,14 +9089,14 @@ snapshots:
   nitropack@2.12.9(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.4.0
-      '@rollup/plugin-alias': 5.1.1(rollup@4.53.0)
-      '@rollup/plugin-commonjs': 28.0.9(rollup@4.53.0)
-      '@rollup/plugin-inject': 5.0.5(rollup@4.53.0)
-      '@rollup/plugin-json': 6.1.0(rollup@4.53.0)
-      '@rollup/plugin-node-resolve': 16.0.3(rollup@4.53.0)
-      '@rollup/plugin-replace': 6.0.3(rollup@4.53.0)
-      '@rollup/plugin-terser': 0.4.4(rollup@4.53.0)
-      '@vercel/nft': 0.30.3(rollup@4.53.0)
+      '@rollup/plugin-alias': 5.1.1(rollup@4.53.1)
+      '@rollup/plugin-commonjs': 28.0.9(rollup@4.53.1)
+      '@rollup/plugin-inject': 5.0.5(rollup@4.53.1)
+      '@rollup/plugin-json': 6.1.0(rollup@4.53.1)
+      '@rollup/plugin-node-resolve': 16.0.3(rollup@4.53.1)
+      '@rollup/plugin-replace': 6.0.3(rollup@4.53.1)
+      '@rollup/plugin-terser': 0.4.4(rollup@4.53.1)
+      '@vercel/nft': 0.30.3(rollup@4.53.1)
       archiver: 7.0.1
       c12: 3.3.1(magicast@0.5.1)
       chokidar: 4.0.3
@@ -9138,8 +9138,8 @@ snapshots:
       pkg-types: 2.3.0
       pretty-bytes: 7.1.0
       radix3: 1.1.2
-      rollup: 4.53.0
-      rollup-plugin-visualizer: 6.0.5(rollup@4.53.0)
+      rollup: 4.53.1
+      rollup-plugin-visualizer: 6.0.5(rollup@4.53.1)
       scule: 1.3.0
       semver: 7.7.3
       serve-placeholder: 2.0.2
@@ -9227,16 +9227,16 @@ snapshots:
 
   nuxt-define@1.0.0: {}
 
-  nuxt@4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.0)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1):
+  nuxt@4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.1)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1):
     dependencies:
       '@dxup/nuxt': 0.2.1(magicast@0.5.1)
       '@nuxt/cli': 3.30.0(magicast@0.5.1)
       '@nuxt/devtools': 3.1.0(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
       '@nuxt/kit': 4.2.1(magicast@0.5.1)
-      '@nuxt/nitro-server': 4.2.1(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(ioredis@5.8.2)(magicast@0.5.1)(nuxt@4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.0)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1))(typescript@5.9.3)
+      '@nuxt/nitro-server': 4.2.1(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(ioredis@5.8.2)(magicast@0.5.1)(nuxt@4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.1)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1))(typescript@5.9.3)
       '@nuxt/schema': 4.2.1
       '@nuxt/telemetry': 2.6.6(magicast@0.5.1)
-      '@nuxt/vite-builder': 4.2.1(eslint@9.39.1(jiti@2.6.1))(lightningcss@1.30.2)(magicast@0.5.1)(nuxt@4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.0)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1))(optionator@0.9.4)(rollup@4.53.0)(terser@5.44.1)(typescript@5.9.3)(vue@3.5.24(typescript@5.9.3))(yaml@2.8.1)
+      '@nuxt/vite-builder': 4.2.1(eslint@9.39.1(jiti@2.6.1))(lightningcss@1.30.2)(magicast@0.5.1)(nuxt@4.2.1(@parcel/watcher@2.5.1)(@vue/compiler-sfc@3.5.24)(db0@0.3.4(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0)))(drizzle-orm@0.44.7(@opentelemetry/api@1.9.0))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.1)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(yaml@2.8.1))(optionator@0.9.4)(rollup@4.53.1)(terser@5.44.1)(typescript@5.9.3)(vue@3.5.24(typescript@5.9.3))(yaml@2.8.1)
       '@unhead/vue': 2.0.19(vue@3.5.24(typescript@5.9.3))
       '@vue/shared': 3.5.24
       c12: 3.3.1(magicast@0.5.1)
@@ -9883,41 +9883,41 @@ snapshots:
 
   rfdc@1.4.1: {}
 
-  rollup-plugin-visualizer@6.0.5(rollup@4.53.0):
+  rollup-plugin-visualizer@6.0.5(rollup@4.53.1):
     dependencies:
       open: 8.4.2
       picomatch: 4.0.3
       source-map: 0.7.6
       yargs: 17.7.2
     optionalDependencies:
-      rollup: 4.53.0
+      rollup: 4.53.1
 
-  rollup@4.53.0:
+  rollup@4.53.1:
     dependencies:
       '@types/estree': 1.0.8
     optionalDependencies:
-      '@rollup/rollup-android-arm-eabi': 4.53.0
-      '@rollup/rollup-android-arm64': 4.53.0
-      '@rollup/rollup-darwin-arm64': 4.53.0
-      '@rollup/rollup-darwin-x64': 4.53.0
-      '@rollup/rollup-freebsd-arm64': 4.53.0
-      '@rollup/rollup-freebsd-x64': 4.53.0
-      '@rollup/rollup-linux-arm-gnueabihf': 4.53.0
-      '@rollup/rollup-linux-arm-musleabihf': 4.53.0
-      '@rollup/rollup-linux-arm64-gnu': 4.53.0
-      '@rollup/rollup-linux-arm64-musl': 4.53.0
-      '@rollup/rollup-linux-loong64-gnu': 4.53.0
-      '@rollup/rollup-linux-ppc64-gnu': 4.53.0
-      '@rollup/rollup-linux-riscv64-gnu': 4.53.0
-      '@rollup/rollup-linux-riscv64-musl': 4.53.0
-      '@rollup/rollup-linux-s390x-gnu': 4.53.0
-      '@rollup/rollup-linux-x64-gnu': 4.53.0
-      '@rollup/rollup-linux-x64-musl': 4.53.0
-      '@rollup/rollup-openharmony-arm64': 4.53.0
-      '@rollup/rollup-win32-arm64-msvc': 4.53.0
-      '@rollup/rollup-win32-ia32-msvc': 4.53.0
-      '@rollup/rollup-win32-x64-gnu': 4.53.0
-      '@rollup/rollup-win32-x64-msvc': 4.53.0
+      '@rollup/rollup-android-arm-eabi': 4.53.1
+      '@rollup/rollup-android-arm64': 4.53.1
+      '@rollup/rollup-darwin-arm64': 4.53.1
+      '@rollup/rollup-darwin-x64': 4.53.1
+      '@rollup/rollup-freebsd-arm64': 4.53.1
+      '@rollup/rollup-freebsd-x64': 4.53.1
+      '@rollup/rollup-linux-arm-gnueabihf': 4.53.1
+      '@rollup/rollup-linux-arm-musleabihf': 4.53.1
+      '@rollup/rollup-linux-arm64-gnu': 4.53.1
+      '@rollup/rollup-linux-arm64-musl': 4.53.1
+      '@rollup/rollup-linux-loong64-gnu': 4.53.1
+      '@rollup/rollup-linux-ppc64-gnu': 4.53.1
+      '@rollup/rollup-linux-riscv64-gnu': 4.53.1
+      '@rollup/rollup-linux-riscv64-musl': 4.53.1
+      '@rollup/rollup-linux-s390x-gnu': 4.53.1
+      '@rollup/rollup-linux-x64-gnu': 4.53.1
+      '@rollup/rollup-linux-x64-musl': 4.53.1
+      '@rollup/rollup-openharmony-arm64': 4.53.1
+      '@rollup/rollup-win32-arm64-msvc': 4.53.1
+      '@rollup/rollup-win32-ia32-msvc': 4.53.1
+      '@rollup/rollup-win32-x64-gnu': 4.53.1
+      '@rollup/rollup-win32-x64-msvc': 4.53.1
       fsevents: 2.3.3
 
   run-applescript@7.1.0: {}
@@ -10134,13 +10134,13 @@ snapshots:
 
   tagged-tag@1.0.0: {}
 
-  tailwind-merge@3.3.1: {}
+  tailwind-merge@3.4.0: {}
 
-  tailwind-variants@3.1.1(tailwind-merge@3.3.1)(tailwindcss@4.1.17):
+  tailwind-variants@3.1.1(tailwind-merge@3.4.0)(tailwindcss@4.1.17):
     dependencies:
       tailwindcss: 4.1.17
     optionalDependencies:
-      tailwind-merge: 3.3.1
+      tailwind-merge: 3.4.0
 
   tailwindcss@4.1.17: {}
 
@@ -10431,7 +10431,7 @@ snapshots:
 
   vite-dev-rpc@1.1.0(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1)):
     dependencies:
-      birpc: 2.7.0
+      birpc: 2.8.0
       vite: 7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1)
       vite-hot-client: 2.1.0(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))
 
@@ -10493,7 +10493,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-vue-tracer@1.1.2(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3)):
+  vite-plugin-vue-tracer@1.1.3(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3)):
     dependencies:
       estree-walker: 3.0.3
       exsolve: 1.0.7
@@ -10509,7 +10509,7 @@ snapshots:
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
       postcss: 8.5.6
-      rollup: 4.53.0
+      rollup: 4.53.1
       tinyglobby: 0.2.15
     optionalDependencies:
       fsevents: 2.3.3

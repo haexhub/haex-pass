@@ -1,17 +1,13 @@
 <template>
-  <div v-if="haexhubStore.state.isSetupComplete">
-    <UApp :locale="currentLocaleData">
-      <NuxtPage />
-    </UApp>
-  </div>
-  <div v-else>
-    <div class="flex items-center justify-center h-screen">
+  <UApp :locale="currentLocaleData">
+    <NuxtPage />
+    <div v-if="!haexhubStore.state.isSetupComplete" class="fixed inset-0 z-50 flex items-center justify-center bg-background">
       <div class="text-center">
         <div class="mb-4">Initializing...</div>
         <UProgress animation="carousel" />
       </div>
     </div>
-  </div>
+  </UApp>
 </template>
 
 <script setup lang="ts">
