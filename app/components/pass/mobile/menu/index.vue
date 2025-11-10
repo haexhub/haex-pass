@@ -77,7 +77,6 @@ watch(selectedItems, () => {
 
 const localePath = useLocalePath();
 const { ctrl } = useMagicKeys();
-const { searchInput } = storeToRefs(useSearchStore());
 
 const onClickItemAsync = async (item: IPasswordMenuItem) => {
   currentSelectedItem.value = null;
@@ -109,7 +108,7 @@ const onClickItemAsync = async (item: IPasswordMenuItem) => {
         })
       );
     }
-    searchInput.value = "";
+    // Keep search term active when opening items
   }
 };
 

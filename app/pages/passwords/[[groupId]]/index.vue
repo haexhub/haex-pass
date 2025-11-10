@@ -124,6 +124,37 @@ const isGroupInTrash = (groupId: string | null | undefined): boolean => {
 let fuseInstance: Fuse<(typeof items.value)[number]> | null = null;
 let lastItemsLength = 0;
 
+// Create Fuse instance reactively
+const searchableFuse = computed(() => {
+  // Recreate Fuse instance only when items change
+  if (!fuseInstance || lastItemsLength !== items.value.length) {
+    fuseInstance = new Fuse(items.value, {
+      keys: [
+        `${itemDetailsTableName}.title`,
+        `${itemDetailsTableName}.username`,
+        `${itemDetailsTableName}.url`,
+        // Don't search in password and note for performance
+      ],
+      threshold: 0.3, // Stricter matching for better performance
+      ignoreLocation: true,
+      shouldSort: true,
+      minMatchCharLength: 2, // Require at least 2 characters to match
+    });
+    lastItemsLength = items.value.length;
+  }
+  return fuseInstance;
+});
+
+// Separate computed for search results with caching
+const searchResults = computed(() => {
+  if (!search.value) return null;
+
+  // Minimum search length to avoid too broad results
+  if (search.value.length < 2) return [];
+
+  return searchableFuse.value.search(search.value, { limit: 50 }).map((match) => match.item);
+});
+
 const groupItems = computed<IPasswordMenuItem[]>(() => {
   const menuItems: IPasswordMenuItem[] = [];
 
@@ -133,25 +164,7 @@ const groupItems = computed<IPasswordMenuItem[]>(() => {
     : groups.value.filter((group) => group.parentId == currentGroupId.value);
 
   const filteredItems = search.value
-    ? (() => {
-        // Recreate Fuse instance only when items change
-        if (!fuseInstance || lastItemsLength !== items.value.length) {
-          fuseInstance = new Fuse(items.value, {
-            keys: [
-              `${itemDetailsTableName}.title`,
-              `${itemDetailsTableName}.note`,
-              `${itemDetailsTableName}.password`,
-              `${itemDetailsTableName}.tags`,
-              `${itemDetailsTableName}.url`,
-              `${itemDetailsTableName}.username`,
-            ],
-            threshold: 0.4, // More lenient matching
-            ignoreLocation: true, // Don't care where in the string the match is
-          });
-          lastItemsLength = items.value.length;
-        }
-        return fuseInstance.search(search.value).map((match) => match.item);
-      })()
+    ? searchResults.value || []
     : items.value.filter((item) => {
         const itemRecord = item as Record<string, Record<string, unknown>>;
         return itemRecord[groupItemsTableName]?.groupId == currentGroupId.value;

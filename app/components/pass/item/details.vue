@@ -75,7 +75,6 @@
         :read-only
         :with-copy-button
         @keyup.enter.stop
-        color="error"
       />
     </form>
   </div>

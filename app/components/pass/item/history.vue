@@ -6,8 +6,8 @@
         <template #indicator="{ item }">
           <UButton
             icon="mdi-history"
-            @click="selectedSnapshot = item.snapshot"
             :variant="selectedSnapshot === item.snapshot ? 'solid' : 'ghost'"
+            @click="selectedSnapshot = item.snapshot"
           />
         </template>
         <template #title="{ item }">
@@ -173,22 +173,28 @@ const selectedSnapshot = ref<SelectHaexPasswordsItemSnapshots | null>(null);
 // Sort snapshots by date (newest first)
 const sortedSnapshots = computed(() => {
   return [...snapshots.value].sort((a, b) => {
-    const dateA = new Date(a.createdAt || 0).getTime();
-    const dateB = new Date(b.createdAt || 0).getTime();
+    // Use modifiedAt if available, otherwise fall back to createdAt
+    const dateA = new Date(a.modifiedAt || a.createdAt || 0).getTime();
+    const dateB = new Date(b.modifiedAt || b.createdAt || 0).getTime();
     return dateB - dateA;
   });
 });
 
 // Create timeline items for UTimeline component
 const timelineItems = computed(() => {
-  return sortedSnapshots.value.map((snapshot) => ({
-    id: snapshot.id,
-    snapshot: snapshot,
-    title: formatRelativeDate(snapshot.createdAt),
-    description: formatSnapshotSize(snapshot.snapshotData),
-    icon: "i-heroicons-clock",
-    color: selectedSnapshot.value?.id === snapshot.id ? "primary" : "gray",
-  }));
+  return sortedSnapshots.value.map((snapshot) => {
+    // Use modifiedAt if available, otherwise fall back to createdAt
+    const dateToDisplay = snapshot.modifiedAt || snapshot.createdAt;
+
+    return {
+      id: snapshot.id,
+      snapshot: snapshot,
+      title: formatRelativeDate(dateToDisplay),
+      description: formatSnapshotSize(snapshot.snapshotData),
+      icon: "i-heroicons-clock",
+      color: selectedSnapshot.value?.id === snapshot.id ? "primary" : "gray",
+    };
+  });
 });
 
 // Auto-select first snapshot when list changes

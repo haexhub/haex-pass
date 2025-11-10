@@ -9,57 +9,73 @@
       <div class="flex flex-wrap gap-3 items-start">
         <UiList
           v-if="items.length || itemsToAdd.length"
-          class="rounded-lg overflow-hidden w-full sm:flex-1"
+          class="rounded-lg w-full sm:flex-1"
         >
-          <li
-            v-for="(item, index) in [...items, ...itemsToAdd]"
-            :key="item.id"
-            :class="{
-              'bg-primary/20': currentSelected === item,
-              'rounded-t-lg': index === 0,
-              'rounded-b-lg': index === [...items, ...itemsToAdd].length - 1,
-            }"
-            class="flex gap-2 hover:bg-primary/20 px-4 items-center"
-            @click="currentSelected = item"
-          >
-            <button class="flex items-center no-underline w-full py-2">
-              <input
-                :ref="el => { if (index === [...items, ...itemsToAdd].length - 1) lastKeyInput = el as HTMLInputElement }"
-                v-model="item.key"
-                :readonly="currentSelected !== item || readOnly"
-                class="flex-1 cursor-pointer bg-transparent border-none outline-none truncate"
-              />
-            </button>
+          <TransitionGroup name="list" tag="div">
+            <li
+              v-for="(item, index) in [...items, ...itemsToAdd]"
+              :key="item.id"
+              :class="{
+                'border border-primary': currentSelected === item,
+                'border border-transparent': currentSelected !== item,
+                'rounded-t-lg': index === 0,
+                'rounded-b-lg': index === [...items, ...itemsToAdd].length - 1,
+              }"
+              class="flex gap-2 hover:bg-gray-500/5 px-2 items-center transition-all duration-200"
+              @click="currentSelected = item"
+            >
+              <button
+                class="flex items-center no-underline min-w-0 flex-1 py-2"
+              >
+                <input
+                  :ref="el => { if (index === [...items, ...itemsToAdd].length - 1) lastKeyInput = el as HTMLInputElement }"
+                  v-model="item.key"
+                  :readonly="currentSelected !== item || readOnly"
+                  class="w-full cursor-pointer bg-transparent border-none outline-none truncate"
+                />
+              </button>
 
-            <UiButton
-              v-if="!readOnly"
-              :class="[currentSelected === item ? 'visible' : 'invisible']"
-              variant="outline"
-              color="error"
-              icon="mdi:trash-outline"
-              @click="deleteItem(item.id)"
-            />
-          </li>
+              <UiButton
+                v-if="!readOnly"
+                :class="[currentSelected === item ? 'visible' : 'invisible']"
+                class="shrink-0"
+                variant="ghost"
+                color="error"
+                icon="mdi:trash-outline"
+                @click="deleteItem(item.id)"
+              />
+
+              <UiButton
+                :color="copied ? 'success' : 'neutral'"
+                :tooltip="t('copy')"
+                :icon="copied ? 'mdi:check' : 'mdi:content-copy'"
+                class="shrink-0"
+                size="sm"
+                variant="link"
+                @click="copy(`${item}`)"
+              />
+            </li>
+          </TransitionGroup>
         </UiList>
 
         <UiTextarea
           v-if="items.length || itemsToAdd.length"
-          :readOnly="readOnly || !currentSelected"
-          :label="t('value')"
-          class="flex-1 min-w-52 border-base-content/25"
           v-model="currentValue"
+          :label="t('value')"
+          :read-only="readOnly || !currentSelected"
+          class="flex-1 min-w-52 border-base-content/25"
           with-copy-button
         />
       </div>
 
       <template #footer v-if="!readOnly">
         <UiButton
-          @click="addItem"
-          icon="mdi:plus"
           :label="t('addField')"
+          icon="mdi:plus"
           block
           color="primary"
           variant="outline"
+          @click="addItem"
         />
       </template>
     </UCard>
@@ -82,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { useFocus } from '@vueuse/core';
+import { useClipboard, useFocus } from "@vueuse/core";
 import type {
   SelectHaexPasswordsItemKeyValues,
   SelectHaexPasswordsItemBinaries,
@@ -167,22 +183,24 @@ const deleteItem = (id: string) => {
 
   itemsToAdd.value = itemsToAdd.value?.filter((item) => item.id !== id) ?? [];
 };
+
+const { copy, copied } = useClipboard();
 </script>
 
 <i18n lang="yaml">
 de:
-  add: Hinzufügen
   addField: Feld hinzufügen
   key: Schlüssel
   value: Wert
   customFields: Benutzerdefinierte Felder
   attachments: Anhänge
+  copy: Kopieren
 
 en:
-  add: Add
   addField: Add field
   key: Key
   value: Value
   customFields: Custom Fields
   attachments: Attachments
+  copy: Copy
 </i18n>

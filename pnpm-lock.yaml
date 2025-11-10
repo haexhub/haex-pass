@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@haexhub/sdk':
-        specifier: 1.2.2
-        version: 1.2.2(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
+        specifier: 1.2.3
+        version: 1.2.3(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
       '@nuxt/eslint':
         specifier: 1.9.0
         version: 1.9.0(@typescript-eslint/utils@8.46.3(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.24)(eslint@9.39.1(jiti@2.6.1))(magicast@0.5.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))
@@ -53,6 +53,9 @@ importers:
       otpauth:
         specifier: ^9.4.1
         version: 9.4.1
+      photoswipe:
+        specifier: ^5.4.4
+        version: 5.4.4
       tailwindcss:
         specifier: ^4.1.17
         version: 4.1.17
@@ -640,8 +643,8 @@ packages:
   '@floating-ui/vue@1.1.9':
     resolution: {integrity: sha512-BfNqNW6KA83Nexspgb9DZuz578R7HT8MZw1CfK9I6Ah4QReNWEJsXWHN+SdmOVLNGmTPDi+fDT535Df5PzMLbQ==}
 
-  '@haexhub/sdk@1.2.2':
-    resolution: {integrity: sha512-q/yDA7GCy3wwpM290FEYpUAa/LMPM9hRdeqXAEUmtLl2lpQerGzut/8hPRtpSdYLMaeqfhB6r9+xSRwffO18LA==}
+  '@haexhub/sdk@1.2.3':
+    resolution: {integrity: sha512-IbLWTy8raVh9/3ngReYeUxsshPCkI4wp788VMHrFie+e/MXRzqmDRbmW+c+spLl85NlNlxHI1biZtqvFSvfxiw==}
     hasBin: true
     peerDependencies:
       '@nuxt/kit': ^3.0.0 || ^4.0.0
@@ -4075,6 +4078,10 @@ packages:
   perfect-debounce@2.0.0:
     resolution: {integrity: sha512-fkEH/OBiKrqqI/yIgjR92lMfs2K8105zt/VT6+7eTjNwisrsh47CeIED9z58zI7DfKdH3uHAn25ziRZn3kgAow==}
 
+  photoswipe@5.4.4:
+    resolution: {integrity: sha512-WNFHoKrkZNnvFFhbHL93WDkW3ifwVOXSW3w1UuZZelSmgXpIGiZSNlZJq37rR8YejqME2rHs9EhH9ZvlvFH2NA==}
+    engines: {node: '>= 0.12.0'}
+
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -5710,7 +5717,7 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@haexhub/sdk@1.2.2(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))':
+  '@haexhub/sdk@1.2.3(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))':
     dependencies:
       archiver: 7.0.1
       commander: 14.0.2
@@ -9572,6 +9579,8 @@ snapshots:
   perfect-debounce@1.0.0: {}
 
   perfect-debounce@2.0.0: {}
+
+  photoswipe@5.4.4: {}
 
   picocolors@1.1.1: {}
 

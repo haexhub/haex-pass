@@ -17,13 +17,13 @@
         <!-- Image attachments with overlay -->
         <div
           v-if="isImage(attachment.fileName)"
-          class="relative w-full aspect-video overflow-hidden"
+          class="relative w-full aspect-video overflow-hidden bg-muted/20"
         >
           <img
             v-if="imageDataUrls.get(attachment.id)"
             :src="imageDataUrls.get(attachment.id)"
             :alt="attachment.fileName"
-            class="w-full h-full object-cover"
+            class="w-full h-full object-contain"
           />
           <div
             v-else
@@ -38,25 +38,27 @@
 
           <!-- Info Overlay at Bottom -->
           <div
-            class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/60 to-transparent p-3"
+            class="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 via-black/60 to-transparent p-3"
           >
             <div class="flex items-center justify-between gap-2">
               <div class="min-w-0 flex-1">
-                <input
-                  v-if="editingAttachmentId === attachment.id"
-                  ref="editInput"
-                  v-model="editingFileName"
-                  type="text"
-                  class="w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white/90"
-                  @click.stop
-                  @keyup.enter="saveRename(attachment)"
-                  @keyup.escape="cancelRename"
-                  @blur="saveRename(attachment)"
-                />
+                <div v-if="editingAttachmentId === attachment.id" @click.stop>
+                  <UiInput
+                    :ref="(el: any) => el?.$el && (editInputRefs[attachment.id] = el.$el.querySelector('input'))"
+                    v-model="editingFileName"
+                    size="sm"
+                    @keyup.enter="saveRename(attachment)"
+                    @keyup.escape="cancelRename"
+                    @blur="saveRename(attachment)"
+                  />
+                </div>
                 <div v-else class="text-white font-medium text-sm truncate">
                   {{ attachment.fileName }}
                 </div>
-                <div class="text-white/70 text-xs mt-0.5">
+                <div
+                  v-if="editingAttachmentId !== attachment.id"
+                  class="text-white/70 text-xs mt-0.5"
+                >
                   {{ formatFileSize(attachment.size) }}
                 </div>
               </div>
@@ -121,21 +123,23 @@
         <div v-if="!isImage(attachment.fileName)" class="p-3">
           <div class="flex items-center justify-between gap-2">
             <div class="min-w-0 flex-1">
-              <input
-                v-if="editingAttachmentId === attachment.id"
-                ref="editInput"
-                v-model="editingFileName"
-                type="text"
-                class="w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-primary"
-                @click.stop
-                @keyup.enter="saveRename(attachment)"
-                @keyup.escape="cancelRename"
-                @blur="saveRename(attachment)"
-              />
+              <div v-if="editingAttachmentId === attachment.id" @click.stop>
+                <UiInput
+                  :ref="(el: any) => el?.$el && (editInputRefs[attachment.id] = el.$el.querySelector('input'))"
+                  v-model="editingFileName"
+                  size="sm"
+                  @keyup.enter="saveRename(attachment)"
+                  @keyup.escape="cancelRename"
+                  @blur="saveRename(attachment)"
+                />
+              </div>
               <div v-else class="font-medium text-sm truncate">
                 {{ attachment.fileName }}
               </div>
-              <div class="text-muted-foreground text-xs mt-0.5">
+              <div
+                v-if="editingAttachmentId !== attachment.id"
+                class="text-muted-foreground text-xs mt-0.5"
+              >
                 {{ formatFileSize(attachment.size) }}
               </div>
             </div>
@@ -300,9 +304,10 @@ const { t } = useI18n();
 const { orm } = storeToRefs(useHaexHubStore());
 const { client } = useHaexHubStore();
 const toast = useToast();
+const { openLightboxAsync } = usePhotoSwipe();
 
 const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
-const editInput = useTemplateRef<HTMLInputElement>("editInput");
+const editInputRefs = ref<Record<string, HTMLInputElement>>({});
 const showPreview = ref(false);
 const previewFile = ref<AttachmentWithSize | null>(null);
 const previewDataUrl = ref<string | null>(null);
@@ -428,77 +433,39 @@ async function onFileChange(event: Event) {
   }
 }
 
-// Open image with system viewer
+// Open image with PhotoSwipe lightbox
 async function openImageAsync(attachment: AttachmentWithSize) {
-  if (!client) {
+  // Get the already loaded image data URL
+  const dataUrl = imageDataUrls.get(attachment.id);
+  if (!dataUrl) {
     toast.add({
       title: t("viewError"),
-      description: "HaexHub client not available",
+      description: t("binaryNotFound"),
       color: "error",
     });
     return;
   }
 
-  try {
-    // Get the already loaded image data URL
-    const dataUrl = imageDataUrls.get(attachment.id);
-    if (!dataUrl) {
-      toast.add({
-        title: t("viewError"),
-        description: t("binaryNotFound"),
-        color: "error",
-      });
-      return;
-    }
+  // Get all image attachments for the gallery
+  const allAttachments = [...attachments.value, ...attachmentsToAdd.value];
+  const imageAttachments = allAttachments.filter((a) => isImage(a.fileName));
 
-    // Convert base64 data URL to Uint8Array
-    const base64 = dataUrl.split(",")[1];
-    if (!base64) {
-      toast.add({
-        title: t("viewError"),
-        color: "error",
-      });
-      return;
-    }
+  // Prepare items for PhotoSwipe
+  const items = imageAttachments
+    .map((att) => {
+      const url = imageDataUrls.get(att.id);
+      if (!url) return null;
 
-    const binaryString = atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
+      return {
+        id: att.id,
+        dataUrl: url,
+        fileName: att.fileName,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 
-    // Determine MIME type from file extension
-    const ext = attachment.fileName.split(".").pop()?.toLowerCase();
-    const mimeTypes: Record<string, string> = {
-      jpg: "image/jpeg",
-      jpeg: "image/jpeg",
-      png: "image/png",
-      gif: "image/gif",
-      webp: "image/webp",
-      bmp: "image/bmp",
-      svg: "image/svg+xml",
-    };
-    const mimeType = mimeTypes[ext || ""] || "image/png";
-
-    // Open file with system viewer
-    const openResult = await client.filesystem.openFileAsync(bytes, {
-      fileName: attachment.fileName,
-      mimeType,
-    });
-
-    if (!openResult.success) {
-      toast.add({
-        title: t("viewError"),
-        color: "error",
-      });
-    }
-  } catch (error) {
-    console.error("[Attachments] Open error:", error);
-    toast.add({
-      title: t("viewError"),
-      color: "error",
-    });
-  }
+  // Open PhotoSwipe lightbox
+  await openLightboxAsync(items, attachment.id);
 }
 
 // Download attachment
@@ -573,49 +540,6 @@ async function downloadAttachment(attachment: AttachmentWithSize) {
   }
 }
 
-// View attachment (for images)
-async function viewAttachment(attachment: AttachmentWithSize) {
-  if (!orm.value) return;
-
-  console.log("[Attachments] View - attachment:", attachment);
-  console.log("[Attachments] View - binaryHash:", attachment.binaryHash);
-
-  try {
-    const result = await orm.value
-      .select()
-      .from(haexPasswordsBinaries)
-      .where(eq(haexPasswordsBinaries.hash, attachment.binaryHash))
-      .limit(1);
-
-    console.log("[Attachments] View - query result:", result);
-    console.log("[Attachments] View - result length:", result.length);
-    console.log(
-      "[Attachments] View - has data:",
-      result[0]?.data ? "yes" : "no"
-    );
-
-    if (!result.length || !result[0]?.data) {
-      console.error("[Attachments] View - Binary not found in database");
-      toast.add({
-        title: t("viewError"),
-        description: t("binaryNotFound"),
-        color: "error",
-      });
-      return;
-    }
-
-    previewFile.value = attachment;
-    previewDataUrl.value = `data:image/png;base64,${result[0].data}`;
-    showPreview.value = true;
-  } catch (error) {
-    console.error("[Attachments] View error:", error);
-    toast.add({
-      title: t("viewError"),
-      color: "error",
-    });
-  }
-}
-
 // Delete attachment
 function deleteAttachment(id: string) {
   const attachment = attachments.value.find((a) => a.id === id);
@@ -634,8 +558,11 @@ function startRename(attachment: AttachmentWithSize) {
 
   // Focus input after render
   nextTick(() => {
-    editInput.value?.focus();
-    editInput.value?.select();
+    const input = editInputRefs.value[attachment.id];
+    if (input) {
+      input.focus();
+      input.select();
+    }
   });
 }
 
