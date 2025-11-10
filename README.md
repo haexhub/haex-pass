@@ -53,6 +53,29 @@ pnpm ext:build
 
 This creates a signed `.haextension` file ready for distribution.
 
+## Release Process
+
+Create a new release using the automated scripts:
+
+```bash
+# Patch release (0.1.6 → 0.1.7)
+pnpm release:patch
+
+# Minor release (0.1.6 → 0.2.0)
+pnpm release:minor
+
+# Major release (0.1.6 → 1.0.0)
+pnpm release:major
+```
+
+The script automatically:
+1. Updates version in `package.json`
+2. Creates a git commit
+3. Creates a git tag
+4. Pushes to remote
+
+GitHub Actions will then automatically build and package the extension as a signed `.haextension` file.
+
 ## Security
 
 - All passwords stored in local SQLite database
