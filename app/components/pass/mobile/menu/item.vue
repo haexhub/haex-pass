@@ -1,12 +1,12 @@
 <template>
   <button
-    class="flex gap-4 w-full px-4 py-2 cursor-pointer"
+    class="flex gap-4 w-full px-4 py-3 cursor-pointer border-b transition-all hover:bg-accent/50 active:bg-accent"
     :style="{ color: menuItem.color ?? '' }"
     @click="$emit('click', menuItem)"
   >
     <UiIcon
-      :icon="menuItem?.icon"
-      :alt="menuItem?.name"
+      :icon="menuItem?.icon ?? undefined"
+      :alt="menuItem?.name ?? undefined"
       class="shrink-0 w-6 h-6"
     />
     <p class="w-full flex-1 text-start truncate font-bold">

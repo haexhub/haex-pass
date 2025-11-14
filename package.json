@@ -22,7 +22,7 @@
     "release:major": "node scripts/release.js major"
   },
   "dependencies": {
-    "@haexhub/sdk": "1.2.3",
+    "@haexhub/sdk": "1.9.13",
     "@nuxt/eslint": "1.9.0",
     "@nuxt/ui": "^4.1.0",
     "@nuxtjs/i18n": "^10.2.0",

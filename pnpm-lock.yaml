@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@haexhub/sdk':
-        specifier: 1.2.3
-        version: 1.2.3(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
+        specifier: 1.9.13
+        version: 1.9.13(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))
       '@nuxt/eslint':
         specifier: 1.9.0
         version: 1.9.0(@typescript-eslint/utils@8.46.3(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.24)(eslint@9.39.1(jiti@2.6.1))(magicast@0.5.1)(typescript@5.9.3)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))
@@ -643,8 +643,8 @@ packages:
   '@floating-ui/vue@1.1.9':
     resolution: {integrity: sha512-BfNqNW6KA83Nexspgb9DZuz578R7HT8MZw1CfK9I6Ah4QReNWEJsXWHN+SdmOVLNGmTPDi+fDT535Df5PzMLbQ==}
 
-  '@haexhub/sdk@1.2.3':
-    resolution: {integrity: sha512-IbLWTy8raVh9/3ngReYeUxsshPCkI4wp788VMHrFie+e/MXRzqmDRbmW+c+spLl85NlNlxHI1biZtqvFSvfxiw==}
+  '@haexhub/sdk@1.9.13':
+    resolution: {integrity: sha512-d5VlGl4PotEEN24dkqczgAVraC7VIaqd7TkPik7RKlVlK+wrAf0n5U/CJJVLchkbzDjFsOAdagldKtsFxRMsAg==}
     hasBin: true
     peerDependencies:
       '@nuxt/kit': ^3.0.0 || ^4.0.0
@@ -2133,22 +2133,22 @@ packages:
   '@vue/devtools-api@6.6.4':
     resolution: {integrity: sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g==}
 
-  '@vue/devtools-api@7.7.7':
-    resolution: {integrity: sha512-lwOnNBH2e7x1fIIbVT7yF5D+YWhqELm55/4ZKf45R9T8r9dE2AIOy8HKjfqzGsoTHFbWbr337O4E0A0QADnjBg==}
+  '@vue/devtools-api@7.7.8':
+    resolution: {integrity: sha512-BtFcAmDbtXGwurWUFf8ogIbgZyR+rcVES1TSNEI8Em80fD8Anu+qTRN1Fc3J6vdRHlVM3fzPV1qIo+B4AiqGzw==}
 
   '@vue/devtools-core@8.0.3':
     resolution: {integrity: sha512-gCEQN7aMmeaigEWJQ2Z2o3g7/CMqGTPvNS1U3n/kzpLoAZ1hkAHNgi4ml/POn/9uqGILBk65GGOUdrraHXRj5Q==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@vue/devtools-kit@7.7.7':
-    resolution: {integrity: sha512-wgoZtxcTta65cnZ1Q6MbAfePVFxfM+gq0saaeytoph7nEa7yMXoi6sCPy4ufO111B9msnw0VOWjPEFCXuAKRHA==}
+  '@vue/devtools-kit@7.7.8':
+    resolution: {integrity: sha512-4Y8op+AoxOJhB9fpcEF6d5vcJXWKgHxC3B0ytUB8zz15KbP9g9WgVzral05xluxi2fOeAy6t140rdQ943GcLRQ==}
 
   '@vue/devtools-kit@8.0.3':
     resolution: {integrity: sha512-UF4YUOVGdfzXLCv5pMg2DxocB8dvXz278fpgEE+nJ/DRALQGAva7sj9ton0VWZ9hmXw+SV8yKMrxP2MpMhq9Wg==}
 
-  '@vue/devtools-shared@7.7.7':
-    resolution: {integrity: sha512-+udSj47aRl5aKb0memBvcUG9koarqnxNM5yjuREvqwK6T3ap4mn3Zqqc17QrBFTqSMjr3HK1cvStEZpMDpfdyw==}
+  '@vue/devtools-shared@7.7.8':
+    resolution: {integrity: sha512-XHpO3jC5nOgYr40M9p8Z4mmKfTvUxKyRcUnpBAYg11pE78eaRFBKb0kG5yKLroMuJeeNH9LWmKp2zMU5LUc7CA==}
 
   '@vue/devtools-shared@8.0.3':
     resolution: {integrity: sha512-s/QNll7TlpbADFZrPVsaUNPCOF8NvQgtgmmB7Tip6pLf/HcOvBTly0lfLQ0Eylu9FQ4OqBhFpLyBgwykiSf8zw==}
@@ -5717,7 +5717,7 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@haexhub/sdk@1.2.3(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))':
+  '@haexhub/sdk@1.9.13(@nuxt/kit@4.2.1(magicast@0.5.1))(@opentelemetry/api@1.9.0)(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))':
     dependencies:
       archiver: 7.0.1
       commander: 14.0.2
@@ -7456,9 +7456,9 @@ snapshots:
 
   '@vue/devtools-api@6.6.4': {}
 
-  '@vue/devtools-api@7.7.7':
+  '@vue/devtools-api@7.7.8':
     dependencies:
-      '@vue/devtools-kit': 7.7.7
+      '@vue/devtools-kit': 7.7.8
 
   '@vue/devtools-core@8.0.3(vite@7.2.2(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.24(typescript@5.9.3))':
     dependencies:
@@ -7472,9 +7472,9 @@ snapshots:
     transitivePeerDependencies:
       - vite
 
-  '@vue/devtools-kit@7.7.7':
+  '@vue/devtools-kit@7.7.8':
     dependencies:
-      '@vue/devtools-shared': 7.7.7
+      '@vue/devtools-shared': 7.7.8
       birpc: 2.8.0
       hookable: 5.5.3
       mitt: 3.0.1
@@ -7492,7 +7492,7 @@ snapshots:
       speakingurl: 14.0.1
       superjson: 2.2.5
 
-  '@vue/devtools-shared@7.7.7':
+  '@vue/devtools-shared@7.7.8':
     dependencies:
       rfdc: 1.4.1
 
@@ -9590,7 +9590,7 @@ snapshots:
 
   pinia@3.0.3(typescript@5.9.3)(vue@3.5.24(typescript@5.9.3)):
     dependencies:
-      '@vue/devtools-api': 7.7.7
+      '@vue/devtools-api': 7.7.8
       vue: 3.5.24(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3

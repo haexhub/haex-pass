@@ -4,8 +4,8 @@
       v-model="value"
       :label="t('label')"
       :read-only
-      @keyup.enter="$emit('submit')"
       class="w-full"
+      @keyup.enter="$emit('submit')"
     />
 
     <!-- OTP Code Display (only when there's a secret) -->
